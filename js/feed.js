@@ -849,70 +849,87 @@ async function renderCalendarNewsFeed() {
 
   const announcements = await dbService.getAnnouncements();
 
-  // Try to fetch live DepEd news via rss2json
   let newsPosts = [];
+  let aklanItems = [];
+  let nationalItems = [];
+
+  // 1. Fetch DepEd Aklan News (Live)
   try {
-    const rssRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.deped.gov.ph/feed/");
-    const rssData = await rssRes.json();
-    if (rssData.status === 'ok') {
-      newsPosts = rssData.items.slice(0, 6).map(item => {
-        // Strip HTML from description for snippet
+    const aklanRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://home.depedaklan.online/feed/");
+    const aklanData = await aklanRes.json();
+    if (aklanData.status === 'ok') {
+      aklanItems = aklanData.items.map(item => {
         const tmp = document.createElement('div');
         tmp.innerHTML = item.description || item.content;
-        const textContent = tmp.textContent || tmp.innerText || "";
-        
-        // Try to find image in description if no thumbnail
+        const textContent = tmp.textContent || tmp.innerText || "No description provided.";
+        return {
+          title: item.title,
+          content: textContent,
+          timestamp: new Date(item.pubDate).getTime(),
+          imageData: item.thumbnail || '',
+          type: 'Division Advisory',
+          link: item.link
+        };
+      });
+    }
+  } catch(e) {
+    console.warn("Failed to fetch DepEd Aklan feed", e);
+  }
+
+  // 2. Fetch National DepEd News
+  try {
+    const natRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.deped.gov.ph/feed/");
+    const natData = await natRes.json();
+    if (natData.status === 'ok') {
+      nationalItems = natData.items.map(item => {
+        const tmp = document.createElement('div');
+        tmp.innerHTML = item.description || item.content;
         let imgUrl = item.thumbnail;
         if (!imgUrl && item.description) {
           const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
           if (imgMatch) imgUrl = imgMatch[1];
         }
-
         return {
           title: item.title,
-          content: textContent,
+          content: tmp.textContent || tmp.innerText || "",
           timestamp: new Date(item.pubDate).getTime(),
-          imageData: imgUrl,
-          type: 'Official News',
+          imageData: imgUrl || '',
+          type: 'National News',
           link: item.link
         };
       });
     } else {
-      throw new Error("RSS API failed with status: " + rssData.status);
+      throw new Error("RSS API failed with status: " + natData.status);
     }
   } catch(e) {
-    console.warn("Using fallback DepEd feed due to CORS/Cloudflare block", e);
-    // Fallback: Mix of local posts + mock latest DepEd news
-    const localNews = announcements
-      .filter(a => a.status === 'approved' || !a.status)
-      .sort((a, b) => b.timestamp - a.timestamp);
-      
-    const mockDepEdNews = [
+    console.warn("Using fallback National DepEd feed due to block", e);
+    nationalItems = [
       {
         title: "Statement on the school shooting incident in Tacloban City",
         content: "LUNGSOD NG MAKATI — Binigyang-diin ng Department of Education (DepEd) na ang naganap na pamamaril sa Tacloban City ay isang matinding paalala para lalong patatagin ang mga sistemang nagpoprotekta...",
-        timestamp: Date.now() - 3600000 * 4, // 4 hours ago
-        type: 'Official News',
+        timestamp: Date.now() - 3600000 * 4,
+        type: 'National News',
         link: 'https://www.deped.gov.ph/'
       },
       {
         title: "Guidelines on Public School Teachers’ Proportional Vacation Pay for School Year 2025–2026",
         content: "DM_s2026_040r. Guidelines and regulations regarding the proportional vacation pay for public school teachers...",
-        timestamp: Date.now() - 86400000 * 2, // 2 days ago
-        type: 'Official News',
-        link: 'https://www.deped.gov.ph/'
-      },
-      {
-        title: "2026 Pride Month Celebration in the Department of Education",
-        content: "DM_s2026_041r. Official memorandum for the celebration of Pride Month across the Department of Education.",
-        timestamp: Date.now() - 86400000 * 3, // 3 days ago
-        type: 'Official News',
+        timestamp: Date.now() - 86400000 * 2,
+        type: 'National News',
         link: 'https://www.deped.gov.ph/'
       }
     ];
-
-    newsPosts = [...mockDepEdNews, ...localNews].slice(0, 6);
   }
+
+  // 3. Local Announcements
+  const localNews = announcements
+    .filter(a => a.status === 'approved' || !a.status)
+    .sort((a, b) => b.timestamp - a.timestamp);
+
+  // 4. Merge, sort by timestamp descending, take top 6
+  newsPosts = [...nationalItems, ...aklanItems, ...localNews]
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 6);
 
   if (newsPosts.length === 0) {
     container.innerHTML = `<p style="color:var(--text-secondary); text-align:center; font-size:0.9rem; padding:1rem 0;">No news posts yet.</p>`;
@@ -920,8 +937,14 @@ async function renderCalendarNewsFeed() {
     container.innerHTML = newsPosts.map(post => {
       const timeAgo = getTimeAgo(post.timestamp);
       const hasImage = !!post.imageData;
-      const typeIcon = post.type === 'Official News' ? 'globe-outline' : post.type === 'event' ? 'calendar-outline' : post.type === 'announcement' ? 'megaphone-outline' : 'chatbubble-ellipses-outline';
-      const typeColor = post.type === 'Official News' ? 'var(--primary)' : post.type === 'event' ? 'var(--warning)' : post.type === 'announcement' ? 'var(--danger)' : 'var(--primary)';
+      
+      let typeIcon = 'chatbubble-ellipses-outline';
+      let typeColor = 'var(--primary)';
+      if (post.type === 'National News') { typeIcon = 'globe-outline'; typeColor = 'var(--primary)'; }
+      else if (post.type === 'Division Advisory') { typeIcon = 'business-outline'; typeColor = 'var(--success)'; }
+      else if (post.type === 'event') { typeIcon = 'calendar-outline'; typeColor = 'var(--warning)'; }
+      else if (post.type === 'announcement') { typeIcon = 'megaphone-outline'; typeColor = 'var(--danger)'; }
+
       const snippet = (post.content || '').slice(0, 100) + ((post.content || '').length > 100 ? '…' : '');
       const targetLink = post.link ? post.link : '#/home';
       const targetAttr = post.link ? 'target="_blank"' : '';
