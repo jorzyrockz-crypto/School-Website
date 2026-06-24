@@ -826,11 +826,11 @@
   </div>
 
   <!-- Manage Sources Modal -->
-  <div id="modal-manage-sources" class="modal">
-    <div class="modal-content" style="max-width: 500px;">
+  <div id="modal-manage-sources" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+    <div style="background:var(--bg-secondary); border-radius:var(--radius-lg); width:90%; max-width:500px; padding:1.5rem; box-shadow:var(--shadow-lg);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
         <h2 style="font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;"><ion-icon name="settings-outline" style="color:var(--primary);"></ion-icon> Manage News Sources</h2>
-        <span class="close-modal" onclick="closeManageSourcesModal()">&times;</span>
+        <button onclick="closeManageSourcesModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-secondary); line-height:1;">&times;</button>
       </div>
       <div style="margin-bottom:1.5rem;">
         <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">Add RSS feed URLs to pull news directly into your School News Feed.</p>
