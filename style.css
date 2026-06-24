@@ -100,6 +100,71 @@ button, input, select, textarea {
   box-shadow: 2px 0 5px rgba(0,0,0,0.1);
 }
 
+/* ── Sidebar Branding Header ── */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  min-height: 72px;
+  overflow: hidden;
+}
+
+/* Fixed square container so ANY logo shape looks consistent */
+.sidebar-brand-logo-wrap {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.12); /* subtle bg for transparent PNGs */
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* The logo image always fits inside the box, never distorts */
+.sidebar-brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* scale proportionally, never crop */
+  display: block;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* allow flex children to shrink and truncate */
+  flex: 1;
+}
+
+/* School name: max 2 lines, then ellipsis */
+.sidebar-brand-name {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.sidebar-brand-tag {
+  font-size: 0.6rem;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.2rem;
+  white-space: nowrap;
+}
+
+
 .sidebar-profile {
   padding: 1.5rem;
   display: flex;
