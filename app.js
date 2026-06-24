@@ -1399,9 +1399,12 @@ function toggleAuthUIElements(isLoggedIn) {
     item.style.display = isLoggedIn ? 'block' : 'none';
   });
 
-  // Toggle logout vs quick login dropdown
-  document.getElementById('guest-login-box').style.display = isLoggedIn ? 'none' : 'block';
-  document.getElementById('auth-logout-box').style.display = isLoggedIn ? 'block' : 'none';
+  // Toggle logout dropdown
+  const guestBox = document.getElementById('guest-login-box');
+  if (guestBox) guestBox.style.display = isLoggedIn ? 'none' : 'block';
+  
+  const logoutBox = document.getElementById('auth-logout-box');
+  if (logoutBox) logoutBox.style.display = isLoggedIn ? 'block' : 'none';
 
   // Toggle create-post box on newsfeed (Admin/Teacher only)
   const canPost = isLoggedIn && activeUser && (activeUser.role === 'admin' || activeUser.role === 'teacher');
@@ -1438,6 +1441,12 @@ if (closeAnnModalBtn) {
 }
 
 // Announcement photo attach wiring
+const btnViewCalendar = document.getElementById('btn-view-calendar');
+if (btnViewCalendar) {
+  btnViewCalendar.onclick = () => {
+    showToast("Full Interactive Calendar feature coming in Phase 3!");
+  };
+}
 const annPhotoBtn = document.getElementById('btn-attach-ann-photo');
 const annPhotoInput = document.getElementById('ann-photo-input');
 const annRemovePhotoBtn = document.getElementById('btn-remove-ann-photo');
