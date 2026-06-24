@@ -1,21 +1,16 @@
-import { getLocalDB, saveLocalDB, useFirebase, firebaseConfig } from './firebase-config.js';
+import { getLocalDB, saveLocalDB, useFirebase } from './firebase-config.js';
 
 // ==========================================
-// 1. DATA ACCESS LAYER (HYBRID LOCAL/FIREBASE)
+// 1. SESSION MANAGEMENT & STATE
 // ==========================================
 
-let activeUser = null;
+let activeUser = JSON.parse(sessionStorage.getItem('activeUser')) || null;
 let currentSchoolId = "default-school";
 
-// Initialize Firebase if configured
-let db = null;
-let auth = null;
-if (useFirebase) {
-  // Dynamic imports since we're using CDN modules and we want it to check config
-  // For offline/zero-setup, we will use mock db operations by default
-}
+// ==========================================
+// 2. DATA ACCESS LAYER
+// ==========================================
 
-// Custom wrapper to route calls to either Firebase or localStorage
 const dbService = {
   getSchool: async (schoolId) => {
     const local = getLocalDB();
@@ -59,7 +54,6 @@ const dbService = {
     };
     local.announcements.unshift(newAnn);
     
-    // Admin notification if teacher submits
     if (activeUser.role !== 'admin') {
       local.notifications.unshift({
         id: "notif_" + Date.now(),
@@ -81,7 +75,6 @@ const dbService = {
     if (annIndex !== -1) {
       local.announcements[annIndex].status = status;
       
-      // Notify teachers if approved
       if (status === 'approved') {
         local.notifications.unshift({
           id: "notif_" + Date.now(),
@@ -128,7 +121,6 @@ const dbService = {
     }
     local.attendance[currentSchoolId][learnerId][date] = status;
     
-    // Notify parent
     if (local.users[learnerId] && status === 'absent') {
       local.notifications.unshift({
         id: "notif_" + Date.now(),
@@ -154,7 +146,6 @@ const dbService = {
   },
   getChatThreads: async (uid) => {
     const local = getLocalDB();
-    // Return other users as contacts
     return Object.values(local.users).filter(u => u.uid !== uid);
   },
   getMessages: async (chatId) => {
@@ -173,7 +164,6 @@ const dbService = {
     };
     local.chats[chatId].push(newMsg);
     
-    // Alert recipient via notifications
     const parts = chatId.split('_');
     const recipientId = parts[0] === senderId ? parts[1] : parts[0];
     local.notifications.unshift({
@@ -201,7 +191,7 @@ const dbService = {
 };
 
 // ==========================================
-// 2. THEME ENGINE CONTROLLER
+// 3. THEME ENGINE CONTROLLER
 // ==========================================
 
 function applyTheme(themeName, customLogo = null) {
@@ -209,8 +199,6 @@ function applyTheme(themeName, customLogo = null) {
   html.setAttribute('data-theme', themeName);
   
   if (customLogo) {
-    // Simulated color analyzer: Picks a color code out of typical preset logos or defaults
-    // Since we're in the browser, if it's an uploaded URL, we set the accent CSS variables dynamically
     if (customLogo.includes('indigo') || customLogo.includes('blue')) {
       html.style.setProperty('--accent', '#6366f1');
       html.style.setProperty('--accent-hover', '#4f46e5');
@@ -218,83 +206,36 @@ function applyTheme(themeName, customLogo = null) {
       html.style.setProperty('--accent', '#d4af37');
       html.style.setProperty('--accent-hover', '#c5a028');
     } else {
-      // Default fallback logo analysis
       html.style.setProperty('--accent', '#10b981');
       html.style.setProperty('--accent-hover', '#059669');
     }
   } else {
-    // Reset properties to use theme definitions
     html.style.removeProperty('--accent');
     html.style.removeProperty('--accent-hover');
   }
 }
 
 // ==========================================
-// 3. APPLICATION ROUTING & NAVIGATION
+// 4. PORTAL TABS ROUTER (INSIDE portal.html)
 // ==========================================
 
-function initRouter() {
-  const handleRouting = async () => {
-    const hash = window.location.hash || '#/home';
+function initPortalTabs() {
+  const handlePortalRouting = () => {
+    const hash = window.location.hash || '#/dashboard';
     
-    // Public vs Portal layouts
-    const publicSite = document.getElementById('public-site');
-    const portalSite = document.getElementById('portal-site');
-
-    if (hash.startsWith('#/dashboard')) {
-      if (!activeUser) {
-        window.location.hash = '#/login';
-        return;
-      }
-      publicSite.style.display = 'none';
-      portalSite.style.display = 'flex';
-      
-      // Load specific dashboard panel
-      const panel = hash.split('#/dashboard/')[1] || 'dashboard';
-      switchPortalPanel(panel);
-    } else {
-      publicSite.style.display = 'block';
-      portalSite.style.display = 'none';
-      
-      // Update public navbar state
-      document.querySelectorAll('.nav-link').forEach(link => {
-        link.classList.remove('active');
-        if (`#/${link.dataset.route}` === hash) {
-          link.classList.add('active');
-        }
-      });
-
-      // Toggle public views
-      document.querySelectorAll('.route-view').forEach(view => {
-        view.style.display = 'none';
-      });
-
-      const viewId = `view-${hash.substring(2).split('?')[0]}`;
-      const activeView = document.getElementById(viewId);
-      if (activeView) {
-        activeView.style.display = 'block';
-      }
-      
-      // Specific page triggers
-      if (hash === '#/home') {
-        renderPublicAnnouncements();
-      } else if (hash === '#/transparency') {
-        renderTransparencyDocs();
-      }
+    let panel = 'dashboard';
+    if (hash.startsWith('#/dashboard/')) {
+      panel = hash.split('#/dashboard/')[1];
     }
+    
+    switchPortalPanel(panel);
   };
 
-  window.addEventListener('hashchange', handleRouting);
-  // Initial load routing
-  handleRouting();
+  window.addEventListener('hashchange', handlePortalRouting);
+  handlePortalRouting();
 }
 
-// ==========================================
-// 4. PORTAL INTERFACES & RENDERERS
-// ==========================================
-
 function switchPortalPanel(panelName) {
-  // Toggle UI panels
   document.querySelectorAll('.portal-panel').forEach(panel => {
     panel.style.display = 'none';
   });
@@ -304,7 +245,6 @@ function switchPortalPanel(panelName) {
     targetPanel.style.display = 'block';
   }
 
-  // Update active sidebar selection
   document.querySelectorAll('.menu-item').forEach(item => {
     item.classList.remove('active');
     if (item.dataset.panel === panelName) {
@@ -312,7 +252,6 @@ function switchPortalPanel(panelName) {
     }
   });
 
-  // Render specific modules
   if (panelName === 'dashboard') {
     renderRolePortal();
   } else if (panelName === 'messages') {
@@ -322,22 +261,23 @@ function switchPortalPanel(panelName) {
   }
 }
 
+// ==========================================
+// 5. RENDERING BLOCKS (PORTAL VIEWS)
+// ==========================================
+
 async function renderRolePortal() {
   const role = activeUser.role;
   
-  // Hide all portal-views inside default panel first
   document.getElementById('portal-view-learner').style.display = 'none';
   document.getElementById('portal-view-parent').style.display = 'none';
   document.getElementById('portal-view-teacher').style.display = 'none';
   document.getElementById('portal-view-admin').style.display = 'none';
 
-  // Display role specific view
   const roleView = document.getElementById(`portal-view-${role}`);
   if (roleView) {
     roleView.style.display = 'block';
   }
 
-  // Load appropriate data
   if (role === 'learner') {
     renderLearnerView();
   } else if (role === 'parent') {
@@ -349,7 +289,6 @@ async function renderRolePortal() {
   }
 }
 
-// Learner Module
 async function renderLearnerView() {
   const sched = await dbService.getSchedule('learner', activeUser.uid);
   const list = document.getElementById('learner-schedule-list');
@@ -363,7 +302,6 @@ async function renderLearnerView() {
     </div>
   `).join('');
 
-  // Attendance Check-in Widget
   const attendance = await dbService.getAttendance();
   const dateStr = new Date().toISOString().split('T')[0];
   const myAttendance = attendance[activeUser.uid] || {};
@@ -381,18 +319,16 @@ async function renderLearnerView() {
       <p style="margin-bottom:1rem; font-size:0.9rem;">You haven't logged attendance for today yet.</p>
       <button id="btn-learner-checkin" class="btn-action" style="padding:0.5rem 1.5rem;">Mark Attendance Present</button>
     `;
-    document.getElementById('btn-learner-checkin').addEventListener('click', async () => {
+    document.getElementById('btn-learner-checkin').onclick = async () => {
       await dbService.markAttendance(activeUser.uid, dateStr, 'present');
       showToast("Attendance logged successfully!");
       renderLearnerView();
-    });
+    };
   }
 }
 
-// Parent Module
 async function renderParentView() {
   const attendance = await dbService.getAttendance();
-  // Parent checks learner1
   const learnerId = "learner1";
   const childLogs = attendance[learnerId] || {};
   const logKeys = Object.keys(childLogs);
@@ -412,7 +348,6 @@ async function renderParentView() {
   }
 }
 
-// Teacher Module
 async function renderTeacherView() {
   const sched = await dbService.getSchedule('teacher', activeUser.uid);
   const list = document.getElementById('teacher-schedule-list');
@@ -426,10 +361,9 @@ async function renderTeacherView() {
     </div>
   `).join('');
 
-  // Class List Attendance tracker
   const attendance = await dbService.getAttendance();
   const dateStr = new Date().toISOString().split('T')[0];
-  const learnerId = "learner1"; // Mock class containing learner1
+  const learnerId = "learner1";
   const isPresent = (attendance[learnerId] || {})[dateStr] === 'present';
   
   const container = document.getElementById('teacher-attendance-tracker');
@@ -447,15 +381,14 @@ async function renderTeacherView() {
     </div>
   `;
 
-  document.getElementById('btn-toggle-present').addEventListener('click', async () => {
+  document.getElementById('btn-toggle-present').onclick = async () => {
     const nextStatus = isPresent ? 'absent' : 'present';
     await dbService.markAttendance(learnerId, dateStr, nextStatus);
     showToast(`Marked ${nextStatus.toUpperCase()}`);
     renderTeacherView();
-  });
+  };
 }
 
-// Admin Module
 async function renderAdminView() {
   const announcements = await dbService.getAnnouncements();
   const pendings = announcements.filter(a => a.status === 'pending');
@@ -473,39 +406,34 @@ async function renderAdminView() {
         <h4 class="news-title">${p.title}</h4>
         <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">${p.content}</p>
         <div style="display:flex; gap:1rem;">
-          <button class="btn-action btn-approve" data-id="${p.id}" style="padding:0.4rem 1rem; background-color:var(--success)">Approve</button>
-          <button class="btn-secondary btn-reject" data-id="${p.id}" style="padding:0.4rem 1rem; border-color:var(--danger); color:var(--danger)">Reject</button>
+          <button class="btn-approve btn-action" data-id="${p.id}" style="padding:0.4rem 1rem; background-color:var(--success)">Approve</button>
+          <button class="btn-reject btn-secondary" data-id="${p.id}" style="padding:0.4rem 1rem; border-color:var(--danger); color:var(--danger)">Reject</button>
         </div>
       </div>
     `).join('');
 
-    // Attach click triggers
     pendingContainer.querySelectorAll('.btn-approve').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+      btn.onclick = async (e) => {
         await dbService.moderateAnnouncement(e.target.dataset.id, 'approved');
         showToast("Announcement approved!");
         renderAdminView();
         updateNotificationsList();
-      });
+      };
     });
 
     pendingContainer.querySelectorAll('.btn-reject').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
+      btn.onclick = async (e) => {
         await dbService.moderateAnnouncement(e.target.dataset.id, 'rejected');
         showToast("Announcement rejected.");
         renderAdminView();
-      });
+      };
     });
   }
 
-  // Consolidated attendance statistics
   const attendance = await dbService.getAttendance();
   const grid = document.getElementById('admin-attendance-grid');
   const dateStr = new Date().toISOString().split('T')[0];
-  
-  const students = [
-    { name: "Juan Cruz", id: "learner1" }
-  ];
+  const students = [{ name: "Juan Cruz", id: "learner1" }];
   
   grid.innerHTML = `
     <table class="data-table">
@@ -535,7 +463,7 @@ async function renderAdminView() {
 }
 
 // ==========================================
-// 5. PRIVATE MESSAGING ENGINE
+// 6. PRIVATE MESSAGES & CHAT
 // ==========================================
 
 let activeChatThread = null;
@@ -554,19 +482,16 @@ async function initMessagesPanel() {
     </div>
   `).join('');
 
-  // Attach thread selection
   threadListContainer.querySelectorAll('.thread-item').forEach(item => {
-    item.addEventListener('click', (e) => {
+    item.onclick = (e) => {
       const threadEl = e.currentTarget;
       threadListContainer.querySelectorAll('.thread-item').forEach(i => i.classList.remove('active'));
       threadEl.classList.add('active');
-      
       const targetUser = threads.find(t => t.uid === threadEl.dataset.uid);
       openChatWindow(targetUser);
-    });
+    };
   });
 
-  // Re-open active chat if exists
   if (activeChatThread) {
     const activeEl = threadListContainer.querySelector(`[data-uid="${activeChatThread.uid}"]`);
     if (activeEl) activeEl.click();
@@ -589,43 +514,46 @@ async function openChatWindow(targetUser) {
     </div>
   `).join('');
   
-  // Scroll to bottom
   body.scrollTop = body.scrollHeight;
 }
 
-document.getElementById('chat-input-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  if (!activeChatThread) {
-    showToast("Please select a thread first!");
-    return;
-  }
-  
-  const input = document.getElementById('chat-msg-input');
-  const text = input.value.trim();
-  if (!text) return;
-  
-  const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
-  await dbService.sendMessage(chatId, activeUser.uid, text);
-  input.value = '';
-  
-  openChatWindow(activeChatThread);
-});
+const chatForm = document.getElementById('chat-input-form');
+if (chatForm) {
+  chatForm.onsubmit = async (e) => {
+    e.preventDefault();
+    if (!activeChatThread) {
+      showToast("Please select a thread first!");
+      return;
+    }
+    
+    const input = document.getElementById('chat-msg-input');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
+    await dbService.sendMessage(chatId, activeUser.uid, text);
+    input.value = '';
+    
+    openChatWindow(activeChatThread);
+  };
+}
 
 // ==========================================
-// 6. PUBLIC PORTAL RENDERERS
+// 7. PUBLIC PAGES POPULATION
 // ==========================================
 
 async function renderPublicAnnouncements() {
+  const list = document.getElementById('public-announcements-list');
+  if (!list) return;
+
   const announcements = await dbService.getAnnouncements();
   const approved = announcements.filter(a => a.status === 'approved');
-  const list = document.getElementById('public-announcements-list');
 
   if (approved.length === 0) {
     list.innerHTML = `<p style="color:var(--text-secondary)">No announcements posted yet.</p>`;
     return;
   }
 
-  // Generate HTML containing news + comment section
   list.innerHTML = approved.map(a => `
     <article class="news-card">
       <div class="news-meta">
@@ -650,9 +578,8 @@ async function renderPublicAnnouncements() {
     </article>
   `).join('');
 
-  // Comment expand triggers
   list.querySelectorAll('.news-comments-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
+    btn.onclick = async (e) => {
       const annId = e.currentTarget.dataset.id;
       const box = document.getElementById(`comments-box-${annId}`);
       const isHidden = box.style.display === 'none';
@@ -660,7 +587,7 @@ async function renderPublicAnnouncements() {
       if (isHidden) {
         renderCommentsList(annId);
       }
-    });
+    };
   });
 }
 
@@ -679,7 +606,6 @@ async function renderCommentsList(annId) {
     `).join('');
   }
 
-  // Handle new comments
   const form = document.querySelector(`.comment-form[data-ann-id="${annId}"]`);
   form.onsubmit = async (e) => {
     e.preventDefault();
@@ -694,9 +620,10 @@ async function renderCommentsList(annId) {
 }
 
 async function renderTransparencyDocs() {
-  const school = await dbService.getSchool(currentSchoolId);
   const list = document.getElementById('transparency-docs-list');
-  
+  if (!list) return;
+
+  const school = await dbService.getSchool(currentSchoolId);
   list.innerHTML = school.transparencyDocs.map(d => `
     <tr>
       <td><strong>${d.title}</strong></td>
@@ -711,15 +638,13 @@ async function renderTransparencyDocs() {
 }
 
 // ==========================================
-// 7. PROFILE & ADMIN BRANDING SETTINGS
+// 8. PROFILE & BRANDING CONTROLLER
 // ==========================================
 
 function initProfilePanel() {
-  // Populate User inputs
   document.getElementById('profile-avatar-preview').src = activeUser.avatar;
   document.getElementById('profile-name-input').value = activeUser.name;
   
-  // Custom seed event
   const seedInput = document.getElementById('profile-avatar-seed');
   seedInput.oninput = (e) => {
     const val = e.target.value.trim();
@@ -729,20 +654,19 @@ function initProfilePanel() {
     }
   };
 
-  // User details submit
   document.getElementById('profile-user-form').onsubmit = async (e) => {
     e.preventDefault();
     const name = document.getElementById('profile-name-input').value.trim();
     const avatar = document.getElementById('profile-avatar-preview').src;
     
     activeUser = await dbService.saveUser(activeUser.uid, { name, avatar });
+    sessionStorage.setItem('activeUser', JSON.stringify(activeUser));
     showToast("Profile details updated!");
-    // Sync sidebar
+    
     document.getElementById('user-name').innerText = activeUser.name;
     document.getElementById('user-avatar').src = activeUser.avatar;
   };
 
-  // Populate School configuration if Admin
   const adminBox = document.getElementById('admin-branding-settings');
   if (activeUser.role === 'admin') {
     adminBox.style.display = 'block';
@@ -751,7 +675,6 @@ function initProfilePanel() {
       document.getElementById('school-name-input').value = school.name;
       document.getElementById('school-logo-input').value = school.logo;
       
-      // Select preset
       document.querySelectorAll('.theme-card').forEach(card => {
         card.classList.remove('selected');
         if (card.dataset.themeVal === school.theme) {
@@ -760,7 +683,6 @@ function initProfilePanel() {
       });
     });
 
-    // Theme pickers click binding
     document.querySelectorAll('.theme-card').forEach(card => {
       card.onclick = (e) => {
         document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
@@ -769,7 +691,6 @@ function initProfilePanel() {
       };
     });
 
-    // School config submit
     document.getElementById('profile-school-form').onsubmit = async (e) => {
       e.preventDefault();
       const name = document.getElementById('school-name-input').value.trim();
@@ -779,7 +700,6 @@ function initProfilePanel() {
 
       const updated = await dbService.saveSchool(currentSchoolId, { name, logo, theme });
       applyTheme(updated.theme, updated.logo);
-      syncBranding(updated);
       showToast("Branding settings saved successfully!");
     };
   } else {
@@ -787,29 +707,25 @@ function initProfilePanel() {
   }
 }
 
-function syncBranding(school) {
-  document.getElementById('public-school-name').innerText = school.name;
-  document.getElementById('school-portal-name').innerText = school.name;
-  document.getElementById('public-logo').src = school.logo;
-}
-
 // ==========================================
-// 8. REAL-TIME NOTIFICATIONS (FB-STYLE)
+// 9. REAL-TIME NOTIFICATIONS
 // ==========================================
 
 async function updateNotificationsList() {
   if (!activeUser) return;
+  const listEl = document.getElementById('notif-items-list');
+  if (!listEl) return;
+
   const notifs = await dbService.getNotifications(activeUser.uid);
   const badge = document.getElementById('notif-badge-count');
   
   badge.innerText = notifs.length;
   badge.style.display = notifs.length > 0 ? 'flex' : 'none';
 
-  const container = document.getElementById('notif-items-list');
   if (notifs.length === 0) {
-    container.innerHTML = `<p style="padding:1rem; text-align:center; color:var(--text-secondary); font-size:0.8rem;">No new notifications</p>`;
+    listEl.innerHTML = `<p style="padding:1rem; text-align:center; color:var(--text-secondary); font-size:0.8rem;">No new notifications</p>`;
   } else {
-    container.innerHTML = notifs.map(n => `
+    listEl.innerHTML = notifs.map(n => `
       <div class="notif-item ${n.read ? '' : 'unread'}">
         <div class="notif-text"><strong>${n.senderName}</strong> ${n.messageText}</div>
       </div>
@@ -817,102 +733,135 @@ async function updateNotificationsList() {
   }
 }
 
-// Clear all notifications
-document.getElementById('btn-clear-notifs').addEventListener('click', async () => {
-  if (!activeUser) return;
-  await dbService.clearNotifications(activeUser.uid);
-  updateNotificationsList();
-});
-
-// Toggle notifications dropdown
-document.getElementById('notif-bell-trigger').addEventListener('click', (e) => {
-  e.stopPropagation();
-  const dropdown = document.getElementById('notif-dropdown-menu');
-  dropdown.classList.toggle('show');
-});
-
-document.addEventListener('click', () => {
-  document.getElementById('notif-dropdown-menu').classList.remove('show');
-});
-
-// ==========================================
-// 9. AUTHENTICATION & INITIALIZATION
-// ==========================================
-
-// Login Handler
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const email = document.getElementById('login-email').value.trim();
-  const pass = document.getElementById('login-password').value; // In mock config, password is bypassed
-
-  const user = await dbService.getUser(email);
-  if (user) {
-    activeUser = user;
-    showToast("Welcome back, logged in successfully!");
-    
-    // Set user profile in sidebar
-    document.getElementById('user-avatar').src = user.avatar;
-    document.getElementById('user-name').innerText = user.name;
-    document.getElementById('user-role').innerText = user.role;
-
-    // Load portal
-    window.location.hash = '#/dashboard';
+const clearNotifsBtn = document.getElementById('btn-clear-notifs');
+if (clearNotifsBtn) {
+  clearNotifsBtn.onclick = async () => {
+    if (!activeUser) return;
+    await dbService.clearNotifications(activeUser.uid);
     updateNotificationsList();
-  } else {
-    showToast("Invalid credentials. Try demo credentials!");
-  }
-});
+  };
+}
 
-// Logout Portal
-document.getElementById('btn-logout').addEventListener('click', () => {
-  activeUser = null;
-  activeChatThread = null;
-  showToast("Logged out successfully.");
-  window.location.hash = '#/home';
-});
+const bellTrigger = document.getElementById('notif-bell-trigger');
+if (bellTrigger) {
+  bellTrigger.onclick = (e) => {
+    e.stopPropagation();
+    document.getElementById('notif-dropdown-menu').classList.toggle('show');
+  };
+  document.addEventListener('click', () => {
+    const dropdown = document.getElementById('notif-dropdown-menu');
+    if (dropdown) dropdown.classList.remove('show');
+  });
+}
 
-// Toast controller helper
+// ==========================================
+// 10. LOGIN / LOGOUT WORKFLOWS
+// ==========================================
+
+const loginForm = document.getElementById('login-form');
+if (loginForm) {
+  loginForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value.trim();
+    const user = await dbService.getUser(email);
+    
+    if (user) {
+      sessionStorage.setItem('activeUser', JSON.stringify(user));
+      window.location.href = "portal.html";
+    } else {
+      showToast("Invalid credentials. Try demo credentials!");
+    }
+  };
+}
+
+const logoutBtn = document.getElementById('btn-logout');
+if (logoutBtn) {
+  logoutBtn.onclick = () => {
+    sessionStorage.removeItem('activeUser');
+    window.location.href = "index.html";
+  };
+}
+
+// Announcements Creation Modal (Teacher Dashboard)
+const openAnnModalBtn = document.getElementById('btn-open-announcement-modal');
+if (openAnnModalBtn) {
+  openAnnModalBtn.onclick = () => {
+    document.getElementById('announcement-modal').style.display = 'flex';
+  };
+}
+
+const closeAnnModalBtn = document.getElementById('btn-close-ann-modal');
+if (closeAnnModalBtn) {
+  closeAnnModalBtn.onclick = () => {
+    document.getElementById('announcement-modal').style.display = 'none';
+  };
+}
+
+const annForm = document.getElementById('announcement-form');
+if (annForm) {
+  annForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const title = document.getElementById('ann-title').value.trim();
+    const content = document.getElementById('ann-content').value.trim();
+    
+    await dbService.addAnnouncement(title, content, activeUser.name);
+    document.getElementById('ann-title').value = '';
+    document.getElementById('ann-content').value = '';
+    document.getElementById('announcement-modal').style.display = 'none';
+    
+    showToast(activeUser.role === 'admin' ? "Announcement posted!" : "Submitted for review.");
+    renderRolePortal();
+  };
+}
+
 function showToast(msg) {
   const toast = document.getElementById('toast');
-  toast.innerText = msg;
-  toast.style.display = 'block';
-  setTimeout(() => {
-    toast.style.display = 'none';
-  }, 3000);
+  if (toast) {
+    toast.innerText = msg;
+    toast.style.display = 'block';
+    setTimeout(() => { toast.style.display = 'none'; }, 3000);
+  }
 }
 
-// Announcements Creation modal triggers
-document.getElementById('btn-open-announcement-modal').onclick = () => {
-  document.getElementById('announcement-modal').style.display = 'flex';
-};
+// ==========================================
+// 11. GLOBAL INITIALIZATION
+// ==========================================
 
-document.getElementById('btn-close-ann-modal').onclick = () => {
-  document.getElementById('announcement-modal').style.display = 'none';
-};
-
-document.getElementById('announcement-form').onsubmit = async (e) => {
-  e.preventDefault();
-  const title = document.getElementById('ann-title').value.trim();
-  const content = document.getElementById('ann-content').value.trim();
-  
-  await dbService.addAnnouncement(title, content, activeUser.name);
-  document.getElementById('ann-title').value = '';
-  document.getElementById('ann-content').value = '';
-  document.getElementById('announcement-modal').style.display = 'none';
-  
-  showToast(activeUser.role === 'admin' ? "Announcement posted!" : "Submitted for review.");
-  renderRolePortal();
-};
-
-// Global App Init
-async function initApp() {
-  // Load school config
+async function initPage() {
   const school = await dbService.getSchool(currentSchoolId);
   applyTheme(school.theme, school.logo);
-  syncBranding(school);
+  
+  // Sync page header logo/name if public layout exists
+  const publicSchoolName = document.getElementById('public-school-name');
+  if (publicSchoolName) publicSchoolName.innerText = school.name;
+  
+  const publicLogo = document.getElementById('public-logo');
+  if (publicLogo) publicLogo.src = school.logo;
 
-  // Bind Router
-  initRouter();
+  const schoolPortalName = document.getElementById('school-portal-name');
+  if (schoolPortalName) schoolPortalName.innerText = school.name;
+
+  // Page Specific Init
+  const path = window.location.pathname;
+  
+  if (path.endsWith('index.html') || path.endsWith('/')) {
+    renderPublicAnnouncements();
+  } else if (path.endsWith('transparency.html')) {
+    renderTransparencyDocs();
+  } else if (path.endsWith('portal.html')) {
+    // Portal Guard
+    if (!activeUser) {
+      window.location.href = "login.html";
+      return;
+    }
+    // Initialize user profile details in sidebar
+    document.getElementById('user-avatar').src = activeUser.avatar;
+    document.getElementById('user-name').innerText = activeUser.name;
+    document.getElementById('user-role').innerText = activeUser.role;
+
+    initPortalTabs();
+    updateNotificationsList();
+  }
 }
 
-initApp();
+initPage();
