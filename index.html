@@ -83,7 +83,11 @@
     <main class="portal-main">
       <!-- Portal Top Header (Notifications, Action bar) -->
       <header class="portal-header">
-        <div class="header-title">
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <!-- Hamburger menu for mobile -->
+          <button id="btn-sidebar-toggle" style="background:none; border:none; font-size:1.6rem; color:var(--text-secondary); cursor:pointer; display:none; align-items:center; justify-content:center;">
+            <ion-icon name="menu-outline"></ion-icon>
+          </button>
           <span id="school-portal-name">Apex Integrated School</span>
         </div>
         <div class="header-actions">

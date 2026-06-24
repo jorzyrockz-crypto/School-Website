@@ -723,14 +723,22 @@ button, input, select, textarea {
 
 /* Responsive constraints */
 @media(max-width: 900px) {
+  #btn-sidebar-toggle {
+    display: flex !important;
+  }
+  .portal-workspace {
+    padding: 1rem;
+  }
   .sections-grid {
     grid-template-columns: 1fr;
   }
   .portal-sidebar {
     transform: translateX(-100%);
+    box-shadow: none;
   }
   .portal-sidebar.active {
     transform: translateX(0);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.25);
   }
   .portal-main {
     margin-left: 0;
@@ -740,5 +748,8 @@ button, input, select, textarea {
   }
   .chat-threads {
     display: none;
+  }
+  .dash-grid {
+    grid-template-columns: 1fr;
   }
 }

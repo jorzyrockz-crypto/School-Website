@@ -954,7 +954,7 @@ const menuLoginTriggers = document.querySelectorAll('.menu-login-trigger');
 menuLoginTriggers.forEach(trigger => {
   trigger.onclick = async (e) => {
     e.preventDefault();
-    const email = e.currentTarget.dataset.email;
+    const email = trigger.dataset.email;
     const user = await dbService.getUser(email);
     if (user) {
       activeUser = user;
@@ -964,7 +964,10 @@ menuLoginTriggers.forEach(trigger => {
       // Update layouts
       syncSidebarProfile();
       toggleAuthUIElements(true);
-      window.location.hash = "#/dashboard"; // Jump to workspace dashboard
+      
+      // Force routing and panel rendering immediately
+      window.location.hash = "#/dashboard";
+      switchView("dashboard");
     }
   };
 });
@@ -1091,6 +1094,33 @@ async function initPage() {
   
   if (activeUser) {
     updateNotificationsList();
+  }
+
+  // Mobile Navigation Toggler
+  const sidebarToggle = document.getElementById('btn-sidebar-toggle');
+  const sidebar = document.querySelector('.portal-sidebar');
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.onclick = (e) => {
+      e.stopPropagation();
+      sidebar.classList.toggle('active');
+    };
+    
+    // Close sidebar when clicking outside on mobile
+    document.addEventListener('click', (e) => {
+      if (window.innerWidth <= 900 && sidebar.classList.contains('active') && !sidebar.contains(e.target)) {
+        sidebar.classList.remove('active');
+      }
+    });
+
+    // Close sidebar on navigation on mobile
+    const menuLinks = document.querySelectorAll('.menu-item a');
+    menuLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 900) {
+          sidebar.classList.remove('active');
+        }
+      });
+    });
   }
 }
 
