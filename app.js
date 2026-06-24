@@ -90,16 +90,39 @@ const DEFAULT_LOCAL_DB = {
   }
 };
 
-// Initialize LocalStorage DB with Version check to force resets on updates
+// Initialize LocalStorage DB with Version check
 const DB_VERSION = "v4";
 try {
-  if (localStorage.getItem("deped_saas_db_version") !== DB_VERSION) {
-    localStorage.removeItem("deped_saas_db");
-    sessionStorage.removeItem("activeUser");
+  const currentVer = localStorage.getItem("deped_saas_db_version");
+  if (!currentVer || currentVer < DB_VERSION) {
+    // Only wipe if REALLY necessary. Actually let's just do a merge.
     localStorage.setItem("deped_saas_db_version", DB_VERSION);
   }
-} catch(e) {
-  console.error("Storage versioning failed", e);
+} catch(e) {}
+
+// Image compression helper to prevent localStorage QuotaExceededError
+function compressImage(dataUrl, maxDimension, callback) {
+  const img = new Image();
+  img.onload = () => {
+    let w = img.width;
+    let h = img.height;
+    if (w > maxDimension || h > maxDimension) {
+      if (w > h) {
+        h = Math.floor(h * (maxDimension / w));
+        w = maxDimension;
+      } else {
+        w = Math.floor(w * (maxDimension / h));
+        h = maxDimension;
+      }
+    }
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, w, h);
+    callback(canvas.toDataURL('image/jpeg', 0.8));
+  };
+  img.src = dataUrl;
 }
 
 try {
@@ -148,6 +171,7 @@ function saveLocalDB(data) {
     localStorage.setItem("deped_saas_db", JSON.stringify(data));
   } catch(e) {
     console.error("Failed to write to local storage", e);
+    showToast("Error: Storage limit reached! Try smaller images.");
   }
 }
 
@@ -892,13 +916,14 @@ if (chatAttachBtn && chatPhotoInput) {
       return;
     }
     const reader = new FileReader();
-    reader.onload = async (ev) => {
-      const imageData = ev.target.result;
-      const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
-      await dbService.sendMessage(chatId, activeUser.uid, '', imageData);
-      chatPhotoInput.value = '';
-      openChatWindow(activeChatThread);
-      showToast('Photo sent!');
+    reader.onload = (ev) => {
+      compressImage(ev.target.result, 800, async (compressedData) => {
+        const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
+        await dbService.sendMessage(chatId, activeUser.uid, '', compressedData);
+        chatPhotoInput.value = '';
+        openChatWindow(activeChatThread);
+        showToast('Photo sent!');
+      });
     };
     reader.readAsDataURL(file);
   };
@@ -954,8 +979,10 @@ function initProfilePanel() {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = (ev) => {
-        document.getElementById('profile-avatar-preview').src = ev.target.result;
-        showToast('Photo selected! Click Save Profile to apply.');
+        compressImage(ev.target.result, 400, (compressedData) => {
+          document.getElementById('profile-avatar-preview').src = compressedData;
+          showToast('Photo selected! Click Save Profile to apply.');
+        });
       };
       reader.readAsDataURL(file);
     };
@@ -1015,13 +1042,14 @@ function initProfilePanel() {
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (ev) => {
-          const dataUrl = ev.target.result;
-          document.getElementById('school-logo-input').value = dataUrl;
-          const logoPreview = document.getElementById('logo-upload-preview');
-          if (logoPreview) logoPreview.src = dataUrl;
-          // Apply to sidebar live preview
-          document.getElementById('school-logo-img').src = dataUrl;
-          showToast('Logo uploaded! Click Save to apply.');
+          compressImage(ev.target.result, 500, (compressedData) => {
+            document.getElementById('school-logo-input').value = compressedData;
+            const logoPreview = document.getElementById('logo-upload-preview');
+            if (logoPreview) logoPreview.src = compressedData;
+            // Apply to sidebar live preview
+            document.getElementById('school-logo-img').src = compressedData;
+            showToast('Logo uploaded! Click Save to apply.');
+          });
         };
         reader.readAsDataURL(file);
       };
@@ -1199,7 +1227,7 @@ function toggleAuthUIElements(isLoggedIn) {
 
   // Toggle logout vs quick login dropdown
   document.getElementById('guest-login-box').style.display = isLoggedIn ? 'none' : 'block';
-  document.getElementById('btn-logout').style.display = isLoggedIn ? 'block' : 'none';
+  document.getElementById('auth-logout-box').style.display = isLoggedIn ? 'block' : 'none';
 
   // Toggle create-post box on newsfeed (Admin/Teacher only)
   const canPost = isLoggedIn && activeUser && (activeUser.role === 'admin' || activeUser.role === 'teacher');
@@ -1247,8 +1275,10 @@ if (annPhotoBtn && annPhotoInput) {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      document.getElementById('ann-photo-preview').src = ev.target.result;
-      document.getElementById('ann-photo-preview-wrap').style.display = 'block';
+      compressImage(ev.target.result, 800, (compressedData) => {
+        document.getElementById('ann-photo-preview').src = compressedData;
+        document.getElementById('ann-photo-preview-wrap').style.display = 'block';
+      });
     };
     reader.readAsDataURL(file);
   };
