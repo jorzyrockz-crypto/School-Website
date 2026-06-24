@@ -933,26 +933,56 @@ function initProfilePanel() {
   if (!activeUser) return;
   document.getElementById('profile-avatar-preview').src = activeUser.avatar;
   document.getElementById('profile-name-input').value = activeUser.name;
-  
+
+  // --- Profile Photo Upload (click avatar to pick a file) ---
+  const profilePhotoInput = document.getElementById('profile-photo-input');
+  const avatarUploadWrap = document.getElementById('profile-avatar-upload-wrap');
+
+  if (avatarUploadWrap && profilePhotoInput) {
+    // Hover dim effect
+    avatarUploadWrap.onmouseenter = () => {
+      document.getElementById('profile-avatar-preview').style.opacity = '0.75';
+    };
+    avatarUploadWrap.onmouseleave = () => {
+      document.getElementById('profile-avatar-preview').style.opacity = '1';
+    };
+    // Click opens file picker
+    avatarUploadWrap.onclick = () => profilePhotoInput.click();
+
+    profilePhotoInput.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('profile-avatar-preview').src = ev.target.result;
+        showToast('Photo selected! Click Save Profile to apply.');
+      };
+      reader.readAsDataURL(file);
+    };
+  }
+
+  // --- Cartoon avatar seed (fallback) ---
   const seedInput = document.getElementById('profile-avatar-seed');
-  seedInput.oninput = (e) => {
-    const val = e.target.value.trim();
-    if (val) {
-      const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(val)}`;
-      document.getElementById('profile-avatar-preview').src = newAvatar;
-    }
-  };
+  if (seedInput) {
+    seedInput.oninput = (e) => {
+      const val = e.target.value.trim();
+      if (val) {
+        const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(val)}`;
+        document.getElementById('profile-avatar-preview').src = newAvatar;
+      }
+    };
+  }
 
   document.getElementById('profile-user-form').onsubmit = async (e) => {
     e.preventDefault();
     const name = document.getElementById('profile-name-input').value.trim();
     const avatar = document.getElementById('profile-avatar-preview').src;
-    
+
     activeUser = await dbService.saveUser(activeUser.uid, { name, avatar });
-    sessionStorage.setItem('activeUser', JSON.stringify(activeUser));
-    showToast("Profile details updated!");
-    
-    // Sync UI elements
+    try { sessionStorage.setItem('activeUser', JSON.stringify(activeUser)); } catch(err) {}
+    showToast('Profile updated successfully!');
+
+    // Sync sidebar avatar + name immediately
     syncSidebarProfile();
   };
 
