@@ -445,6 +445,15 @@ function initRouter() {
 }
 
 function switchView(viewName) {
+  // Check auth and show login screen if not authenticated
+  const loginOverlay = document.getElementById('login-screen-overlay');
+  if (!activeUser) {
+    if (loginOverlay) loginOverlay.style.display = 'flex';
+    // Let the background routing still process underneath so when they log in, it's ready.
+  } else {
+    if (loginOverlay) loginOverlay.style.display = 'none';
+  }
+
   // Restore saved theme on navigation (in case user was previewing a theme in settings but didn't save)
   const currentSchoolId = activeUser ? activeUser.schoolId : "default-school";
   dbService.getSchool(currentSchoolId).then(school => {
@@ -1268,16 +1277,12 @@ if (loginMenuBtn) {
   });
 }
 
-const menuLoginTriggers = document.querySelectorAll('.menu-login-trigger');
-menuLoginTriggers.forEach(trigger => {
+const mockLoginTriggers = document.querySelectorAll('.btn-mock-login');
+mockLoginTriggers.forEach(trigger => {
   trigger.onclick = async (e) => {
     e.preventDefault();
-    e.stopPropagation(); // Prevent document click from closing dropdown before we finish
+    e.stopPropagation();
     const email = trigger.dataset.email;
-
-    // Close the dropdown first
-    const dropdown = document.getElementById('login-menu-dropdown');
-    if (dropdown) dropdown.classList.remove('show');
 
     const user = await dbService.getUser(email);
     if (user) {
@@ -1285,13 +1290,16 @@ menuLoginTriggers.forEach(trigger => {
       try { sessionStorage.setItem('activeUser', JSON.stringify(user)); } catch(err) {}
       showToast(`Welcome back, ${user.name}!`);
       
-      // Update layouts
+      // Update layouts and hide login overlay
+      const loginOverlay = document.getElementById('login-screen-overlay');
+      if (loginOverlay) loginOverlay.style.display = 'none';
+
       syncSidebarProfile();
       toggleAuthUIElements(true);
       
       // Force routing and panel rendering immediately
-      window.location.hash = "#/dashboard";
-      switchView("dashboard");
+      window.location.hash = "#/home";
+      switchView("home");
     } else {
       showToast("Login failed: user not found in database.");
     }
@@ -1309,6 +1317,11 @@ if (logoutBtn) {
     // Clear sidebar layout
     syncSidebarProfile();
     toggleAuthUIElements(false);
+    
+    // Show login overlay immediately upon logout
+    const loginOverlay = document.getElementById('login-screen-overlay');
+    if (loginOverlay) loginOverlay.style.display = 'flex';
+    
     window.location.hash = "#/home"; // Redirect to homepage feed
   };
 }

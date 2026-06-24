@@ -9,6 +9,28 @@
 </head>
 <body>
 
+  <!-- ================= FULL PAGE LOGIN SCREEN ================= -->
+  <div id="login-screen-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-primary); z-index:9999; display:flex; align-items:center; justify-content:center; padding:1.5rem;">
+    <div style="background:var(--bg-secondary); border-radius:var(--radius-lg); padding:2.5rem; max-width:400px; width:100%; box-shadow:var(--shadow-lg); text-align:center;">
+      <div style="margin-bottom:2rem;">
+        <img id="login-logo-img" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80" alt="School Logo" style="width:80px; height:80px; border-radius:16px; object-fit:cover; margin-bottom:1rem;">
+        <h2 style="font-size:1.5rem; font-weight:700; margin-bottom:0.25rem;" id="login-school-name">Apex School Portal</h2>
+        <p style="color:var(--text-secondary); font-size:0.95rem;">Sign in to continue</p>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:0.75rem;">
+        <!-- Mock Login Buttons instead of real auth for now -->
+        <button class="btn-action btn-mock-login" data-email="admin@school.edu" style="width:100%;">Sign in as Admin</button>
+        <button class="btn-secondary btn-mock-login" data-email="teacher@school.edu" style="width:100%;">Sign in as Teacher</button>
+        <button class="btn-secondary btn-mock-login" data-email="learner@school.edu" style="width:100%;">Sign in as Learner</button>
+        <button class="btn-secondary btn-mock-login" data-email="parent@school.edu" style="width:100%;">Sign in as Parent</button>
+      </div>
+
+      <div style="margin-top:2rem; font-size:0.85rem; color:var(--text-secondary);">
+        <p>By signing in, you agree to the DepEd Privacy Policy and Terms of Service.</p>
+      </div>
+    </div>
+  </div>
   <!-- ================= UNIFIED FB-STYLE CONTAINER ================= -->
   <div class="portal-container">
     
@@ -36,22 +58,6 @@
         </div>
       </div>
 
-
-      <!-- Quick Login / Sign-Out (Always visible, above nav menu) -->
-      <div id="guest-login-box" style="padding: 0.75rem 1rem; position: relative;">
-        <button id="btn-login-menu" class="btn-logout" style="background:var(--accent); border-color:var(--accent); color:#fff;">
-          <ion-icon name="log-in-outline" style="font-size:1.1rem;"></ion-icon>
-          Quick Login
-          <ion-icon name="chevron-down-outline"></ion-icon>
-        </button>
-        <div id="login-menu-dropdown" class="notif-dropdown" style="bottom: 54px; left: 0; right: 0; width: auto; top: auto;">
-          <div style="padding:0.6rem 1rem; font-weight:700; font-size:0.7rem; color:var(--text-secondary); border-bottom:1px solid var(--border-color); text-transform:uppercase; letter-spacing:0.08em;">Sign In As:</div>
-          <a href="#" class="notif-item menu-login-trigger" data-email="admin@school.edu">🔑 Admin</a>
-          <a href="#" class="notif-item menu-login-trigger" data-email="teacher@school.edu">👨‍🏫 Teacher</a>
-          <a href="#" class="notif-item menu-login-trigger" data-email="parent@school.edu">👪 Parent</a>
-          <a href="#" class="notif-item menu-login-trigger" data-email="learner@school.edu">🎓 Learner</a>
-        </div>
-      </div>
 
       <!-- Auth Logout Trigger (Hidden by default) -->
       <div id="auth-logout-box" class="sidebar-auth-action" style="display:none;">
@@ -147,17 +153,33 @@
             <!-- Right Widget column -->
             <div>
               <div class="sidebar-widget">
-                <h3 class="widget-title">Calendar & Events</h3>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                  <h3 class="widget-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Agenda</h3>
+                  <button style="background:none; border:none; color:var(--primary); font-size:1.4rem; cursor:pointer;" title="Add Event (Admin Only)"><ion-icon name="add-circle"></ion-icon></button>
+                </div>
                 <ul style="list-style:none; display:flex; flex-direction:column; gap:1rem;">
-                  <li>
-                    <div style="font-weight:700; color:var(--primary)">July 1, 2026</div>
-                    <div style="font-size:0.9rem; color:var(--text-secondary)">First Day of Class (AY 2026-2027)</div>
+                  <li style="display:flex; gap:1rem; align-items:flex-start;">
+                    <div style="background:var(--bg-primary); padding:0.4rem; border-radius:8px; text-align:center; min-width:50px; border:1px solid var(--border-color);">
+                      <div style="font-size:0.7rem; color:var(--danger); font-weight:700; text-transform:uppercase;">Jul</div>
+                      <div style="font-size:1.2rem; font-weight:700; color:var(--text-primary); line-height:1; margin-top:2px;">01</div>
+                    </div>
+                    <div>
+                      <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">First Day of Class</div>
+                      <div style="font-size:0.8rem; color:var(--text-secondary)">AY 2026-2027</div>
+                    </div>
                   </li>
-                  <li>
-                    <div style="font-weight:700; color:var(--primary)">July 15, 2026</div>
-                    <div style="font-size:0.9rem; color:var(--text-secondary)">Brigada Eskwela Assembly</div>
+                  <li style="display:flex; gap:1rem; align-items:flex-start;">
+                    <div style="background:var(--bg-primary); padding:0.4rem; border-radius:8px; text-align:center; min-width:50px; border:1px solid var(--border-color);">
+                      <div style="font-size:0.7rem; color:var(--danger); font-weight:700; text-transform:uppercase;">Jul</div>
+                      <div style="font-size:1.2rem; font-weight:700; color:var(--text-primary); line-height:1; margin-top:2px;">15</div>
+                    </div>
+                    <div>
+                      <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Brigada Eskwela</div>
+                      <div style="font-size:0.8rem; color:var(--text-secondary)">School Assembly</div>
+                    </div>
                   </li>
                 </ul>
+                <button class="btn-secondary" style="width:100%; margin-top:1.5rem; font-size:0.85rem; padding:0.5rem;">View Full Calendar</button>
               </div>
             </div>
           </div>
