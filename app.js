@@ -445,6 +445,12 @@ function initRouter() {
 }
 
 function switchView(viewName) {
+  // Restore saved theme on navigation (in case user was previewing a theme in settings but didn't save)
+  const currentSchoolId = activeUser ? activeUser.schoolId : "default-school";
+  dbService.getSchool(currentSchoolId).then(school => {
+    applyTheme(school.theme, school.logo);
+  });
+
   // Toggle visibility of route blocks
   document.querySelectorAll('.route-view').forEach(view => {
     view.style.display = 'none';
@@ -1060,6 +1066,8 @@ function initProfilePanel() {
         document.querySelectorAll('.theme-card').forEach(c => c.classList.remove('selected'));
         const el = e.currentTarget;
         el.classList.add('selected');
+        // Live preview the theme
+        applyTheme(el.dataset.themeVal, document.getElementById('school-logo-input').value.trim());
       };
     });
 
