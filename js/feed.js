@@ -842,123 +842,113 @@ async function renderCalendar() {
 // CALENDAR NEWS FEED & QUICK STATS
 // ==========================================
 
-async function renderCalendarNewsFeed() {
+let currentFeedPage = 0;
+const ITEMS_PER_PAGE = 6;
+let cachedFeedPosts = null;
+
+async function renderCalendarNewsFeed(forceRefresh = false) {
   const container = document.getElementById('calendar-news-feed');
   const statsContainer = document.getElementById('calendar-quick-stats');
   if (!container) return;
 
-  const announcements = await dbService.getAnnouncements();
+  if (forceRefresh || cachedFeedPosts === null) {
+    const announcements = await dbService.getAnnouncements();
+    const feedSources = await dbService.getFeedSources();
 
-  let newsPosts = [];
-  let aklanItems = [];
-  let nationalItems = [];
+    let externalItems = [];
 
-  // 1. Fetch DepEd Aklan News (Live)
-  try {
-    const aklanRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://home.depedaklan.online/feed/");
-    const aklanData = await aklanRes.json();
-    if (aklanData.status === 'ok') {
-      aklanItems = aklanData.items.map(item => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = item.description || item.content;
-        const textContent = tmp.textContent || tmp.innerText || "No description provided.";
-        return {
-          title: item.title,
-          content: textContent,
-          timestamp: new Date(item.pubDate).getTime(),
-          imageData: item.thumbnail || '',
-          type: 'Division Advisory',
-          link: item.link
-        };
-      });
-    }
-  } catch(e) {
-    console.warn("Failed to fetch DepEd Aklan feed", e);
-  }
-
-  // 2. Fetch National DepEd News
-  try {
-    const natRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.deped.gov.ph/feed/");
-    const natData = await natRes.json();
-    if (natData.status === 'ok') {
-      nationalItems = natData.items.map(item => {
-        const tmp = document.createElement('div');
-        tmp.innerHTML = item.description || item.content;
-        let imgUrl = item.thumbnail;
-        if (!imgUrl && item.description) {
-          const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
-          if (imgMatch) imgUrl = imgMatch[1];
+    const fetchPromises = feedSources.map(async (source) => {
+      try {
+        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source.url));
+        const data = await res.json();
+        if (data.status === 'ok') {
+          return data.items.map(item => {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = item.description || item.content;
+            let imgUrl = item.thumbnail;
+            if (!imgUrl && item.description) {
+              const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+              if (imgMatch) imgUrl = imgMatch[1];
+            }
+            return {
+              title: item.title,
+              content: tmp.textContent || tmp.innerText || "No description",
+              timestamp: new Date(item.pubDate).getTime(),
+              imageData: imgUrl || '',
+              type: source.type || 'News Source',
+              color: source.color || 'var(--primary)',
+              icon: source.tag || 'globe-outline',
+              link: item.link
+            };
+          });
         }
-        return {
-          title: item.title,
-          content: tmp.textContent || tmp.innerText || "",
-          timestamp: new Date(item.pubDate).getTime(),
-          imageData: imgUrl || '',
-          type: 'National News',
-          link: item.link
-        };
-      });
-    } else {
-      throw new Error("RSS API failed with status: " + natData.status);
-    }
-  } catch(e) {
-    console.warn("Using fallback National DepEd feed due to block", e);
-    nationalItems = [
-      {
-        title: "Statement on the school shooting incident in Tacloban City",
-        content: "LUNGSOD NG MAKATI — Binigyang-diin ng Department of Education (DepEd) na ang naganap na pamamaril sa Tacloban City ay isang matinding paalala para lalong patatagin ang mga sistemang nagpoprotekta...",
-        timestamp: Date.now() - 3600000 * 4,
-        type: 'National News',
-        link: 'https://www.deped.gov.ph/'
-      },
-      {
-        title: "Guidelines on Public School Teachers’ Proportional Vacation Pay for School Year 2025–2026",
-        content: "DM_s2026_040r. Guidelines and regulations regarding the proportional vacation pay for public school teachers...",
-        timestamp: Date.now() - 86400000 * 2,
-        type: 'National News',
-        link: 'https://www.deped.gov.ph/'
+      } catch(e) {
+        console.warn("Failed to fetch RSS source: " + source.url, e);
       }
-    ];
+      return [];
+    });
+
+    const results = await Promise.allSettled(fetchPromises);
+    results.forEach(res => {
+      if (res.status === 'fulfilled') {
+        externalItems = externalItems.concat(res.value);
+      }
+    });
+
+    // Fallback for primary deped if it's in the sources but failed due to Cloudflare
+    if (feedSources.some(s => s.url.includes("www.deped.gov.ph")) && !externalItems.some(i => i.link.includes("deped.gov.ph"))) {
+      externalItems.push(
+        { title: "Statement on the school shooting incident in Tacloban City", content: "LUNGSOD NG MAKATI — Binigyang-diin ng Department of Education...", timestamp: Date.now() - 3600000 * 4, type: 'National News', icon: 'globe-outline', color: 'var(--primary)', link: 'https://www.deped.gov.ph/' },
+        { title: "Guidelines on Public School Teachers’ Proportional Vacation Pay", content: "DM_s2026_040r. Guidelines and regulations regarding the proportional vacation pay...", timestamp: Date.now() - 86400000 * 2, type: 'National News', icon: 'globe-outline', color: 'var(--primary)', link: 'https://www.deped.gov.ph/' },
+        { title: "2026 Pride Month Celebration in the Department of Education", content: "DM_s2026_041r. Official memorandum for the celebration of Pride Month...", timestamp: Date.now() - 86400000 * 3, type: 'National News', icon: 'globe-outline', color: 'var(--primary)', link: 'https://www.deped.gov.ph/' }
+      );
+    }
+
+    const localNews = announcements
+      .filter(a => a.status === 'approved' || !a.status)
+      .map(a => ({
+        title: a.title,
+        content: a.content,
+        timestamp: a.timestamp,
+        imageData: a.imageData,
+        type: a.type === 'event' ? 'event' : 'announcement',
+        icon: a.type === 'event' ? 'calendar-outline' : 'megaphone-outline',
+        color: a.type === 'event' ? 'var(--warning)' : 'var(--danger)',
+        link: '#/home'
+      }));
+
+    cachedFeedPosts = [...externalItems, ...localNews].sort((a, b) => b.timestamp - a.timestamp);
   }
 
-  // 3. Local Announcements
-  const localNews = announcements
-    .filter(a => a.status === 'approved' || !a.status)
-    .sort((a, b) => b.timestamp - a.timestamp);
+  // Pagination slice
+  const startIndex = currentFeedPage * ITEMS_PER_PAGE;
+  const pagePosts = cachedFeedPosts.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
-  // 4. Merge, sort by timestamp descending, take top 6
-  newsPosts = [...nationalItems, ...aklanItems, ...localNews]
-    .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 6);
+  // Pagination Buttons Update
+  const prevBtn = document.getElementById('feed-prev-btn');
+  const nextBtn = document.getElementById('feed-next-btn');
+  if (prevBtn) prevBtn.disabled = currentFeedPage === 0;
+  if (nextBtn) nextBtn.disabled = startIndex + ITEMS_PER_PAGE >= cachedFeedPosts.length;
 
-  if (newsPosts.length === 0) {
+  if (pagePosts.length === 0) {
     container.innerHTML = `<p style="color:var(--text-secondary); text-align:center; font-size:0.9rem; padding:1rem 0;">No news posts yet.</p>`;
   } else {
-    container.innerHTML = newsPosts.map(post => {
+    container.innerHTML = pagePosts.map(post => {
       const timeAgo = getTimeAgo(post.timestamp);
       const hasImage = !!post.imageData;
-      
-      let typeIcon = 'chatbubble-ellipses-outline';
-      let typeColor = 'var(--primary)';
-      if (post.type === 'National News') { typeIcon = 'globe-outline'; typeColor = 'var(--primary)'; }
-      else if (post.type === 'Division Advisory') { typeIcon = 'business-outline'; typeColor = 'var(--success)'; }
-      else if (post.type === 'event') { typeIcon = 'calendar-outline'; typeColor = 'var(--warning)'; }
-      else if (post.type === 'announcement') { typeIcon = 'megaphone-outline'; typeColor = 'var(--danger)'; }
-
       const snippet = (post.content || '').slice(0, 100) + ((post.content || '').length > 100 ? '…' : '');
-      const targetLink = post.link ? post.link : '#/home';
-      const targetAttr = post.link ? 'target="_blank"' : '';
+      const targetAttr = post.link && post.link !== '#/home' ? 'target="_blank"' : '';
 
       return `
-        <a href="${targetLink}" ${targetAttr} style="display:flex; gap:0.75rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border-color); cursor:pointer; transition:opacity 0.2s; text-decoration:none; color:inherit;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+        <a href="${post.link}" ${targetAttr} style="display:flex; gap:0.75rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border-color); cursor:pointer; transition:opacity 0.2s; text-decoration:none; color:inherit;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
           ${hasImage
             ? `<img src="${post.imageData}" alt="News" style="width:68px; height:68px; border-radius:8px; object-fit:cover; flex-shrink:0;">`
-            : `<div style="width:68px; height:68px; border-radius:8px; background:var(--bg-primary); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><ion-icon name="${typeIcon}" style="font-size:1.75rem; color:${typeColor};"></ion-icon></div>`
+            : `<div style="width:68px; height:68px; border-radius:8px; background:var(--bg-primary); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><ion-icon name="${post.icon}" style="font-size:1.75rem; color:${post.color};"></ion-icon></div>`
           }
           <div style="flex:1; min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem;">
-              <ion-icon name="${typeIcon}" style="color:${typeColor}; font-size:0.8rem; flex-shrink:0;"></ion-icon>
-              <span style="font-size:0.7rem; color:${typeColor}; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">${post.type || 'Post'}</span>
+              <ion-icon name="${post.icon}" style="color:${post.color}; font-size:0.8rem; flex-shrink:0;"></ion-icon>
+              <span style="font-size:0.7rem; color:${post.color}; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">${post.type || 'Post'}</span>
             </div>
             <p style="font-weight:600; font-size:0.9rem; margin:0 0 0.25rem; line-height:1.3; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">${post.title || 'Untitled'}</p>
             <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 0.3rem; line-height:1.4;">${snippet}</p>
@@ -996,6 +986,73 @@ async function renderCalendarNewsFeed() {
     ].join('');
   }
 }
+
+// ==========================================
+// PAGINATION & MANAGE SOURCES LOGIC
+// ==========================================
+window.prevFeedPage = () => {
+  if (currentFeedPage > 0) {
+    currentFeedPage--;
+    renderCalendarNewsFeed();
+  }
+};
+window.nextFeedPage = () => {
+  if (cachedFeedPosts && (currentFeedPage + 1) * ITEMS_PER_PAGE < cachedFeedPosts.length) {
+    currentFeedPage++;
+    renderCalendarNewsFeed();
+  }
+};
+
+window.openManageSourcesModal = async () => {
+  document.getElementById('modal-manage-sources').style.display = 'flex';
+  renderManageSourcesList();
+};
+window.closeManageSourcesModal = () => {
+  document.getElementById('modal-manage-sources').style.display = 'none';
+};
+window.renderManageSourcesList = async () => {
+  const sources = await dbService.getFeedSources();
+  const list = document.getElementById('feed-sources-list');
+  list.innerHTML = sources.map(s => `
+    <li style="display:flex; justify-content:space-between; align-items:center; padding:0.75rem; border:1px solid var(--border-color); border-radius:var(--radius-sm);">
+      <div style="display:flex; flex-direction:column;">
+        <span style="font-size:0.85rem; font-weight:600;">${s.type}</span>
+        <span style="font-size:0.75rem; color:var(--text-secondary);">${s.url}</span>
+      </div>
+      <button class="btn-icon" onclick="deleteFeedSource('${s.id}')" style="color:var(--danger); background:none; border:none; cursor:pointer;"><ion-icon name="trash"></ion-icon></button>
+    </li>
+  `).join('');
+};
+window.addFeedSource = async () => {
+  const urlInput = document.getElementById('new-feed-source-url');
+  const url = urlInput.value.trim();
+  if (!url) return;
+  const sources = await dbService.getFeedSources();
+  sources.push({
+    id: 'fs' + Date.now(),
+    url: url,
+    type: 'Custom Source',
+    tag: 'rss-outline',
+    color: 'var(--accent)'
+  });
+  await dbService.saveFeedSources(sources);
+  urlInput.value = '';
+  renderManageSourcesList();
+  currentFeedPage = 0;
+  renderCalendarNewsFeed(true); // force refresh
+};
+window.deleteFeedSource = async (id) => {
+  const sources = await dbService.getFeedSources();
+  const newSources = sources.filter(s => s.id !== id);
+  await dbService.saveFeedSources(newSources);
+  renderManageSourcesList();
+  currentFeedPage = 0;
+  renderCalendarNewsFeed(true); // force refresh
+};
+
+// ==========================================
+// PAGINATION & MANAGE SOURCES LOGIC
+// ==========================================
 
 function getTimeAgo(timestamp) {
   const diff = Date.now() - timestamp;

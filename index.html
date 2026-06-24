@@ -280,15 +280,21 @@
             <div style="display:flex; flex-direction:column; gap:1.5rem;">
               <!-- News Feed Header Card -->
               <div class="news-card" style="padding:1.25rem;">
-                <h2 class="widget-title" style="border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
-                  <ion-icon name="newspaper" style="color:var(--primary);"></ion-icon> School News Feed
+                <h2 class="widget-title" style="border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1.25rem; display:flex; align-items:center; justify-content:space-between;">
+                  <div style="display:flex; align-items:center; gap:0.5rem;">
+                    <ion-icon name="newspaper" style="color:var(--primary);"></ion-icon> School News Feed
+                  </div>
+                  <button class="btn-icon" onclick="openManageSourcesModal()" title="Manage Sources" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size:1.2rem; display:flex;">
+                    <ion-icon name="settings-outline"></ion-icon>
+                  </button>
                 </h2>
                 <div id="calendar-news-feed" style="display:flex; flex-direction:column; gap:1.25rem;">
                   <!-- Dynamic news items -->
                 </div>
-                <button class="btn-secondary" onclick="window.location.hash='#/home'" style="width:100%; margin-top:1.25rem; font-size:0.85rem; padding:0.5rem;">
-                  View All Posts
-                </button>
+                <div style="display:flex; justify-content:space-between; margin-top:1.25rem;">
+                  <button id="feed-prev-btn" class="btn-secondary" onclick="prevFeedPage()" style="flex:1; margin-right:0.5rem; padding:0.5rem;" disabled>&laquo; Previous</button>
+                  <button id="feed-next-btn" class="btn-secondary" onclick="nextFeedPage()" style="flex:1; margin-left:0.5rem; padding:0.5rem;">Next &raquo;</button>
+                </div>
               </div>
             </div>
 
@@ -817,6 +823,29 @@
       
       <button type="submit" class="chat-input-btn like-btn" style="color:var(--primary);"><ion-icon name="send"></ion-icon></button>
     </form>
+  </div>
+
+  <!-- Manage Sources Modal -->
+  <div id="modal-manage-sources" class="modal">
+    <div class="modal-content" style="max-width: 500px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem;">
+        <h2 style="font-size:1.2rem; display:flex; align-items:center; gap:0.5rem;"><ion-icon name="settings-outline" style="color:var(--primary);"></ion-icon> Manage News Sources</h2>
+        <span class="close-modal" onclick="closeManageSourcesModal()">&times;</span>
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">Add RSS feed URLs to pull news directly into your School News Feed.</p>
+        <form onsubmit="event.preventDefault(); addFeedSource();" style="display:flex; gap:0.5rem;">
+          <input type="url" id="new-feed-source-url" class="form-control" placeholder="https://example.com/feed/" required style="flex:1;">
+          <button type="submit" class="btn-primary" style="padding:0 1rem; flex-shrink:0;">Add</button>
+        </form>
+      </div>
+      <div style="border-top:1px solid var(--border-color); padding-top:1rem;">
+        <h3 style="font-size:0.9rem; margin-bottom:1rem; color:var(--text-primary);">Current Sources</h3>
+        <ul id="feed-sources-list" style="list-style:none; display:flex; flex-direction:column; gap:0.75rem; max-height:250px; overflow-y:auto; padding-right:0.5rem;">
+          <!-- Rendered by JS -->
+        </ul>
+      </div>
+    </div>
   </div>
 
   <!-- Emoji Picker Overlay -->
