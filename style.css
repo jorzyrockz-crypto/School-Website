@@ -281,24 +281,27 @@ button, input, select, textarea {
 }
 
 .profile-avatar {
+  flex-shrink: 0;
   width: 48px;
   height: 48px;
   border-radius: 50%;
   border: 2px solid var(--accent);
-  background: white;
+  background: var(--bg-secondary);
   object-fit: cover;
 }
 
 .profile-name {
+  flex: 1;
+  min-width: 0;
   font-weight: 700;
   font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
 }
 
 .profile-role {
+  flex-shrink: 0;
   font-size: 0.65rem;
   padding: 0.15rem 0.5rem;
   border-radius: 50px;
