@@ -107,6 +107,10 @@ function toggleAuthUIElements(isLoggedIn) {
   const profileWidget = document.getElementById('profile-widget-trigger');
   if (profileWidget) profileWidget.style.display = isLoggedIn ? 'block' : 'none';
 
+  // Toggle Chat Heads Dock
+  const chatDock = document.getElementById('chat-heads-dock');
+  if (chatDock) chatDock.style.display = isLoggedIn ? 'flex' : 'none';
+
   const fbCreatePost = document.getElementById('fb-create-post-box');
   if (fbCreatePost) {
     // Show composer ONLY for Admins and Teachers

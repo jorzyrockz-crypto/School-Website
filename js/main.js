@@ -87,6 +87,37 @@ document.addEventListener('click', () => {
   document.querySelectorAll('.header-dropdown').forEach(d => d.classList.remove('show'));
 });
 
+// Floating Chat Window Logic
+function openChatWindow(title) {
+  const chatWindow = document.getElementById('floating-chat-window');
+  if (chatWindow) {
+    document.getElementById('chat-window-title').innerText = title;
+    chatWindow.style.display = 'flex';
+    // Small timeout to allow display:flex to apply before adding class for transition
+    setTimeout(() => {
+      chatWindow.classList.add('show');
+    }, 10);
+  }
+}
+
+function minimizeChatWindow() {
+  const chatWindow = document.getElementById('floating-chat-window');
+  if (chatWindow) {
+    chatWindow.classList.remove('show');
+  }
+}
+
+function closeChatWindow() {
+  const chatWindow = document.getElementById('floating-chat-window');
+  if (chatWindow) {
+    chatWindow.classList.remove('show');
+    // Wait for transition before hiding completely
+    setTimeout(() => {
+      chatWindow.style.display = 'none';
+    }, 300);
+  }
+}
+
 function showToast(msg) {
   const toast = document.getElementById('toast');
   if (toast) {
