@@ -181,7 +181,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
             <div style="font-size:0.9rem; font-weight:600;">${doc.name}</div>
             <div style="font-size:0.75rem; color:var(--text-secondary);">${doc.size}</div>
           </div>
-          <button onclick="showToast('Downloading ${doc.name}...')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem;"><ion-icon name="download-outline" style="font-size:1.1rem; vertical-align:middle;"></ion-icon> Download</button>
+          <a href="${doc.fileData || '#'}" ${doc.fileData ? `download="${doc.name}"` : `onclick="showToast('Downloading ${doc.name}...')"`} style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.2rem;"><ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Download</a>
         </div>
       `;
     }
@@ -551,25 +551,37 @@ document.querySelectorAll('.post-action-btn').forEach(btn => {
         if (!file) return;
         
         const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
-        composerDocData = {
-          name: file.name,
-          size: sizeMb + ' MB'
-        };
         
-        document.getElementById('composer-attachments').innerHTML = `
-          <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.5rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.5rem; width:100%;">
-            <ion-icon name="document-text" style="color:var(--primary); font-size:1.5rem;"></ion-icon>
-            <div style="flex:1;">
-              <div style="font-size:0.85rem; font-weight:600;">${file.name}</div>
-              <div style="font-size:0.7rem; color:var(--text-secondary);">${sizeMb} MB</div>
+        // Safety check for localStorage limits
+        if (file.size > 2 * 1024 * 1024) {
+          showToast("File too large! Max 2MB for prototype limits.");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          composerDocData = {
+            name: file.name,
+            size: sizeMb + ' MB',
+            fileData: ev.target.result // The base64 Data URL
+          };
+          
+          document.getElementById('composer-attachments').innerHTML = `
+            <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.5rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.5rem; width:100%;">
+              <ion-icon name="document-text" style="color:var(--primary); font-size:1.5rem;"></ion-icon>
+              <div style="flex:1;">
+                <div style="font-size:0.85rem; font-weight:600;">${file.name}</div>
+                <div style="font-size:0.7rem; color:var(--text-secondary);">${sizeMb} MB</div>
+              </div>
+              <button id="btn-remove-composer-doc" style="background:none; border:none; color:var(--danger); cursor:pointer;"><ion-icon name="close-circle"></ion-icon></button>
             </div>
-            <button id="btn-remove-composer-doc" style="background:none; border:none; color:var(--danger); cursor:pointer;"><ion-icon name="close-circle"></ion-icon></button>
-          </div>
-        `;
-        document.getElementById('btn-remove-composer-doc').onclick = () => {
-          composerDocData = null;
-          document.getElementById('composer-attachments').innerHTML = '';
+          `;
+          document.getElementById('btn-remove-composer-doc').onclick = () => {
+            composerDocData = null;
+            document.getElementById('composer-attachments').innerHTML = '';
+          };
         };
+        reader.readAsDataURL(file);
       };
       fileInput.click();
       return;
