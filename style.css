@@ -1,40 +1,144 @@
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
+/* Smooth theme-switch animation on the whole page */
+html {
+  transition: background-color 0.4s ease, color 0.3s ease;
+}
+
 :root {
-  /* Facebook-like modern School palette */
-  --primary: #1877f2; /* FB Blue */
-  --primary-hover: #166fe5;
-  --accent: #d4af37; /* DepEd Gold accent */
-  --accent-hover: #c5a028;
-  --bg-primary: #f0f2f5; /* Light grey FB background */
-  --bg-secondary: #ffffff;
-  --text-primary: #050505;
-  --text-secondary: #65676b;
-  --border-color: #e4e6eb;
-  --success: #31a24c;
-  --danger: #f02849;
-  --warning: #f59e0b;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 16px;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.1);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 12px 28px rgba(0,0,0,0.12);
-  --sidebar-width: 280px;
-  --transition: all 0.2s ease;
+  /* ── DepEd Blue Gold (default) ── */
+  --primary:           #1877f2;
+  --primary-hover:     #166fe5;
+  --accent:            #d4af37;
+  --accent-hover:      #c5a028;
+  --sidebar-bg:        #1c1e21;
+  --sidebar-glow:      rgba(24, 119, 242, 0.25);
+  --sidebar-active-bg: rgba(24, 119, 242, 0.18);
+  --btn-gradient:      linear-gradient(135deg, #1877f2, #0d5bce);
+  --bg-primary:        #f0f2f5;
+  --bg-secondary:      #ffffff;
+  --bg-tint:           #eef4ff;
+  --text-primary:      #050505;
+  --text-secondary:    #65676b;
+  --border-color:      #e4e6eb;
+  --success:           #31a24c;
+  --danger:            #f02849;
+  --warning:           #f59e0b;
+  --radius-sm:         6px;
+  --radius-md:         10px;
+  --radius-lg:         16px;
+  --shadow-sm:         0 1px 2px rgba(0,0,0,0.1);
+  --shadow-md:         0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg:         0 12px 28px rgba(0,0,0,0.12);
+  --sidebar-width:     280px;
+  --transition:        all 0.2s ease;
 }
 
-/* Theme Options */
+/* ── Forest Green ── */
 [data-theme="forest-green"] {
-  --primary: #2d6a4f;
-  --primary-hover: #1b4332;
-  --accent: #95d5b2;
+  --primary:           #2d9e6b;
+  --primary-hover:     #1b7a50;
+  --accent:            #95d5b2;
+  --accent-hover:      #74c69d;
+  --sidebar-bg:        #0d2117;
+  --sidebar-glow:      rgba(45, 158, 107, 0.3);
+  --sidebar-active-bg: rgba(45, 158, 107, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #2d9e6b, #1b7a50);
+  --bg-primary:        #f0f7f4;
+  --bg-tint:           #e8f5ee;
 }
 
+/* ── Maroon Elite ── */
 [data-theme="maroon-crimson"] {
-  --primary: #9e2a2b;
-  --primary-hover: #7a1c1c;
-  --accent: #e09f3e;
+  --primary:           #9e2a2b;
+  --primary-hover:     #7a1c1c;
+  --accent:            #e09f3e;
+  --accent-hover:      #c8861f;
+  --sidebar-bg:        #1e0a0a;
+  --sidebar-glow:      rgba(158, 42, 43, 0.3);
+  --sidebar-active-bg: rgba(158, 42, 43, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #9e2a2b, #7a1c1c);
+  --bg-primary:        #fdf4f4;
+  --bg-tint:           #fceaea;
+}
+
+/* ── Midnight Purple ── */
+[data-theme="midnight-purple"] {
+  --primary:           #7c3aed;
+  --primary-hover:     #6d28d9;
+  --accent:            #f0abfc;
+  --accent-hover:      #e879f9;
+  --sidebar-bg:        #13082a;
+  --sidebar-glow:      rgba(124, 58, 237, 0.35);
+  --sidebar-active-bg: rgba(124, 58, 237, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #7c3aed, #6d28d9);
+  --bg-primary:        #f5f3ff;
+  --bg-tint:           #ede9fe;
+}
+
+/* ── Sunset Orange ── */
+[data-theme="sunset-orange"] {
+  --primary:           #ea580c;
+  --primary-hover:     #c2410c;
+  --accent:            #fbbf24;
+  --accent-hover:      #f59e0b;
+  --sidebar-bg:        #1c0f05;
+  --sidebar-glow:      rgba(234, 88, 12, 0.3);
+  --sidebar-active-bg: rgba(234, 88, 12, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #ea580c, #c2410c);
+  --bg-primary:        #fff7ed;
+  --bg-tint:           #ffedd5;
+}
+
+/* ── Teal Ocean ── */
+[data-theme="teal-ocean"] {
+  --primary:           #0891b2;
+  --primary-hover:     #0e7490;
+  --accent:            #22d3ee;
+  --accent-hover:      #06b6d4;
+  --sidebar-bg:        #042a32;
+  --sidebar-glow:      rgba(8, 145, 178, 0.3);
+  --sidebar-active-bg: rgba(8, 145, 178, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #0891b2, #0e7490);
+  --bg-primary:        #f0fdfe;
+  --bg-tint:           #cffafe;
+}
+
+/* ── Auto Dark Mode (Reacts to Device Settings) ── */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary:        #18191a;
+    --bg-secondary:      #242526;
+    --bg-tint:           #1e2b40;
+    --text-primary:      #e4e6eb;
+    --text-secondary:    #b0b3b8;
+    --border-color:      #3e4042;
+  }
+  
+  [data-theme="forest-green"] {
+    --bg-primary:        #121b16;
+    --bg-tint:           #1a2d22;
+  }
+  
+  [data-theme="maroon-crimson"] {
+    --bg-primary:        #1b0c0c;
+    --bg-tint:           #2b1212;
+  }
+  
+  [data-theme="midnight-purple"] {
+    --bg-primary:        #120a22;
+    --bg-tint:           #1b0f34;
+  }
+  
+  [data-theme="sunset-orange"] {
+    --bg-primary:        #1a0c05;
+    --bg-tint:           #2a1409;
+  }
+  
+  [data-theme="teal-ocean"] {
+    --bg-primary:        #061a1e;
+    --bg-tint:           #092b33;
+  }
 }
 
 * {
@@ -88,7 +192,7 @@ button, input, select, textarea {
 /* Left Sidebar Navigation (Sticky) */
 .portal-sidebar {
   width: var(--sidebar-width);
-  background-color: #1c1e21; /* Sticky dark sidebar for admin SaaS control */
+  background-color: var(--sidebar-bg);
   color: white;
   display: flex;
   flex-direction: column;
@@ -97,7 +201,8 @@ button, input, select, textarea {
   bottom: 0;
   left: 0;
   z-index: 50;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+  box-shadow: 2px 0 20px var(--sidebar-glow, rgba(0,0,0,0.2));
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
 }
 
 /* ── Sidebar Branding Header ── */
@@ -227,7 +332,7 @@ button, input, select, textarea {
 
 .menu-item:hover a, .menu-item.active a {
   color: white;
-  background: rgba(255,255,255,0.07);
+  background: var(--sidebar-active-bg, rgba(255,255,255,0.07));
   border-left-color: var(--accent);
 }
 
@@ -252,26 +357,49 @@ button, input, select, textarea {
   flex-shrink: 0;
 }
 
+/* Sidebar sign-in/sign-out action area */
+.sidebar-auth-action {
+  padding: 0.65rem 1rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
 .btn-logout {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: transparent;
+  padding: 0.7rem 1rem;
+  border: none;
+  background: var(--btn-gradient, rgba(255,255,255,0.1));
   color: white;
   border-radius: var(--radius-md);
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  letter-spacing: 0.01em;
 }
 
 .btn-logout:hover {
-  background: rgba(255,255,255,0.1);
-  border-color: white;
+  filter: brightness(1.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  transform: translateY(-1px);
+}
+
+/* Sign Out button — danger-tinted variant */
+#btn-logout {
+  background: rgba(240, 40, 73, 0.2);
+  border: 1px solid rgba(240, 40, 73, 0.4);
+  box-shadow: none;
+}
+#btn-logout:hover {
+  background: rgba(240, 40, 73, 0.35);
+  border-color: rgba(240, 40, 73, 0.7);
+  transform: none;
+  filter: none;
 }
 
 /* Right Main Panel */
