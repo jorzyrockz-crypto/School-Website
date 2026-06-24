@@ -833,10 +833,10 @@
         <button onclick="closeManageSourcesModal()" style="background:none; border:none; font-size:1.5rem; cursor:pointer; color:var(--text-secondary); line-height:1;">&times;</button>
       </div>
       <div style="margin-bottom:1.5rem;">
-        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">Add RSS feed URLs to pull news directly into your School News Feed.</p>
+        <p style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:1rem;">Add a website or RSS feed URL — the app will auto-detect the feed. You can also paste a direct RSS link (e.g. <code>https://example.com/feed/</code>).</p>
         <form onsubmit="event.preventDefault(); addFeedSource();" style="display:flex; gap:0.5rem;">
-          <input type="url" id="new-feed-source-url" class="form-control" placeholder="https://example.com/feed/" required style="flex:1;">
-          <button type="submit" class="btn-primary" style="padding:0 1rem; flex-shrink:0;">Add</button>
+          <input type="text" id="new-feed-source-url" class="form-control" placeholder="https://example.com or https://example.com/feed/" style="flex:1;">
+          <button type="submit" id="btn-add-feed-source" class="btn-primary" style="padding:0 1rem; flex-shrink:0;">Add</button>
         </form>
       </div>
       <div style="border-top:1px solid var(--border-color); padding-top:1rem;">

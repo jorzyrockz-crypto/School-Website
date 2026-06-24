@@ -1025,12 +1025,31 @@ window.renderManageSourcesList = async () => {
 };
 window.addFeedSource = async () => {
   const urlInput = document.getElementById('new-feed-source-url');
-  const url = urlInput.value.trim();
+  const addBtn = document.getElementById('btn-add-feed-source');
+  let url = urlInput.value.trim();
   if (!url) return;
+
+  // Show loading state
+  if (addBtn) { addBtn.textContent = 'Checking...'; addBtn.disabled = true; }
+
+  // Auto-detect RSS feed URL
+  const resolvedUrl = await autoDetectRssFeed(url);
+
+  if (addBtn) { addBtn.textContent = 'Add'; addBtn.disabled = false; }
+
+  if (!resolvedUrl) {
+    alert('Could not find an RSS feed at that URL. Please enter the direct RSS/Atom feed link (e.g. https://example.com/feed/)');
+    return;
+  }
+
   const sources = await dbService.getFeedSources();
+  if (sources.some(s => s.url === resolvedUrl)) {
+    alert('This feed source is already added.');
+    return;
+  }
   sources.push({
     id: 'fs' + Date.now(),
-    url: url,
+    url: resolvedUrl,
     type: 'Custom Source',
     tag: 'rss-outline',
     color: 'var(--accent)'
@@ -1041,6 +1060,31 @@ window.addFeedSource = async () => {
   currentFeedPage = 0;
   renderCalendarNewsFeed(true); // force refresh
 };
+
+// Auto-detect RSS feed: tries the URL directly, then common feed paths
+async function autoDetectRssFeed(url) {
+  const normalize = u => u.replace(/\/+$/, '');
+  const base = normalize(url);
+
+  // Candidate feed URLs to try in order
+  const candidates = [base];
+  // Only add /feed/ if the URL doesn't already look like a feed
+  const feedPatterns = [/\/feed\/?$/i, /\/rss\/?$/i, /\.xml$/i, /\.rss$/i, /\.atom$/i];
+  if (!feedPatterns.some(p => p.test(base))) {
+    candidates.push(base + '/feed/', base + '/rss/', base + '/feed.xml', base + '/atom.xml');
+  }
+
+  for (const candidate of candidates) {
+    try {
+      const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(candidate));
+      const data = await res.json();
+      if (data.status === 'ok' && data.items && data.items.length > 0) {
+        return candidate;
+      }
+    } catch(e) { /* try next */ }
+  }
+  return null;
+}
 window.deleteFeedSource = async (id) => {
   const sources = await dbService.getFeedSources();
   const newSources = sources.filter(s => s.id !== id);
