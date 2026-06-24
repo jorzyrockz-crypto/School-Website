@@ -26,10 +26,10 @@ const DEFAULT_LOCAL_DB = {
     }
   },
   users: {
-    "admin1": { uid: "admin1", email: "admin@school.edu", name: "Maria Santos (Admin)", role: "admin", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=admin" },
-    "teacher1": { uid: "teacher1", email: "teacher@school.edu", name: "Teacher Jose (Math)", role: "teacher", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=teacher" },
-    "parent1": { uid: "parent1", email: "parent@school.edu", name: "Mrs. Cruz (Parent)", role: "parent", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=parent" },
-    "learner1": { uid: "learner1", email: "learner@school.edu", name: "Juan Cruz (Grade 10)", role: "learner", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=learner" }
+    "admin1":   { uid: "admin1",   email: "admin@school.edu",   name: "Maria Santos (Admin)",    role: "admin",   schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos" },
+    "teacher1": { uid: "teacher1", email: "teacher@school.edu", name: "Teacher Jose (Math)",    role: "teacher", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose" },
+    "parent1":  { uid: "parent1",  email: "parent@school.edu",  name: "Mrs. Cruz (Parent)",     role: "parent",  schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz" },
+    "learner1": { uid: "learner1", email: "learner@school.edu", name: "Juan Cruz (Grade 10)",   role: "learner", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz" }
   },
   announcements: [
     {
@@ -39,7 +39,7 @@ const DEFAULT_LOCAL_DB = {
       content: "We are pleased to announce that enrollment for both Junior and Senior High School is now officially open. Please submit requirements to the registrar's office.",
       author: "Maria Santos",
       authorRole: "admin",
-      authorAvatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=admin",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
       date: "2026-06-24",
       status: "approved",
       likes: ["learner1", "parent1"]
@@ -51,7 +51,7 @@ const DEFAULT_LOCAL_DB = {
       content: "In compliance with DepEd local directives, classes in all levels are suspended today due to heavy monsoon rains. Stay safe inside, learners!",
       author: "Teacher Jose",
       authorRole: "teacher",
-      authorAvatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=teacher",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
       date: "2026-06-23",
       status: "approved",
       likes: ["parent1"]
@@ -63,7 +63,7 @@ const DEFAULT_LOCAL_DB = {
       content: "Join us this coming Monday for our annual school maintenance and cleanup drive. Let's work together to prepare classrooms for our learners.",
       author: "Teacher Jose",
       authorRole: "teacher",
-      authorAvatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=teacher",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
       date: "2026-06-23",
       status: "pending",
       likes: []
@@ -91,7 +91,7 @@ const DEFAULT_LOCAL_DB = {
 };
 
 // Initialize LocalStorage DB with Version check to force resets on updates
-const DB_VERSION = "v3";
+const DB_VERSION = "v4";
 try {
   if (localStorage.getItem("deped_saas_db_version") !== DB_VERSION) {
     localStorage.removeItem("deped_saas_db");
@@ -477,7 +477,7 @@ async function renderNewsfeed() {
       <article class="news-card" style="margin-bottom:1.5rem;">
         <!-- Card Header (FB Style) -->
         <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
-          <img class="thread-avatar" src="${a.authorAvatar || 'https://api.dicebear.com/7.x/adventurer/svg?seed=placeholder'}" alt="avatar">
+          <img class="thread-avatar" src="${a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder'}" alt="avatar">
           <div>
             <strong style="font-size:0.95rem; display:block;">${a.author}</strong>
             <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${a.authorRole} • ${a.date}</span>
@@ -967,7 +967,7 @@ function initProfilePanel() {
     seedInput.oninput = (e) => {
       const val = e.target.value.trim();
       if (val) {
-        const newAvatar = `https://api.dicebear.com/7.x/adventurer/svg?seed=${encodeURIComponent(val)}`;
+        const newAvatar = `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(val)}`;
         document.getElementById('profile-avatar-preview').src = newAvatar;
       }
     };
@@ -1184,7 +1184,7 @@ function syncSidebarProfile() {
     role.innerText = activeUser.role.toUpperCase();
     role.style.background = "rgba(255,255,255,0.25)";
   } else {
-    avatar.src = "https://api.dicebear.com/7.x/adventurer/svg?seed=guest";
+    avatar.src = "https://api.dicebear.com/7.x/micah/svg?seed=guest";
     name.innerText = "Guest User";
     role.innerText = "Guest";
     role.style.background = "rgba(255,255,255,0.1)";
