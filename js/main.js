@@ -86,11 +86,11 @@ async function updateMessengerDropdownList() {
       const isYou = t.lastMsg.senderId === activeUser.uid ? 'You: ' : '';
       const tJson = encodeURIComponent(JSON.stringify(t)).replace(/'/g, "%27");
       return `
-        <div class="notif-item" style="cursor:pointer;" onclick="openFloatingChat('${tJson}')">
+        <div class="notif-item" style="cursor:pointer; display:flex; align-items:center;" onclick="openFloatingChat('${tJson}')">
           <img src="${t.avatar}" style="width:40px; height:40px; border-radius:50%; margin-right:0.75rem;">
           <div class="notif-text">
             <strong>${t.name}</strong><br>
-            <span style="font-size:0.8rem; color:var(--text-secondary);">${isYou}${t.lastMsg.text ? t.lastMsg.text.substring(0,25) + '...' : 'Sent an image'}</span>
+            <span style="font-size:0.8rem; color:var(--text-secondary);">${isYou}${t.lastMsg.text ? t.lastMsg.text.substring(0,25) + '...' : 'Sent an attachment'}</span>
           </div>
         </div>
       `;
