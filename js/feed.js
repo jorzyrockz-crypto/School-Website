@@ -170,7 +170,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     if (a.imageData) {
       innerCardHTML += `
         <div style="position:relative; margin-bottom:1rem; width:100%;">
-          <a href="${a.imageData}" target="_blank" style="display:block; cursor:zoom-in;" title="Click to view full image">
+          <a href="javascript:void(0)" onclick="openPhotoTheater('${a.imageData}', '${a.id}')" style="display:block; cursor:zoom-in;" title="Click to view full image">
             <img src="${a.imageData}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--border-color); display:block; transition: filter 0.2s;" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='brightness(1)'">
           </a>
           <a href="${a.imageData}" download="post_image_${a.id}.png" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.65); color:white; padding:0.4rem 0.8rem; border-radius:50px; font-size:0.8rem; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:0.3rem; backdrop-filter:blur(4px); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.65)'" title="Download Image">
@@ -852,3 +852,62 @@ setTimeout(() => {
   renderAgenda();
   renderCalendar();
 }, 500);
+
+// ==========================================
+// PHOTO THEATER MODAL LOGIC
+// ==========================================
+window.openPhotoTheater = function(src, id) {
+  const modal = document.getElementById('photo-theater-modal');
+  const img = document.getElementById('theater-img');
+  const dlBtn = document.getElementById('theater-download-btn');
+  
+  if (!modal || !img || !dlBtn) return;
+  
+  img.src = src;
+  dlBtn.href = src;
+  dlBtn.download = `post_image_${id}.png`;
+  
+  modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden'; // Prevent background scrolling
+  
+  // Trigger animation
+  setTimeout(() => {
+    img.style.opacity = '1';
+    img.style.transform = 'scale(1)';
+  }, 10);
+};
+
+window.closePhotoTheater = function() {
+  const modal = document.getElementById('photo-theater-modal');
+  const img = document.getElementById('theater-img');
+  
+  if (!modal || !img) return;
+  
+  img.style.opacity = '0';
+  img.style.transform = 'scale(0.95)';
+  
+  setTimeout(() => {
+    modal.style.display = 'none';
+    img.src = '';
+    document.body.style.overflow = ''; // Restore scrolling
+  }, 300);
+};
+
+// Bind close events
+document.addEventListener('DOMContentLoaded', () => {
+  const modal = document.getElementById('photo-theater-modal');
+  const closeBtn = document.getElementById('btn-close-theater');
+  const bg = document.getElementById('theater-click-bg');
+  
+  if (closeBtn) closeBtn.addEventListener('click', closePhotoTheater);
+  if (bg) bg.addEventListener('click', (e) => {
+    if (e.target === bg) closePhotoTheater();
+  });
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && modal.style.display === 'flex') {
+      closePhotoTheater();
+    }
+  });
+});
+
