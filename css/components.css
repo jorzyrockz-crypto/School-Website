@@ -302,6 +302,7 @@
 
 /* Direct Chat styling */
 .chat-container {
+  position: relative;
   display: grid;
   grid-template-columns: 260px 1fr;
   height: calc(100vh - 190px);
@@ -908,7 +909,7 @@
   gap: 2rem;
 }
 
-@media(max-width: 900px) {
+@media (max-width: 767px) {
   .grid-2 {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -920,7 +921,7 @@
 }
 
 /* Responsive constraints */
-@media(max-width: 900px) {
+@media (max-width: 767px) {
   #btn-sidebar-toggle {
     display: flex !important;
   }
@@ -1246,7 +1247,7 @@
 }
 
 /* Mobile full panel layout */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .chat-threads {
     width: 100%;
   }
@@ -1326,7 +1327,7 @@
 }
 
 /* Hide on mobile devices per user request */
-@media (max-width: 900px) {
+@media (max-width: 767px) {
   .chat-heads-dock, .floating-chat-window {
     display: none !important;
   }

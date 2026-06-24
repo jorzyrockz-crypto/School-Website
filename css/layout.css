@@ -1,8 +1,8 @@
-﻿/* Unified 2-Panel Layout */
+/* Unified 2-Panel Layout */
 .portal-container {
   display: flex;
   min-height: 100vh;
-  width: 100vw;
+  width: 100%;
 }
 
 /* Left Sidebar Navigation (Sticky) */
