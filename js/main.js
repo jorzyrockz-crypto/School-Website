@@ -1,6 +1,64 @@
 // THEME ENGINE CONTROLLER
 // ==========================================
 
+const APP_VERSION = '1.6.0';
+
+// ==========================================
+// UPDATE BANNER
+// ==========================================
+function showUpdateBannerIfNew() {
+  const seenKey = 'seen_update_v' + APP_VERSION;
+  if (localStorage.getItem(seenKey)) return;
+
+  const banner = document.createElement('div');
+  banner.id = 'update-banner';
+  banner.style.cssText = `
+    position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%) translateY(120%);
+    z-index: 99998; width: min(520px, calc(100vw - 2rem));
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius: 1rem; padding: 1.25rem 1.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.1);
+    color: white; font-family: inherit;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+    opacity: 0;
+  `;
+  banner.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem;">
+      <div style="flex:1; min-width:0;">
+        <div style="display:flex; align-items:center; gap:0.6rem; margin-bottom:0.6rem;">
+          <div style="background:rgba(255,255,255,0.2); border-radius:8px; padding:0.35rem 0.6rem; font-size:0.7rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;">v${APP_VERSION}</div>
+          <span style="font-size:1rem; font-weight:700;">&#x1F389; What&rsquo;s New</span>
+        </div>
+        <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:0.4rem;">
+          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F50D;</span> Smart RSS auto-detection &mdash; paste any site URL!</li>
+          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F4F0;</span> Feed sources now show real names from the feed</li>
+          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F5BC;&#xFE0F;</span> Styled fallback thumbnails for image-less news</li>
+          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F504;</span> Live feed &mdash; auto-refreshes every 15 min + manual refresh button</li>
+        </ul>
+      </div>
+      <button onclick="document.getElementById('update-banner').remove()" style="background:rgba(255,255,255,0.15); border:none; color:white; border-radius:50%; width:28px; height:28px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; line-height:1;">&times;</button>
+    </div>
+    <button onclick="localStorage.setItem('${seenKey}', '1'); document.getElementById('update-banner').style.opacity='0'; setTimeout(()=>document.getElementById('update-banner')?.remove(), 400);" style="margin-top:1rem; width:100%; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); color:white; font-weight:600; font-size:0.85rem; padding:0.5rem; border-radius:0.5rem; cursor:pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">Got it &mdash; dismiss</button>
+  `;
+
+  document.body.appendChild(banner);
+  // Animate in after a short delay
+  setTimeout(() => {
+    banner.style.transform = 'translateX(-50%) translateY(0)';
+    banner.style.opacity = '1';
+  }, 800);
+
+  // Auto-dismiss after 20 seconds
+  setTimeout(() => {
+    if (document.getElementById('update-banner')) {
+      localStorage.setItem(seenKey, '1');
+      banner.style.opacity = '0';
+      banner.style.transform = 'translateX(-50%) translateY(120%)';
+      setTimeout(() => banner.remove(), 500);
+    }
+  }, 20000);
+}
+
 function applyTheme(themeName, customLogo = null) {
   const html = document.documentElement;
   html.setAttribute('data-theme', themeName);
@@ -396,6 +454,7 @@ async function initPage() {
   if (activeUser) {
     updateNotificationsList();
     updateMessengerDropdownList();
+    setTimeout(showUpdateBannerIfNew, 1200);
   }
 
   // Mobile Navigation Toggler
