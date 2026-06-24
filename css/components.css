@@ -641,22 +641,34 @@
 .filter-pill {
   background: var(--bg-secondary);
   color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  padding: 0.55rem 1.25rem;
   border-radius: 50px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.filter-pill ion-icon {
+  font-size: 1.1rem;
 }
 .filter-pill:hover {
   background: var(--bg-tint);
+  color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
 }
 .filter-pill.active {
   background: var(--primary);
   color: white;
   border-color: var(--primary);
+  box-shadow: 0 4px 14px rgba(var(--primary-rgb, 24,119,242), 0.4);
+  transform: translateY(-1px);
 }
 
 /* ========================================== */
