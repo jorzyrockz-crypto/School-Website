@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Smooth theme-switch animation on the whole page */
 html {
@@ -24,12 +24,12 @@ html {
   --success:           #31a24c;
   --danger:            #f02849;
   --warning:           #f59e0b;
-  --radius-sm:         6px;
-  --radius-md:         10px;
-  --radius-lg:         16px;
-  --shadow-sm:         0 1px 2px rgba(0,0,0,0.1);
-  --shadow-md:         0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg:         0 12px 28px rgba(0,0,0,0.12);
+  --radius-sm:         8px;
+  --radius-md:         16px;
+  --radius-lg:         24px;
+  --shadow-sm:         0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md:         0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg:         0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
   --sidebar-width:     280px;
   --transition:        all 0.2s ease;
 }
@@ -107,12 +107,12 @@ html {
 /* ── Auto Dark Mode (Reacts to Device Settings) ── */
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg-primary:        #18191a;
-    --bg-secondary:      #242526;
-    --bg-tint:           #1e2b40;
-    --text-primary:      #e4e6eb;
-    --text-secondary:    #b0b3b8;
-    --border-color:      #3e4042;
+    --bg-primary:        #121212;
+    --bg-secondary:      #1e1e1e;
+    --bg-tint:           #2c2c2c;
+    --text-primary:      #e3e3e3;
+    --text-secondary:    #a0a0a0;
+    --border-color:      #333333;
   }
   
   [data-theme="forest-green"] {
@@ -148,7 +148,7 @@ html {
 }
 
 body {
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--bg-primary);
   color: var(--text-primary);
   line-height: 1.5;
@@ -325,18 +325,20 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem 1.25rem;
+  margin: 0 1rem;
+  border-radius: 50px;
   color: #e4e6eb;
   font-weight: 600;
   font-size: 0.95rem;
-  transition: var(--transition);
-  border-left: 4px solid transparent;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
 }
 
 .menu-item:hover a, .menu-item.active a {
   color: white;
   background: var(--sidebar-active-bg, rgba(255,255,255,0.07));
-  border-left-color: var(--accent);
+  transform: translateX(4px);
 }
 
 .menu-item a ion-icon {
@@ -556,13 +558,18 @@ button, input, select, textarea {
   margin: 0 auto;
 }
 
-/* FB style Newsfeed cards */
+/* FB style Newsfeed cards / Material Cards */
 .news-card {
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
   box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+.news-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 .news-title {
@@ -581,9 +588,9 @@ button, input, select, textarea {
 
 .sidebar-widget {
   background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  padding: 1.25rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
   box-shadow: var(--shadow-sm);
   margin-bottom: 1.5rem;
 }
@@ -831,31 +838,43 @@ button, input, select, textarea {
   background-color: var(--primary);
   color: white;
   border: none;
-  padding: 0.6rem 1.25rem;
-  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
   font-weight: 700;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition: var(--transition);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-action:hover {
   background-color: var(--primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-action:active {
+  transform: scale(0.98);
 }
 
 .btn-secondary {
   background-color: transparent;
   color: var(--text-primary);
   border: 1px solid var(--border-color);
-  padding: 0.6rem 1.25rem;
-  border-radius: var(--radius-sm);
+  padding: 0.75rem 1.5rem;
+  border-radius: 50px;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-secondary:hover {
   background-color: var(--bg-primary);
+}
+
+.btn-secondary:active {
+  transform: scale(0.98);
 }
 
 /* Toast */
