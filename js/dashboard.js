@@ -218,27 +218,52 @@ async function initMessagesPanel() {
   
   // Decorate threads with last message timestamp to sort them
   const recentThreads = [];
+  const readTimestamp = window.mockReadChats ? (window.mockReadChats[activeUser.uid] || 0) : 0;
+  
   for (const t of threads) {
     const chatId = t.isGroup ? t.uid : [activeUser.uid, t.uid].sort().join('_');
     const msgs = await dbService.getMessages(chatId);
-    let lastTimestamp = 0;
+    let lastMsg = null;
+    let unread = false;
+    
     if (msgs.length > 0) {
-      lastTimestamp = msgs[msgs.length - 1].timestamp;
+      lastMsg = msgs[msgs.length - 1];
+      if (lastMsg.senderId !== activeUser.uid && lastMsg.timestamp > readTimestamp) {
+        unread = true;
+      }
     }
-    recentThreads.push({ ...t, lastTimestamp });
+    recentThreads.push({ ...t, lastMsg, unread });
   }
 
-  recentThreads.sort((a, b) => b.lastTimestamp - a.lastTimestamp);
+  recentThreads.sort((a, b) => (b.lastMsg?.timestamp || 0) - (a.lastMsg?.timestamp || 0));
 
-  threadListContainer.innerHTML = recentThreads.map(t => `
-    <div class="thread-item" data-uid="${t.uid}">
+  threadListContainer.innerHTML = recentThreads.map(t => {
+    let snippet = "No messages yet";
+    let timeStr = "";
+    if (t.lastMsg) {
+      snippet = t.lastMsg.text || (t.lastMsg.imageData ? "Sent an image" : t.lastMsg.fileAttachment ? "Sent a file" : "Sent an attachment");
+      if (t.lastMsg.senderId === activeUser.uid) snippet = `You: ${snippet}`;
+      
+      const d = new Date(t.lastMsg.timestamp);
+      timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
+
+    return `
+    <div class="thread-item" data-uid="${t.uid}" style="position:relative;">
       <img class="thread-avatar" src="${t.avatar}" alt="avatar">
-      <div class="thread-details">
-        <div class="thread-name">${t.name}</div>
-        <span class="profile-role" style="font-size:0.6rem; padding:0.1rem 0.4rem;">${t.role}</span>
+      <div class="thread-details" style="flex:1; overflow:hidden;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline;">
+          <div class="thread-name" style="font-weight:${t.unread ? '700' : '500'};">${t.name}</div>
+          <span class="thread-time">${timeStr}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <div class="thread-snippet" style="font-weight:${t.unread ? '700' : '400'}; color:${t.unread ? 'var(--text-primary)' : 'var(--text-secondary)'};">${snippet}</div>
+          ${t.unread ? `<div class="thread-unread-badge"></div>` : ''}
+        </div>
       </div>
     </div>
-  `).join('');
+    `;
+  }).join('');
 
   threadListContainer.querySelectorAll('.thread-item').forEach(item => {
     item.onclick = (e) => {
@@ -265,59 +290,129 @@ async function openChatWindow(targetUser) {
   document.getElementById('chat-header-avatar').src = targetUser.avatar;
   document.getElementById('chat-header-name').innerText = targetUser.name;
   document.getElementById('chat-header-role').innerText = targetUser.role.toUpperCase();
+  
+  const activeDot = document.getElementById('chat-header-active-dot');
+  if (activeDot) activeDot.style.display = 'block';
 
   const chatId = targetUser.isGroup ? targetUser.uid : [activeUser.uid, targetUser.uid].sort().join('_');
   const messages = await dbService.getMessages(chatId);
   
+  // Update mockReadChats to clear unread badges for this thread
+  window.mockReadChats = window.mockReadChats || {};
+  window.mockReadChats[activeUser.uid] = Date.now();
+  if (typeof updateMessengerDropdownList === 'function') updateMessengerDropdownList();
+  
   const body = document.getElementById('chat-messages-body');
-  body.innerHTML = messages.map(m => {
-    const isOut = m.senderId === activeUser.uid;
-    const cls = isOut ? 'outgoing' : 'incoming';
-    let content = '';
+  
+  const renderMessages = () => {
+    let mediaItems = [];
+    body.innerHTML = messages.map((m, idx) => {
+      const isOut = m.senderId === activeUser.uid;
+      const rowCls = isOut ? 'sent' : 'received';
+      let content = '';
+      
+      if (m.fileAttachment) {
+        const ext = m.fileAttachment.name.split('.').pop().toUpperCase();
+        content += `
+          <div class="chat-file-attachment" style="background:rgba(0,0,0,0.1); padding:0.5rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem;">
+            <ion-icon name="document-text" class="file-icon" style="font-size:1.5rem;"></ion-icon>
+            <div class="file-name" title="${m.fileAttachment.name}" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.85rem;">${m.fileAttachment.name}</div>
+            <a href="${m.fileAttachment.data}" download="${m.fileAttachment.name}" class="file-download" title="Download ${ext}" style="color:inherit;">
+              <ion-icon name="download-outline"></ion-icon>
+            </a>
+          </div>
+        `;
+      } else if (m.imageData) {
+        mediaItems.push(m.imageData);
+        content += `
+          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'};">
+            <img src="${m.imageData}" alt="Image" style="max-width:220px; max-height:200px; border-radius:8px; display:block; border:1px solid rgba(255,255,255,0.2);">
+            <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+              <ion-icon name="download-outline"></ion-icon>
+            </a>
+          </div>
+        `;
+      }
+      
+      if (m.text) content += `<span>${m.text}</span>`;
+      
+      const timeStr = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const isLastMsg = idx === messages.length - 1;
+      let receipt = '';
+      if (isOut && isLastMsg) {
+        receipt = `<div style="font-size:0.65rem; color:var(--text-secondary); text-align:right; margin-top:0.2rem;"><ion-icon name="checkmark-done-outline"></ion-icon> Seen</div>`;
+      }
+      
+      return `
+        <div class="chat-msg-row ${rowCls}">
+          ${!isOut ? `<img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">` : ''}
+          <div style="max-width:75%; display:flex; flex-direction:column; align-items:${isOut ? 'flex-end' : 'flex-start'};">
+            <div class="chat-msg-bubble">${content}</div>
+            <span class="chat-msg-timestamp">${timeStr}</span>
+            ${receipt}
+          </div>
+        </div>
+      `;
+    }).join('');
     
-    if (m.fileAttachment) {
-      const ext = m.fileAttachment.name.split('.').pop().toUpperCase();
-      content += `
-        <div class="chat-file-attachment">
-          <ion-icon name="document-text" class="file-icon"></ion-icon>
-          <div class="file-name" title="${m.fileAttachment.name}">${m.fileAttachment.name}</div>
-          <a href="${m.fileAttachment.data}" download="${m.fileAttachment.name}" class="file-download" title="Download ${ext}">
-            <ion-icon name="download-outline"></ion-icon>
-          </a>
-        </div>
-      `;
-    } else if (m.imageData) {
-      content += `
-        <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'};">
-          <img src="${m.imageData}" alt="Image" style="max-width:220px; max-height:200px; border-radius:var(--radius-md); display:block;">
-          <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
-            <ion-icon name="download-outline"></ion-icon>
-          </a>
-        </div>
-      `;
+    // Populate Media Panel
+    const mediaGrid = document.getElementById('chat-media-grid');
+    if (mediaGrid) {
+      document.getElementById('media-panel-avatar').src = targetUser.avatar;
+      document.getElementById('media-panel-name').innerText = targetUser.name;
+      
+      if (mediaItems.length > 0) {
+        mediaGrid.innerHTML = mediaItems.map(src => `<img class="media-item" src="${src}" onclick="window.open('${src}')">`).join('');
+      } else {
+        mediaGrid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:2rem 0;">No media shared yet</p>`;
+      }
     }
     
-    if (m.text) content += `<span>${m.text}</span>`;
-    return `<div class="message-bubble ${cls}">${content}</div>`;
-  }).join('');
+    body.scrollTop = body.scrollHeight;
+  };
   
-  body.scrollTop = body.scrollHeight;
+  // Render typing indicator if there's no messages or randomly (1 in 3 chance) just for effect
+  if (messages.length > 0 && Math.random() > 0.6) {
+    body.innerHTML = `
+      <div class="chat-msg-row received">
+        <img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    `;
+    setTimeout(() => {
+      renderMessages();
+    }, 1500);
+  } else {
+    renderMessages();
+  }
 
   // Toggle active view state on mobile
-  const container = document.getElementById('chat-container-element');
-  if (container) {
-    container.classList.add('chat-active-window');
+  const chatWindow = document.querySelector('.chat-window');
+  if (chatWindow) {
+    chatWindow.classList.add('mobile-active');
   }
 }
+
+// Media Panel Toggle
+window.toggleMediaPanel = function() {
+  const panel = document.getElementById('chat-media-panel');
+  if (panel) {
+    panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+  }
+};
 
 // Bind mobile back button
 const chatBackBtn = document.getElementById('btn-chat-back');
 if (chatBackBtn) {
   chatBackBtn.onclick = () => {
     activeChatThread = null;
-    const container = document.getElementById('chat-container-element');
-    if (container) {
-      container.classList.remove('chat-active-window');
+    const chatWindow = document.querySelector('.chat-window');
+    if (chatWindow) {
+      chatWindow.classList.remove('mobile-active');
     }
   };
 }

@@ -467,11 +467,12 @@
         </div>
 
         <!-- ================= VIEW: DIRECT MESSAGES ================= -->
-        <div id="view-messages" class="route-view" style="display:none;">
-          <h2>School Communications Hub</h2>
-          <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Secure direct messaging between Admins, Teachers, and Parents.</p>
-          <div id="chat-container-element" class="chat-container">
+        <div id="view-messages" class="route-view" style="display:none; padding:0; height:calc(100vh - 70px);">
+          <div id="chat-container-element" class="chat-container" style="border:none; border-radius:0; height:100%; max-height:none; box-shadow:none; display:flex; margin:0;">
             <div class="chat-threads">
+              <div style="padding:1rem 1rem 0 1rem;">
+                <h2 style="font-size:1.5rem;">Chats</h2>
+              </div>
               <div class="chat-search" style="display:flex; gap:0.5rem; align-items:center;">
                 <input type="text" placeholder="Search contacts..." style="flex:1;">
                 <button type="button" id="btn-create-group-chat" title="Create Group Chat" style="background:var(--bg-primary); border:1px solid var(--border-color); color:var(--text-secondary); width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
@@ -482,16 +483,26 @@
                 <!-- Threads -->
               </div>
             </div>
-            <div class="chat-window">
-              <div class="chat-window-header">
-                <!-- Mobile back button to chat lists -->
-                <button id="btn-chat-back" style="background:none; border:none; font-size:1.5rem; color:var(--text-secondary); cursor:pointer; display:none; align-items:center; justify-content:center; padding-right:0.5rem;">
-                  <ion-icon name="arrow-back-outline"></ion-icon>
-                </button>
-                <img id="chat-header-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" alt="User avatar">
-                <div>
-                  <h3 id="chat-header-name" class="thread-name">Select a thread</h3>
-                  <span id="chat-header-role" style="font-size:0.75rem; color:var(--text-secondary);">No active conversation</span>
+            <div class="chat-window" style="flex:1;">
+              <div class="chat-window-header" style="justify-content:space-between; background:var(--bg-secondary);">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <!-- Mobile back button to chat lists -->
+                  <button id="btn-chat-back" style="background:none; border:none; font-size:1.5rem; color:var(--text-secondary); cursor:pointer; display:none; align-items:center; justify-content:center; padding-right:0.5rem;">
+                    <ion-icon name="arrow-back-outline"></ion-icon>
+                  </button>
+                  <div style="position:relative;">
+                    <img id="chat-header-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" alt="User avatar">
+                    <div id="chat-header-active-dot" style="position:absolute; bottom:2px; right:2px; width:10px; height:10px; background:var(--success); border-radius:50%; border:2px solid var(--bg-secondary); display:none;"></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; align-items:flex-start;">
+                    <h3 id="chat-header-name" class="thread-name" style="margin:0;">Select a thread</h3>
+                    <span id="chat-header-role" style="font-size:0.75rem; color:var(--text-secondary);">No active conversation</span>
+                  </div>
+                </div>
+                <div class="chat-header-actions" style="display:flex; gap:1.2rem; color:var(--primary); font-size:1.5rem; align-items:center;">
+                  <ion-icon name="call" style="cursor:pointer; transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="showToast('Voice call coming soon')"></ion-icon>
+                  <ion-icon name="videocam" style="cursor:pointer; transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="showToast('Video call coming soon')"></ion-icon>
+                  <ion-icon name="information-circle" style="cursor:pointer; transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="toggleMediaPanel()"></ion-icon>
                 </div>
               </div>
               <div id="chat-messages-body" class="chat-messages">
@@ -503,20 +514,33 @@
                 </button>
                 <input type="file" id="chat-photo-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;">
                 <button type="button" id="btn-attach-chat-photo" title="Attach file" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.4rem; display:flex; align-items:center; flex-shrink:0;">
-                  <ion-icon name="attach-outline"></ion-icon>
+                  <ion-icon name="image-outline"></ion-icon>
                 </button>
                 <button type="button" class="btn-chat-action" onclick="toggleEmojiPicker('chat-msg-input')" title="Insert Emoji" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.4rem; display:flex; align-items:center; flex-shrink:0;">
                   <ion-icon name="happy"></ion-icon>
                 </button>
                 
-                <div style="flex:1; position:relative; display:flex; align-items:center;">
-                  <input type="text" id="chat-msg-input" placeholder="Type a message..." style="width:100%; border:none; background:transparent; outline:none; font-size:0.95rem;">
+                <div style="flex:1; position:relative; display:flex; align-items:center; background:var(--bg-primary); border-radius:20px; padding:0.4rem 0.75rem; margin:0 0.5rem; border:1px solid var(--border-color);">
+                  <input type="text" id="chat-msg-input" placeholder="Aa" style="width:100%; border:none; background:transparent; outline:none; font-size:0.95rem;">
                 </div>
                 
-                <button type="submit" class="btn-send" style="background:none; border:none; color:var(--primary); font-size:1.5rem; display:flex; align-items:center; padding:0 0.5rem; cursor:pointer;">
+                <button type="submit" class="btn-send" style="background:none; border:none; color:var(--primary); font-size:1.5rem; display:flex; align-items:center; padding:0 0.25rem; cursor:pointer;">
                   <ion-icon name="send"></ion-icon>
                 </button>
               </form>
+            </div>
+            
+            <div id="chat-media-panel" class="chat-media-panel" style="display:none; width:300px; border-left:1px solid var(--border-color); background:var(--bg-secondary); overflow-y:auto; flex-direction:column;">
+              <div style="padding:1.5rem; border-bottom:1px solid var(--border-color); display:flex; flex-direction:column; align-items:center; text-align:center;">
+                <img id="media-panel-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" style="width:80px; height:80px; border-radius:50%; margin-bottom:0.5rem;">
+                <h3 id="media-panel-name" style="margin:0; font-size:1.1rem;">Select a thread</h3>
+              </div>
+              <div style="padding:1rem; flex:1;">
+                <h4 style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">Shared Media</h4>
+                <div id="chat-media-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
             </div>
           </div>
         </div>
