@@ -480,18 +480,6 @@ const dbService = {
     };
     local.chats[chatId].push(newMsg);
     
-    const parts = chatId.split('_');
-    const recipientId = parts[0] === senderId ? parts[1] : parts[0];
-    local.notifications.unshift({
-      id: "notif_" + Date.now(),
-      schoolId: currentSchoolId,
-      recipientId,
-      senderName: local.users[senderId].name,
-      messageText: `sent you a message: "${text.substring(0, 30)}..."`,
-      read: false,
-      timestamp: Date.now()
-    });
-
     saveLocalDB(local);
     return newMsg;
   },

@@ -306,7 +306,7 @@ if (chatAttachBtn && chatPhotoInput) {
         chatPhotoInput.value = '';
         openChatWindow(activeChatThread);
         if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
-          if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)));
+          if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
         }
         showToast('Photo sent!');
       });
@@ -334,7 +334,11 @@ if (chatForm) {
     
     openChatWindow(activeChatThread);
     if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
-      if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)));
+      if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
+    }
+    
+    if (typeof updateMessengerDropdownList === 'function') {
+      updateMessengerDropdownList();
     }
   };
 }

@@ -47,6 +47,57 @@ async function updateNotificationsList() {
   }
 }
 
+async function updateMessengerDropdownList() {
+  if (!activeUser) return;
+  const listEl = document.getElementById('messenger-dropdown-list');
+  const badge = document.getElementById('messenger-badge-count');
+  if (!listEl || !badge) return;
+
+  const threads = await dbService.getChatThreads(activeUser.uid);
+  
+  // For the dropdown, just show the top 4 threads that have recent messages
+  const recentThreads = [];
+  let unreadCount = 0; // Simulated unread count
+
+  for (const t of threads) {
+    const chatId = [activeUser.uid, t.uid].sort().join('_');
+    const msgs = await dbService.getMessages(chatId);
+    if (msgs.length > 0) {
+      const lastMsg = msgs[msgs.length - 1];
+      recentThreads.push({ ...t, lastMsg });
+      
+      // Simulate unread if the last message is not from the active user and was sent recently
+      if (lastMsg.senderId !== activeUser.uid) {
+        unreadCount++;
+      }
+    }
+  }
+
+  // Sort by latest message first
+  recentThreads.sort((a, b) => b.lastMsg.timestamp - a.lastMsg.timestamp);
+
+  badge.innerText = unreadCount;
+  badge.style.display = unreadCount > 0 ? 'flex' : 'none';
+
+  if (recentThreads.length === 0) {
+    listEl.innerHTML = `<div style="padding:1rem; text-align:center; color:var(--text-secondary); font-size:0.9rem;">No recent messages</div>`;
+  } else {
+    listEl.innerHTML = recentThreads.slice(0, 5).map(t => {
+      const isYou = t.lastMsg.senderId === activeUser.uid ? 'You: ' : '';
+      const tJson = encodeURIComponent(JSON.stringify(t)).replace(/'/g, "%27");
+      return `
+        <div class="notif-item" style="cursor:pointer;" onclick="openFloatingChat('${tJson}')">
+          <img src="${t.avatar}" style="width:40px; height:40px; border-radius:50%; margin-right:0.75rem;">
+          <div class="notif-text">
+            <strong>${t.name}</strong><br>
+            <span style="font-size:0.8rem; color:var(--text-secondary);">${isYou}${t.lastMsg.text ? t.lastMsg.text.substring(0,25) + '...' : 'Sent an image'}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
 const clearNotifsBtn = document.getElementById('btn-clear-notifs');
 if (clearNotifsBtn) {
   clearNotifsBtn.onclick = async () => {
@@ -109,7 +160,7 @@ async function initFloatingChatHeads() {
   const topThreads = threads.slice(0, 4);
   const threadsHTML = topThreads.map(t => {
     // Escape JSON so it can be passed as a string
-    const tJson = encodeURIComponent(JSON.stringify(t));
+    const tJson = encodeURIComponent(JSON.stringify(t)).replace(/'/g, "%27");
     return `
       <div class="chat-head-bubble" onclick="openFloatingChat('${tJson}')" title="${t.name}">
         <img src="${t.avatar}" alt="${t.name}">
@@ -128,7 +179,7 @@ async function openFloatingChat(encodedUser) {
   if (!chatWindow) return;
 
   // Set Header Info
-  document.getElementById('chat-window-title').innerText = targetUser.name;
+  document.getElementById('floating-chat-title').innerText = targetUser.name;
   document.getElementById('floating-chat-subtitle').innerText = targetUser.role.toUpperCase();
   document.getElementById('floating-chat-avatar').src = targetUser.avatar;
 
@@ -185,16 +236,11 @@ async function submitFloatingChat() {
   if (!text) return;
 
   const chatId = [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
-  await dbService.saveMessage(chatId, {
-    id: 'msg_' + Date.now(),
-    senderId: activeUser.uid,
-    text: text,
-    timestamp: Date.now()
-  });
+  await dbService.sendMessage(chatId, activeUser.uid, text, null);
 
   input.value = '';
   // Re-render the floating chat to show new message
-  openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)));
+  openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
   
   // If the user is on the messages page and it's the same thread, sync it!
   if (window.location.hash.includes('#/messages') && typeof initMessagesPanel === 'function') {
@@ -206,6 +252,9 @@ async function submitFloatingChat() {
       }
     }
   }
+  
+  // Sync the messenger dropdown
+  updateMessengerDropdownList();
 }
 
 function minimizeChatWindow() {
@@ -253,6 +302,7 @@ async function initPage() {
   
   if (activeUser) {
     updateNotificationsList();
+    updateMessengerDropdownList();
   }
 
   // Mobile Navigation Toggler
