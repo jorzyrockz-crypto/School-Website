@@ -474,8 +474,11 @@
           <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Secure direct messaging between Admins, Teachers, and Parents.</p>
           <div id="chat-container-element" class="chat-container">
             <div class="chat-threads">
-              <div class="chat-search">
-                <input type="text" placeholder="Search contacts...">
+              <div class="chat-search" style="display:flex; gap:0.5rem; align-items:center;">
+                <input type="text" placeholder="Search contacts..." style="flex:1;">
+                <button type="button" id="btn-create-group-chat" title="Create Group Chat" style="background:var(--bg-primary); border:1px solid var(--border-color); color:var(--text-secondary); width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
+                  <ion-icon name="people-outline"></ion-icon>
+                </button>
               </div>
               <div id="chat-thread-list" class="thread-list">
                 <!-- Threads -->
@@ -497,10 +500,10 @@
                 <!-- Messages -->
               </div>
               <form id="chat-input-form" class="chat-input-bar">
-                <!-- Hidden file input for image attachment -->
-                <input type="file" id="chat-photo-input" accept="image/*" style="display:none;">
-                <button type="button" id="btn-attach-chat-photo" title="Attach photo" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.4rem; display:flex; align-items:center; padding:0 0.5rem; flex-shrink:0;">
-                  <ion-icon name="image-outline"></ion-icon>
+                <!-- Hidden file input for file attachments -->
+                <input type="file" id="chat-photo-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;">
+                <button type="button" id="btn-attach-chat-photo" title="Attach file" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.4rem; display:flex; align-items:center; padding:0 0.5rem; flex-shrink:0;">
+                  <ion-icon name="attach-outline"></ion-icon>
                 </button>
                 <input type="text" id="chat-msg-input" placeholder="Type a message...">
                 <button type="submit" class="btn-send">Send</button>
@@ -672,6 +675,30 @@
     </div>
   </div>
 
+  <!-- ================= CREATE GROUP CHAT MODAL ================= -->
+  <div id="create-group-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+    <form id="create-group-form" style="background:var(--bg-secondary); width:90%; max-width:450px; border-radius:var(--radius-lg); padding:2rem; box-shadow:var(--shadow-lg);">
+      <h3 style="margin-bottom:1rem; font-size:1.25rem;">Create Group Chat</h3>
+      
+      <div class="form-group">
+        <label for="group-name-input">Group Name</label>
+        <input type="text" id="group-name-input" class="form-control" placeholder="e.g., Grade 10 Science Project" required>
+      </div>
+
+      <div class="form-group">
+        <label>Select Participants</label>
+        <div id="group-participants-list" style="max-height:200px; overflow-y:auto; border:1px solid var(--border-color); border-radius:var(--radius-md); padding:0.5rem; display:flex; flex-direction:column; gap:0.5rem;">
+          <!-- Checkboxes populated via JS -->
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:1.5rem;">
+        <button type="button" id="btn-close-group-modal" class="btn-secondary">Cancel</button>
+        <button type="submit" class="btn-action">Create Group</button>
+      </div>
+    </form>
+  </div>
+
   <!-- ================= FLOATING CHAT SYSTEM ================= -->
   <!-- Chat Heads Dock -->
   <div id="chat-heads-dock" class="chat-heads-dock auth-only" style="display:none;">
@@ -711,7 +738,9 @@
     <!-- Chat Input Bar -->
     <form id="floating-chat-form" class="chat-window-input-area" onsubmit="event.preventDefault(); submitFloatingChat();">
       <button type="button" class="chat-input-btn add-btn"><ion-icon name="add-circle"></ion-icon></button>
-      <button type="button" class="chat-input-btn"><ion-icon name="image"></ion-icon></button>
+      <!-- Hidden file input for floating chat -->
+      <input type="file" id="floating-chat-photo-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;">
+      <button type="button" class="chat-input-btn" id="btn-attach-floating-photo"><ion-icon name="attach-outline"></ion-icon></button>
       <button type="button" class="chat-input-btn"><ion-icon name="happy"></ion-icon></button>
       
       <div class="chat-input-wrap">

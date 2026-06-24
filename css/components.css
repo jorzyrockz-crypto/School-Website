@@ -365,6 +365,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0; /* Fixes grid item overflow bug */
 }
 
 .chat-window-header {
@@ -432,6 +433,45 @@
   font-weight: 600;
   font-size: 0.85rem;
   cursor: pointer;
+}
+
+.chat-file-attachment {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.25rem;
+}
+
+.message-bubble.outgoing .chat-file-attachment {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.chat-file-attachment .file-icon {
+  font-size: 1.5rem;
+  color: inherit;
+}
+
+.chat-file-attachment .file-name {
+  flex: 1;
+  font-size: 0.8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chat-file-attachment .file-download {
+  color: inherit;
+  text-decoration: none;
+  font-size: 1.2rem;
+  display: flex;
+  cursor: pointer;
+}
+
+.chat-file-attachment .file-download:hover {
+  opacity: 0.8;
 }
 
 /* Forms & elements */

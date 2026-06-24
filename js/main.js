@@ -60,7 +60,7 @@ async function updateMessengerDropdownList() {
   let unreadCount = 0; // Simulated unread count
 
   for (const t of threads) {
-    const chatId = [activeUser.uid, t.uid].sort().join('_');
+    const chatId = t.isGroup ? t.uid : [activeUser.uid, t.uid].sort().join('_');
     const msgs = await dbService.getMessages(chatId);
     if (msgs.length > 0) {
       const lastMsg = msgs[msgs.length - 1];
@@ -184,7 +184,7 @@ async function openFloatingChat(encodedUser) {
   document.getElementById('floating-chat-avatar').src = targetUser.avatar;
 
   // Fetch and Render Messages
-  const chatId = [activeUser.uid, targetUser.uid].sort().join('_');
+  const chatId = targetUser.isGroup ? targetUser.uid : [activeUser.uid, targetUser.uid].sort().join('_');
   const messages = await dbService.getMessages(chatId);
   const body = document.getElementById('floating-chat-messages-body');
   
@@ -196,7 +196,31 @@ async function openFloatingChat(encodedUser) {
     const bubbleCls = isOut ? 'bg-green' : 'bg-dark';
     
     let content = '';
-    if (m.imageData) content += `<img src="${m.imageData}" style="max-width:200px; border-radius:12px; margin-bottom:${m.text ? '0.4rem' : '0'}; display:block;">`;
+    
+    if (m.fileAttachment) {
+      const ext = m.fileAttachment.name.split('.').pop().toUpperCase();
+      content += `
+        <div class="chat-file-attachment" style="background: rgba(0,0,0,0.15); border-radius:12px; margin-bottom:${m.text ? '0.4rem' : '0'}; display:block;">
+          <div style="display:flex; align-items:center; gap:0.5rem; padding:0.5rem;">
+            <ion-icon name="document-text" class="file-icon"></ion-icon>
+            <div class="file-name" title="${m.fileAttachment.name}" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${m.fileAttachment.name}</div>
+            <a href="${m.fileAttachment.data}" download="${m.fileAttachment.name}" class="file-download" style="color:inherit; display:flex;">
+              <ion-icon name="download-outline"></ion-icon>
+            </a>
+          </div>
+        </div>
+      `;
+    } else if (m.imageData) {
+      content += `
+        <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'};">
+          <img src="${m.imageData}" style="max-width:200px; border-radius:12px; display:block;">
+          <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+            <ion-icon name="download-outline" style="font-size:0.9rem;"></ion-icon>
+          </a>
+        </div>
+      `;
+    }
+    
     if (m.text) content += `<span>${m.text}</span>`;
     
     if (isOut) {
@@ -235,7 +259,7 @@ async function submitFloatingChat() {
   const text = input.value.trim();
   if (!text) return;
 
-  const chatId = [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
+  const chatId = activeFloatingChatThread.isGroup ? activeFloatingChatThread.uid : [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
   await dbService.sendMessage(chatId, activeUser.uid, text, null);
 
   input.value = '';
@@ -254,8 +278,56 @@ async function submitFloatingChat() {
   }
   
   // Sync the messenger dropdown
-  updateMessengerDropdownList();
+  if (typeof updateMessengerDropdownList === 'function') {
+    updateMessengerDropdownList();
+  }
 }
+
+// Add event listeners for file attachment in floating chat once DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  const attachBtn = document.getElementById('btn-attach-floating-photo');
+  const fileInput = document.getElementById('floating-chat-photo-input');
+  
+  if (attachBtn && fileInput) {
+    attachBtn.onclick = () => fileInput.click();
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file || !activeFloatingChatThread || !activeUser) return;
+      
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target.result;
+        if (file.type.startsWith('image/')) {
+          dbService.compressImage(dataUrl, 800, async (compressedData) => {
+            const chatId = activeFloatingChatThread.isGroup ? activeFloatingChatThread.uid : [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
+            await dbService.sendMessage(chatId, activeUser.uid, '', { name: file.name, type: file.type, data: compressedData });
+            fileInput.value = '';
+            openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
+            // Sync main dashboard window if open
+            if (window.location.hash.includes('#/messages') && typeof openChatWindow === 'function') {
+              if (typeof activeChatThread !== 'undefined' && activeChatThread && activeChatThread.uid === activeFloatingChatThread.uid) {
+                openChatWindow(activeChatThread);
+              }
+            }
+          });
+        } else {
+          const chatId = activeFloatingChatThread.isGroup ? activeFloatingChatThread.uid : [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
+          dbService.sendMessage(chatId, activeUser.uid, '', { name: file.name, type: file.type, data: dataUrl }).then(() => {
+            fileInput.value = '';
+            openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
+            // Sync main dashboard window if open
+            if (window.location.hash.includes('#/messages') && typeof openChatWindow === 'function') {
+              if (typeof activeChatThread !== 'undefined' && activeChatThread && activeChatThread.uid === activeFloatingChatThread.uid) {
+                openChatWindow(activeChatThread);
+              }
+            }
+          });
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+  }
+});
 
 function minimizeChatWindow() {
   const chatWindow = document.getElementById('floating-chat-window');

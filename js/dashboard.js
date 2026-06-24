@@ -216,7 +216,21 @@ async function initMessagesPanel() {
   const threads = await dbService.getChatThreads(activeUser.uid);
   const threadListContainer = document.getElementById('chat-thread-list');
   
-  threadListContainer.innerHTML = threads.map(t => `
+  // Decorate threads with last message timestamp to sort them
+  const recentThreads = [];
+  for (const t of threads) {
+    const chatId = t.isGroup ? t.uid : [activeUser.uid, t.uid].sort().join('_');
+    const msgs = await dbService.getMessages(chatId);
+    let lastTimestamp = 0;
+    if (msgs.length > 0) {
+      lastTimestamp = msgs[msgs.length - 1].timestamp;
+    }
+    recentThreads.push({ ...t, lastTimestamp });
+  }
+
+  recentThreads.sort((a, b) => b.lastTimestamp - a.lastTimestamp);
+
+  threadListContainer.innerHTML = recentThreads.map(t => `
     <div class="thread-item" data-uid="${t.uid}">
       <img class="thread-avatar" src="${t.avatar}" alt="avatar">
       <div class="thread-details">
@@ -239,6 +253,10 @@ async function initMessagesPanel() {
   if (activeChatThread) {
     const activeEl = threadListContainer.querySelector(`[data-uid="${activeChatThread.uid}"]`);
     if (activeEl) activeEl.click();
+  } else if (recentThreads.length > 0) {
+    // Automatically select the most recent thread
+    const firstEl = threadListContainer.querySelector('.thread-item');
+    if (firstEl) firstEl.click();
   }
 }
 
@@ -248,7 +266,7 @@ async function openChatWindow(targetUser) {
   document.getElementById('chat-header-name').innerText = targetUser.name;
   document.getElementById('chat-header-role').innerText = targetUser.role.toUpperCase();
 
-  const chatId = [activeUser.uid, targetUser.uid].sort().join('_');
+  const chatId = targetUser.isGroup ? targetUser.uid : [activeUser.uid, targetUser.uid].sort().join('_');
   const messages = await dbService.getMessages(chatId);
   
   const body = document.getElementById('chat-messages-body');
@@ -256,9 +274,29 @@ async function openChatWindow(targetUser) {
     const isOut = m.senderId === activeUser.uid;
     const cls = isOut ? 'outgoing' : 'incoming';
     let content = '';
-    if (m.imageData) {
-      content = `<img src="${m.imageData}" alt="Image" style="max-width:220px; max-height:200px; border-radius:var(--radius-md); display:block; margin-bottom:${m.text ? '0.4rem' : '0'};">`;
+    
+    if (m.fileAttachment) {
+      const ext = m.fileAttachment.name.split('.').pop().toUpperCase();
+      content += `
+        <div class="chat-file-attachment">
+          <ion-icon name="document-text" class="file-icon"></ion-icon>
+          <div class="file-name" title="${m.fileAttachment.name}">${m.fileAttachment.name}</div>
+          <a href="${m.fileAttachment.data}" download="${m.fileAttachment.name}" class="file-download" title="Download ${ext}">
+            <ion-icon name="download-outline"></ion-icon>
+          </a>
+        </div>
+      `;
+    } else if (m.imageData) {
+      content += `
+        <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'};">
+          <img src="${m.imageData}" alt="Image" style="max-width:220px; max-height:200px; border-radius:var(--radius-md); display:block;">
+          <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+            <ion-icon name="download-outline"></ion-icon>
+          </a>
+        </div>
+      `;
     }
+    
     if (m.text) content += `<span>${m.text}</span>`;
     return `<div class="message-bubble ${cls}">${content}</div>`;
   }).join('');
@@ -298,18 +336,33 @@ if (chatAttachBtn && chatPhotoInput) {
       chatPhotoInput.value = '';
       return;
     }
+    
     const reader = new FileReader();
     reader.onload = (ev) => {
-      compressImage(ev.target.result, 800, async (compressedData) => {
-        const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
-        await dbService.sendMessage(chatId, activeUser.uid, '', compressedData);
-        chatPhotoInput.value = '';
-        openChatWindow(activeChatThread);
-        if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
-          if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
-        }
-        showToast('Photo sent!');
-      });
+      const dataUrl = ev.target.result;
+      if (file.type.startsWith('image/')) {
+        compressImage(dataUrl, 800, async (compressedData) => {
+          const chatId = activeChatThread.isGroup ? activeChatThread.uid : [activeUser.uid, activeChatThread.uid].sort().join('_');
+          await dbService.sendMessage(chatId, activeUser.uid, '', { name: file.name, type: file.type, data: compressedData });
+          chatPhotoInput.value = '';
+          openChatWindow(activeChatThread);
+          if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
+            if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
+          }
+          showToast('Image sent!');
+        });
+      } else {
+        // Generic file, send directly without compression
+        const chatId = activeChatThread.isGroup ? activeChatThread.uid : [activeUser.uid, activeChatThread.uid].sort().join('_');
+        dbService.sendMessage(chatId, activeUser.uid, '', { name: file.name, type: file.type, data: dataUrl }).then(() => {
+          chatPhotoInput.value = '';
+          openChatWindow(activeChatThread);
+          if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
+            if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
+          }
+          showToast('File sent!');
+        });
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -328,7 +381,7 @@ if (chatForm) {
     const text = input.value.trim();
     if (!text) return;
     
-    const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
+    const chatId = activeChatThread.isGroup ? activeChatThread.uid : [activeUser.uid, activeChatThread.uid].sort().join('_');
     await dbService.sendMessage(chatId, activeUser.uid, text, null);
     input.value = '';
     
@@ -583,3 +636,63 @@ function initProfilePanel() {
   }
 }
 
+// ==========================================
+// CREATE GROUP CHAT LOGIC
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+  const btnCreateGroup = document.getElementById('btn-create-group-chat');
+  const createGroupModal = document.getElementById('create-group-modal');
+  const btnCloseGroupModal = document.getElementById('btn-close-group-modal');
+  const createGroupForm = document.getElementById('create-group-form');
+  const participantsList = document.getElementById('group-participants-list');
+
+  if (btnCreateGroup && createGroupModal) {
+    btnCreateGroup.onclick = async () => {
+      // Populate participants
+      const local = dbService.getLocalDB();
+      const users = Object.values(local.users).filter(u => u.uid !== activeUser.uid);
+      participantsList.innerHTML = users.map(u => `
+        <label style="display:flex; align-items:center; gap:0.5rem; padding:0.25rem; cursor:pointer;">
+          <input type="checkbox" name="group-participant" value="${u.uid}">
+          <img src="${u.avatar}" style="width:24px; height:24px; border-radius:50%;">
+          <span style="font-size:0.9rem;">${u.name}</span>
+        </label>
+      `).join('');
+      
+      createGroupModal.style.display = 'flex';
+    };
+
+    btnCloseGroupModal.onclick = () => {
+      createGroupModal.style.display = 'none';
+    };
+
+    createGroupForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const nameInput = document.getElementById('group-name-input').value.trim();
+      const checkboxes = document.querySelectorAll('input[name="group-participant"]:checked');
+      const selectedUids = Array.from(checkboxes).map(cb => cb.value);
+      
+      if (!nameInput) {
+        showToast("Group name is required.");
+        return;
+      }
+      if (selectedUids.length === 0) {
+        showToast("Select at least one participant.");
+        return;
+      }
+      
+      // Include the active user as a participant automatically
+      selectedUids.push(activeUser.uid);
+      
+      await dbService.createGroupChat(nameInput, selectedUids);
+      createGroupModal.style.display = 'none';
+      createGroupForm.reset();
+      showToast("Group Chat created!");
+      
+      // Refresh the messages panel
+      if (typeof initMessagesPanel === 'function') {
+        initMessagesPanel();
+      }
+    };
+  }
+});

@@ -461,21 +461,64 @@ const dbService = {
   },
   getChatThreads: async (uid) => {
     const local = getLocalDB();
-    return Object.values(local.users).filter(u => u.uid !== uid);
+    const users = Object.values(local.users).filter(u => u.uid !== uid).map(u => ({
+      ...u,
+      isGroup: false
+    }));
+    
+    // Add groups where user is a participant
+    const groups = (local.groups || []).filter(g => g.participants.includes(uid)).map(g => ({
+      uid: g.id,
+      name: g.name,
+      role: 'Group Chat',
+      avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(g.name) + '&backgroundColor=0ea5e9',
+      isGroup: true,
+      participants: g.participants
+    }));
+    
+    return [...users, ...groups];
+  },
+  createGroupChat: async (name, participants) => {
+    const local = getLocalDB();
+    if (!local.groups) local.groups = [];
+    const groupId = 'group_' + Date.now();
+    local.groups.push({
+      id: groupId,
+      name,
+      participants,
+      createdAt: Date.now()
+    });
+    saveLocalDB(local);
+    return groupId;
   },
   getMessages: async (chatId) => {
     const local = getLocalDB();
     return local.chats[chatId] || [];
   },
-  sendMessage: async (chatId, senderId, text, imageData) => {
+  sendMessage: async (chatId, senderId, text, attachment) => {
     const local = getLocalDB();
     if (!local.chats[chatId]) {
       local.chats[chatId] = [];
     }
+    
+    // Legacy support for string imageData
+    let imageData = null;
+    let fileAttachment = null;
+    if (typeof attachment === 'string') {
+      imageData = attachment;
+    } else if (attachment && typeof attachment === 'object') {
+      if (attachment.type.startsWith('image/')) {
+        imageData = attachment.data;
+      } else {
+        fileAttachment = attachment;
+      }
+    }
+
     const newMsg = {
       senderId,
       text: text || '',
-      imageData: imageData || null,
+      imageData: imageData,
+      fileAttachment: fileAttachment,
       timestamp: Date.now()
     };
     local.chats[chatId].push(newMsg);
