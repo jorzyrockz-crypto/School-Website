@@ -28,8 +28,14 @@
       <!-- User Profile Box -->
       <div class="sidebar-profile">
         <img id="user-avatar" class="profile-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest" alt="Avatar">
-        <div id="user-name" class="profile-name">Guest User</div>
-        <span id="user-role" class="profile-role" style="background:rgba(255,255,255,0.1);">Guest</span>
+        <div style="display:flex; flex-direction:column; flex:1; min-width:0; gap:0.25rem;">
+          <div id="user-name" class="profile-name">Guest User</div>
+          <div style="display:flex; align-items:center; gap:0.4rem; white-space:nowrap; overflow:hidden;">
+            <span id="user-position" style="font-size:0.75rem; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; display:none;"></span>
+            <span id="user-pos-sep" style="font-size:0.75rem; color:rgba(255,255,255,0.2); display:none;">|</span>
+            <span id="user-role" class="profile-role" style="background:rgba(255,255,255,0.1);">Guest</span>
+          </div>
+        </div>
       </div>
 
 
