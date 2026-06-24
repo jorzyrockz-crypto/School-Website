@@ -1006,12 +1006,69 @@ function initProfilePanel() {
     };
   }
 
+  // --- Dynamic Role Fields ---
+  const roleFieldsContainer = document.getElementById('profile-role-fields');
+  if (roleFieldsContainer) {
+    const roleData = activeUser.roleData || {};
+    let html = '';
+    
+    if (activeUser.role === 'learner') {
+      html = `
+        <div class="form-group" style="margin-bottom:0;"><label>Learner Reference Number (LRN)</label><input type="text" id="rf-lrn" class="form-control" value="${roleData.lrn || ''}" placeholder="12-digit LRN"></div>
+        <div style="display:flex; gap:1rem;">
+          <div class="form-group" style="margin-bottom:0; flex:1;"><label>Grade Level</label><input type="text" id="rf-grade" class="form-control" value="${roleData.grade || ''}" placeholder="e.g. Grade 10"></div>
+          <div class="form-group" style="margin-bottom:0; flex:1;"><label>Section</label><input type="text" id="rf-section" class="form-control" value="${roleData.section || ''}" placeholder="e.g. Rizal"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:0;"><label>Adviser Name</label><input type="text" id="rf-adviser" class="form-control" value="${roleData.adviser || ''}" placeholder="Class Adviser"></div>
+      `;
+    } else if (activeUser.role === 'teacher') {
+      html = `
+        <div class="form-group" style="margin-bottom:0;"><label>Employee ID Number</label><input type="text" id="rf-empid" class="form-control" value="${roleData.empId || ''}"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>PRC License Number</label><input type="text" id="rf-prc" class="form-control" value="${roleData.prc || ''}"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Department / Subject</label><input type="text" id="rf-dept" class="form-control" value="${roleData.dept || ''}" placeholder="e.g. Mathematics"></div>
+      `;
+    } else if (activeUser.role === 'parent') {
+      html = `
+        <div class="form-group" style="margin-bottom:0;"><label>Contact Number</label><input type="text" id="rf-contact" class="form-control" value="${roleData.contact || ''}" placeholder="09XX-XXX-XXXX"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Learner Name</label><input type="text" id="rf-learner" class="form-control" value="${roleData.learnerName || ''}" placeholder="Child's Full Name"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Relationship</label><input type="text" id="rf-rel" class="form-control" value="${roleData.relationship || ''}" placeholder="e.g. Mother, Father, Guardian"></div>
+      `;
+    } else if (activeUser.role === 'admin') {
+      html = `
+        <div class="form-group" style="margin-bottom:0;"><label>Employee ID Number</label><input type="text" id="rf-empid" class="form-control" value="${roleData.empId || ''}"></div>
+        <div class="form-group" style="margin-bottom:0;"><label>Official Title</label><input type="text" id="rf-title" class="form-control" value="${roleData.title || ''}" placeholder="e.g. School Principal"></div>
+      `;
+    }
+    
+    roleFieldsContainer.innerHTML = html;
+  }
+
   document.getElementById('profile-user-form').onsubmit = async (e) => {
     e.preventDefault();
     const name = document.getElementById('profile-name-input').value.trim();
     const avatar = document.getElementById('profile-avatar-preview').src;
 
-    activeUser = await dbService.saveUser(activeUser.uid, { name, avatar });
+    // Extract Role Data
+    const roleData = {};
+    if (activeUser.role === 'learner') {
+      roleData.lrn = document.getElementById('rf-lrn').value.trim();
+      roleData.grade = document.getElementById('rf-grade').value.trim();
+      roleData.section = document.getElementById('rf-section').value.trim();
+      roleData.adviser = document.getElementById('rf-adviser').value.trim();
+    } else if (activeUser.role === 'teacher') {
+      roleData.empId = document.getElementById('rf-empid').value.trim();
+      roleData.prc = document.getElementById('rf-prc').value.trim();
+      roleData.dept = document.getElementById('rf-dept').value.trim();
+    } else if (activeUser.role === 'parent') {
+      roleData.contact = document.getElementById('rf-contact').value.trim();
+      roleData.learnerName = document.getElementById('rf-learner').value.trim();
+      roleData.relationship = document.getElementById('rf-rel').value.trim();
+    } else if (activeUser.role === 'admin') {
+      roleData.empId = document.getElementById('rf-empid').value.trim();
+      roleData.title = document.getElementById('rf-title').value.trim();
+    }
+
+    activeUser = await dbService.saveUser(activeUser.uid, { name, avatar, roleData });
     try { sessionStorage.setItem('activeUser', JSON.stringify(activeUser)); } catch(err) {}
     showToast('Profile updated successfully!');
 
