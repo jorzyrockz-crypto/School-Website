@@ -407,6 +407,7 @@
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--bg-primary);
+  color: var(--text-primary);
   transition: var(--transition);
 }
 

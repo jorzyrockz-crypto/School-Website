@@ -728,7 +728,7 @@ async function renderPinnedPosts() {
 
     return `
       <div class="pinned-item" onclick="window.location.hash='#/home'; setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);" style="background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border-left:4px solid ${typeColor}; display:flex; flex-direction:column; gap:0.25rem; cursor:pointer; transition:var(--transition);">
-        <span style="font-size:0.65rem; font-weight:700; color:${typeColor}; text-transform:uppercase;">${p.type} &bull; ${p.author}</span>
+        <span style="font-size:0.65rem; font-weight:700; color:${typeColor}; text-transform:uppercase;">${p.type === 'standard' ? 'Post' : p.type} &bull; ${p.author}</span>
         <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary); line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${p.title || p.content || (p.extraData && p.extraData.eventTitle)}</span>
       </div>
     `;
@@ -745,19 +745,17 @@ async function renderAgenda() {
   // Sort by date ascending
   events.sort((a, b) => new Date(a.extraData.date) - new Date(b.extraData.date));
 
-  // Filter next 5 days
+  // Filter for upcoming events only (today onwards)
   const today = new Date();
   today.setHours(0,0,0,0);
-  const fiveDaysLater = new Date(today);
-  fiveDaysLater.setDate(today.getDate() + 5);
 
   const upcomingEvents = events.filter(e => {
     const d = new Date(e.extraData.date);
-    return d >= today && d <= fiveDaysLater;
-  });
+    return d >= today;
+  }).slice(0, 5); // Take only the next 5 events
 
   if (upcomingEvents.length === 0) {
-    container.innerHTML = `<li style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:1rem;">No events in the next 5 days.</li>`;
+    container.innerHTML = `<li style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:1rem;">No upcoming events.</li>`;
     return;
   }
 
