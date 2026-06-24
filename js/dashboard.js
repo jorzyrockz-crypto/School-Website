@@ -362,7 +362,14 @@ async function openChatWindow(targetUser) {
       document.getElementById('media-panel-name').innerText = targetUser.name;
       
       if (mediaItems.length > 0) {
-        mediaGrid.innerHTML = mediaItems.map(src => `<img class="media-item" src="${src}" onclick="window.open('${src}')">`).join('');
+        mediaGrid.innerHTML = mediaItems.map((src, i) => `
+          <div style="position:relative; width:100%; aspect-ratio:1; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${src}', 'media_${i}')">
+            <img class="media-item" src="${src}" style="width:100%; height:100%; display:block;">
+            <a href="${src}" download="media_${i}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
+              <ion-icon name="download-outline"></ion-icon>
+            </a>
+          </div>
+        `).join('');
       } else {
         mediaGrid.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:2rem 0;">No media shared yet</p>`;
       }
