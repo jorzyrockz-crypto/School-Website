@@ -1,4 +1,4 @@
-﻿// ==========================================
+// ==========================================
 // DYNAMIC VIEW RENDERERS (FB SCHOOL NEWSFEED)
 // ==========================================
 
@@ -83,8 +83,8 @@ async function renderNewsfeed() {
         
         <!-- Interactive Like & Comment Status bar -->
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.5rem;">
-          <span id="likes-count-${a.id}">ðŸ‘ ${likes.length} Reactions</span>
-          <span style="cursor:pointer;" class="btn-expand-comments" data-id="${a.id}">ðŸ’¬ Comments</span>
+          <span id="likes-count-${a.id}">👍 ${likes.length} Reactions</span>
+          <span style="cursor:pointer;" class="btn-expand-comments" data-id="${a.id}">💬 Comments</span>
         </div>
 
         <!-- Custom School Reactions Bar -->
@@ -145,7 +145,11 @@ async function renderCommentsList(annId) {
     list.innerHTML = comments.map(c => `
       <div class="comment-item" style="padding:0.5rem; margin-bottom:0.5rem;">
         <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem;">${c.author}</div>
-        <div style="font-size:0.85rem;">${c.text}</div>
+        <div style="font-size:0.85rem; margin-bottom:0.25rem;">${c.text}</div>
+        <div style="display:flex; gap:0.75rem; font-size:0.7rem; color:var(--text-secondary); font-weight:600;">
+          <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'" onclick="showToast('Reacted to comment!')">React</span>
+          <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'" onclick="showToast('Reply feature coming soon!')">Reply</span>
+        </div>
       </div>
     `).join('');
   }

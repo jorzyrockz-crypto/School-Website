@@ -1,4 +1,4 @@
-﻿/* Header */
+/* Header */
 .portal-header {
   height: 60px;
   background: var(--bg-secondary);
@@ -620,10 +620,17 @@
   margin-bottom: 1.5rem;
   scrollbar-width: none;
   position: sticky;
-  top: 70px;
-  z-index: 100;
-  background: var(--bg-primary);
-  padding-top: 0.5rem;
+  top: 59px; /* Just below the 60px header */
+  z-index: 30; /* Keep it below header (40) but above feed cards */
+  background: rgba(var(--bg-primary-rgb, 240, 242, 245), 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 1rem 0 0.5rem 0;
+  border-bottom: 1px solid var(--border-color);
+  margin-left: -1rem;
+  margin-right: -1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 .feed-filter-bar::-webkit-scrollbar {
   display: none;
