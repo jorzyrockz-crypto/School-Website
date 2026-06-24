@@ -1320,15 +1320,12 @@ if (logoutBtn) {
 function syncSidebarProfile() {
   const avatar = document.getElementById('user-avatar');
   const name = document.getElementById('user-name');
-  const role = document.getElementById('user-role');
   const position = document.getElementById('user-position');
-  const sep = document.getElementById('user-pos-sep');
+  const profileBox = document.querySelector('.sidebar-profile');
 
   if (activeUser) {
     avatar.src = activeUser.avatar;
     name.innerText = activeUser.name;
-    role.innerText = activeUser.role.toUpperCase();
-    role.style.background = "rgba(255,255,255,0.25)";
     
     // Position text logic
     let posText = '';
@@ -1341,23 +1338,40 @@ function syncSidebarProfile() {
     else if (activeUser.role === 'learner' && rd.grade) posText = `${rd.grade}${rd.section ? ' - ' + rd.section : ''}`;
     else if (activeUser.role === 'parent' && rd.learnerName) posText = `Parent of ${rd.learnerName}`;
 
-    if (position && sep) {
+    if (position) {
       if (posText) {
         position.innerText = posText;
-        position.style.display = 'inline-block';
-        sep.style.display = 'inline-block';
+        position.style.display = 'block';
       } else {
         position.style.display = 'none';
-        sep.style.display = 'none';
       }
     }
+
+    // Role-based background color for the profile card
+    if (profileBox) {
+      if (activeUser.role === 'admin') {
+        profileBox.style.background = 'rgba(24, 119, 242, 0.15)';
+        profileBox.style.border = '1px solid rgba(24, 119, 242, 0.3)';
+      } else if (activeUser.role === 'teacher') {
+        profileBox.style.background = 'rgba(45, 158, 107, 0.15)';
+        profileBox.style.border = '1px solid rgba(45, 158, 107, 0.3)';
+      } else if (activeUser.role === 'learner') {
+        profileBox.style.background = 'rgba(245, 158, 11, 0.15)';
+        profileBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+      } else if (activeUser.role === 'parent') {
+        profileBox.style.background = 'rgba(124, 58, 237, 0.15)';
+        profileBox.style.border = '1px solid rgba(124, 58, 237, 0.3)';
+      }
+    }
+
   } else {
     avatar.src = "https://api.dicebear.com/7.x/micah/svg?seed=guest";
     name.innerText = "Guest User";
-    role.innerText = "Guest";
-    role.style.background = "rgba(255,255,255,0.1)";
     if (position) position.style.display = 'none';
-    if (sep) sep.style.display = 'none';
+    if (profileBox) {
+      profileBox.style.background = 'rgba(255, 255, 255, 0.03)';
+      profileBox.style.border = 'none';
+    }
   }
 }
 
