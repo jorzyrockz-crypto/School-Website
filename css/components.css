@@ -623,7 +623,9 @@
   position: sticky;
   top: 59px; /* Just below the 60px header */
   z-index: 30; /* Keep it below header (40) but above feed cards */
-  background: rgba(var(--bg-primary-rgb, 240, 242, 245), 0.95);
+  background: var(--bg-primary);
+  /* Optional: if you want translucency without rgb variables */
+  /* background: color-mix(in srgb, var(--bg-primary) 95%, transparent); */
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 1rem 0 0.5rem 0;
