@@ -239,7 +239,7 @@
   background: var(--bg-primary);
   padding: 0.75rem 1rem;
   border-radius: var(--radius-sm);
-  border-left: 4px solid var(--primary);
+  border: 1px solid var(--border-color);
   font-size: 0.85rem;
 }
 
@@ -728,8 +728,7 @@
   padding: 1rem;
   border-radius: var(--radius-md);
   margin-bottom: 1rem;
-  border-left: 4px solid var(--primary);
-}
+  border-left: none;
 
 .poll-card .poll-option {
   background: var(--bg-primary);

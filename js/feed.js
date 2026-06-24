@@ -742,7 +742,7 @@ async function renderPinnedPosts() {
     if (p.type === 'event') typeColor = '#10b981';
 
     return `
-      <div class="pinned-item" onclick="window.location.hash='#/home'; setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);" style="background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border-left:4px solid ${typeColor}; display:flex; flex-direction:column; gap:0.25rem; cursor:pointer; transition:var(--transition);">
+      <div class="pinned-item" onclick="window.location.hash='#/home'; setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);" style="background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); display:flex; flex-direction:column; gap:0.25rem; cursor:pointer; transition:var(--transition);">
         <span style="font-size:0.65rem; font-weight:700; color:${typeColor}; text-transform:uppercase;">${p.type === 'standard' ? 'Post' : p.type} &bull; ${p.author}</span>
         <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary); line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${p.title || p.content || (p.extraData && p.extraData.eventTitle)}</span>
       </div>
