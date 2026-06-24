@@ -153,7 +153,7 @@
         <!-- ================= VIEW: ABOUT INSTITUTION ================= -->
         <div id="view-about" class="route-view" style="display:none;">
           <h1 class="hero-title" style="text-align:center; margin-bottom:2rem;">About Our Institution</h1>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:3rem; align-items:center; margin-bottom:4rem;">
+          <div class="grid-2" style="margin-bottom:4rem;">
             <div>
               <h2>History & Mission</h2>
               <p style="margin:1rem 0; color:var(--text-secondary);">Founded with the vision to deliver quality education, our institution has stood as a beacon of academic rigor and character-building for over two decades.</p>
@@ -184,25 +184,27 @@
           
           <div class="news-card">
             <h2 class="widget-title">Citizen's Charter & Reports</h2>
-            <table class="transparency-table">
-              <thead>
-                <tr>
-                  <th>Document / Report Title</th>
-                  <th>Last Updated</th>
-                  <th>Access Link</th>
-                </tr>
-              </thead>
-              <tbody id="transparency-docs-list">
-                <!-- Dynamically populated -->
-              </tbody>
-            </table>
+            <div style="overflow-x: auto;">
+              <table class="transparency-table">
+                <thead>
+                  <tr>
+                    <th>Document / Report Title</th>
+                    <th>Last Updated</th>
+                    <th>Access Link</th>
+                  </tr>
+                </thead>
+                <tbody id="transparency-docs-list">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
         <!-- ================= VIEW: CONTACT US ================= -->
         <div id="view-contact" class="route-view" style="display:none;">
           <h1 class="hero-title" style="text-align:center; margin-bottom:3rem;">Connect With Us</h1>
-          <div style="display:grid; grid-template-columns:1fr 1fr; gap:3rem;">
+          <div class="grid-2">
             <div class="news-card">
               <h2 class="widget-title">Inquiry Form</h2>
               <form id="contact-form">
@@ -337,7 +339,7 @@
         <div id="view-messages" class="route-view" style="display:none;">
           <h2>School Communications Hub</h2>
           <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Secure direct messaging between Admins, Teachers, and Parents.</p>
-          <div class="chat-container">
+          <div id="chat-container-element" class="chat-container">
             <div class="chat-threads">
               <div class="chat-search">
                 <input type="text" placeholder="Search contacts...">
@@ -348,6 +350,10 @@
             </div>
             <div class="chat-window">
               <div class="chat-window-header">
+                <!-- Mobile back button to chat lists -->
+                <button id="btn-chat-back" style="background:none; border:none; font-size:1.5rem; color:var(--text-secondary); cursor:pointer; display:none; align-items:center; justify-content:center; padding-right:0.5rem;">
+                  <ion-icon name="arrow-back-outline"></ion-icon>
+                </button>
                 <img id="chat-header-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/adventurer/svg?seed=anon" alt="User avatar">
                 <div>
                   <h3 id="chat-header-name" class="thread-name">Select a thread</h3>
@@ -370,7 +376,7 @@
           <h2>Profile Management & Branding Settings</h2>
           <p style="color:var(--text-secondary); margin-bottom:2rem;">Manage your user credentials and school configuration settings.</p>
           
-          <div style="display:grid; grid-template-columns:1fr 2fr; gap:2rem;">
+          <div class="grid-profile">
             <!-- User Settings -->
             <div class="news-card">
               <h3 class="widget-title">User Information</h3>

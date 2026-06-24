@@ -91,16 +91,34 @@ const DEFAULT_LOCAL_DB = {
 };
 
 // Initialize LocalStorage DB if empty
-if (!localStorage.getItem("deped_saas_db")) {
-  localStorage.setItem("deped_saas_db", JSON.stringify(DEFAULT_LOCAL_DB));
+try {
+  if (!localStorage.getItem("deped_saas_db")) {
+    localStorage.setItem("deped_saas_db", JSON.stringify(DEFAULT_LOCAL_DB));
+  }
+} catch(e) {
+  console.error("Storage blocked or unavailable", e);
 }
 
 function getLocalDB() {
-  return JSON.parse(localStorage.getItem("deped_saas_db"));
+  try {
+    const data = localStorage.getItem("deped_saas_db");
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (parsed && parsed.schools) return parsed;
+    }
+  } catch(e) {
+    console.error("Local database corrupted, resetting to defaults...", e);
+  }
+  localStorage.setItem("deped_saas_db", JSON.stringify(DEFAULT_LOCAL_DB));
+  return DEFAULT_LOCAL_DB;
 }
 
 function saveLocalDB(data) {
-  localStorage.setItem("deped_saas_db", JSON.stringify(data));
+  try {
+    localStorage.setItem("deped_saas_db", JSON.stringify(data));
+  } catch(e) {
+    console.error("Failed to write to local storage", e);
+  }
 }
 
 // ==========================================
@@ -792,6 +810,24 @@ async function openChatWindow(targetUser) {
   `).join('');
   
   body.scrollTop = body.scrollHeight;
+
+  // Toggle active view state on mobile
+  const container = document.getElementById('chat-container-element');
+  if (container) {
+    container.classList.add('chat-active-window');
+  }
+}
+
+// Bind mobile back button
+const chatBackBtn = document.getElementById('btn-chat-back');
+if (chatBackBtn) {
+  chatBackBtn.onclick = () => {
+    activeChatThread = null;
+    const container = document.getElementById('chat-container-element');
+    if (container) {
+      container.classList.remove('chat-active-window');
+    }
+  };
 }
 
 const chatForm = document.getElementById('chat-input-form');

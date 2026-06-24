@@ -721,6 +721,31 @@ button, input, select, textarea {
   color: var(--text-secondary);
 }
 
+/* Responsive Grid Utilities */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.grid-profile {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+}
+
+@media(max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .grid-profile {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
 /* Responsive constraints */
 @media(max-width: 900px) {
   #btn-sidebar-toggle {
@@ -743,12 +768,29 @@ button, input, select, textarea {
   .portal-main {
     margin-left: 0;
   }
+  
+  /* Mobile Chat Toggling logic styles */
+  #btn-chat-back {
+    display: flex !important;
+  }
   .chat-container {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr !important;
   }
-  .chat-threads {
-    display: none;
+  .chat-container:not(.chat-active-window) .chat-threads {
+    display: flex !important;
+    width: 100% !important;
   }
+  .chat-container:not(.chat-active-window) .chat-window {
+    display: none !important;
+  }
+  .chat-container.chat-active-window .chat-threads {
+    display: none !important;
+  }
+  .chat-container.chat-active-window .chat-window {
+    display: flex !important;
+    width: 100% !important;
+  }
+
   .dash-grid {
     grid-template-columns: 1fr;
   }
