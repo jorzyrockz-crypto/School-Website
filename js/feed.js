@@ -93,17 +93,22 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     const userHasLiked = activeUser ? likes.includes(activeUser.uid) : false;
     
     let innerCardHTML = '';
-    
-    // Fallback for older mock data
     const titleText = a.title ? `<h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${a.title}</h3>` : '';
     const contentText = `<p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${a.content}</p>`;
 
-    if (a.type === 'achievement') {
+    if (a.type === 'announcement') {
+      innerCardHTML = `
+        <div style="background:rgba(239, 68, 68, 0.1); color:var(--danger); font-size:0.75rem; font-weight:800; padding:0.3rem 0.6rem; border-radius:var(--radius-sm); display:inline-block; margin-bottom:0.75rem; border:1px solid rgba(239, 68, 68, 0.3);">
+          <ion-icon name="megaphone"></ion-icon> OFFICIAL ANNOUNCEMENT
+        </div>
+        ${titleText}
+        <p style="color:var(--text-primary); margin-bottom:1rem; font-size:1.05rem; font-weight:600;">${a.content}</p>
+      `;
+    } else if (a.type === 'achievement') {
       innerCardHTML = `
         <div class="achievement-badge"><ion-icon name="trophy"></ion-icon> Achievement</div>
         ${titleText}
         <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:1rem; font-weight:500;">${a.content}</p>
-        ${a.imageData ? `<img src="${a.imageData}" alt="Post image" style="width:100%; max-height:360px; object-fit:cover; border-radius:var(--radius-md); margin-bottom:1rem; border:1px solid var(--border-color);">` : ''}
       `;
     } else if (a.type === 'event') {
       const eData = a.extraData || {};
@@ -154,11 +159,30 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
         </div>
       `;
     } else {
-      // Default standard
+      // Default standard post
       innerCardHTML = `
         ${titleText}
         ${contentText}
-        ${a.imageData ? `<img src="${a.imageData}" alt="Post image" style="width:100%; max-height:360px; object-fit:cover; border-radius:var(--radius-md); margin-bottom:1rem; border:1px solid var(--border-color);">` : ''}
+      `;
+    }
+
+    // Global Photo Appending
+    if (a.imageData) {
+      innerCardHTML += `<img src="${a.imageData}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); margin-bottom:1rem; border:1px solid var(--border-color);">`;
+    }
+
+    // Global Document Appending
+    if (a.extraData && a.extraData.document) {
+      const doc = a.extraData.document;
+      innerCardHTML += `
+        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:1rem;">
+          <ion-icon name="document-text" style="color:var(--primary); font-size:1.75rem;"></ion-icon>
+          <div style="flex:1;">
+            <div style="font-size:0.9rem; font-weight:600;">${doc.name}</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">${doc.size}</div>
+          </div>
+          <button style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem;"><ion-icon name="download-outline" style="font-size:1.1rem; vertical-align:middle;"></ion-icon> Download</button>
+        </div>
       `;
     }
 
@@ -412,6 +436,7 @@ const fbPostBox = document.getElementById('fb-create-post-box');
 
 let currentPostType = 'standard';
 let composerImageData = null;
+let composerDocData = null;
 
 if (composerInput) {
   composerInput.onfocus = () => {
@@ -435,6 +460,7 @@ if (btnCancel) {
     if (attachmentsBox) attachmentsBox.innerHTML = '';
     currentPostType = 'standard';
     composerImageData = null;
+    composerDocData = null;
     fbPostBox.style.border = 'none';
   };
 }
@@ -515,30 +541,49 @@ document.querySelectorAll('.post-action-btn').forEach(btn => {
       return;
     }
 
-    // Document Attachment Logic (Mock)
+    // Document Attachment Logic
     if (type === 'document') {
-      document.getElementById('composer-attachments').innerHTML = `
-        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.5rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.5rem;">
-          <ion-icon name="document-text" style="color:var(--primary); font-size:1.5rem;"></ion-icon>
-          <div style="flex:1;">
-            <div style="font-size:0.85rem; font-weight:600;">attached_document.pdf</div>
-            <div style="font-size:0.7rem; color:var(--text-secondary);">2.4 MB</div>
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.pdf,.doc,.docx,.txt';
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const sizeMb = (file.size / (1024 * 1024)).toFixed(2);
+        composerDocData = {
+          name: file.name,
+          size: sizeMb + ' MB'
+        };
+        
+        document.getElementById('composer-attachments').innerHTML = `
+          <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.5rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.5rem; width:100%;">
+            <ion-icon name="document-text" style="color:var(--primary); font-size:1.5rem;"></ion-icon>
+            <div style="flex:1;">
+              <div style="font-size:0.85rem; font-weight:600;">${file.name}</div>
+              <div style="font-size:0.7rem; color:var(--text-secondary);">${sizeMb} MB</div>
+            </div>
+            <button id="btn-remove-composer-doc" style="background:none; border:none; color:var(--danger); cursor:pointer;"><ion-icon name="close-circle"></ion-icon></button>
           </div>
-          <button id="btn-remove-composer-doc" style="background:none; border:none; color:var(--danger); cursor:pointer;"><ion-icon name="close-circle"></ion-icon></button>
-        </div>
-      `;
-      document.getElementById('btn-remove-composer-doc').onclick = () => {
-        document.getElementById('composer-attachments').innerHTML = '';
+        `;
+        document.getElementById('btn-remove-composer-doc').onclick = () => {
+          composerDocData = null;
+          document.getElementById('composer-attachments').innerHTML = '';
+        };
       };
+      fileInput.click();
       return;
     }
 
-    // Change Post Type Logic (Event, Poll, Achievement)
+    // Change Post Type Logic (Announcement, Event, Poll, Achievement)
     currentPostType = type;
     dynamicFields.innerHTML = '';
     fbPostBox.style.border = 'none';
     
-    if (type === 'achievement') {
+    if (type === 'announcement') {
+      fbPostBox.style.border = '2px solid var(--primary)';
+      composerInput.placeholder = "Broadcast an official announcement...";
+    } else if (type === 'achievement') {
       fbPostBox.style.border = '2px solid #f59e0b';
       composerInput.placeholder = "Share an achievement or milestone!";
     } else if (type === 'event') {
@@ -606,6 +651,10 @@ if (btnSubmit) {
         votes: opts.map(() => 0),
         votedUsers: {}
       };
+    }
+    
+    if (composerDocData) {
+      extraData.document = composerDocData;
     }
     
     const status = (activeUser.role === 'admin' || activeUser.role === 'teacher') ? 'approved' : 'pending';

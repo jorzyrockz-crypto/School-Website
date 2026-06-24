@@ -152,12 +152,13 @@ function toggleAuthUIElements(isLoggedIn) {
 
   const fbCreatePost = document.getElementById('fb-create-post-box');
   if (fbCreatePost) {
-    // Show composer for ALL logged-in users
-    fbCreatePost.style.display = isLoggedIn ? 'block' : 'none';
+    // Show composer ONLY for Admins and Teachers
+    const canPost = isLoggedIn && activeUser && (activeUser.role === 'admin' || activeUser.role === 'teacher');
+    fbCreatePost.style.display = canPost ? 'block' : 'none';
     
-    const avatar = document.getElementById('post-box-avatar');
-    if (avatar && activeUser) {
-      avatar.src = activeUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder';
+    if (canPost) {
+      const avatar = document.getElementById('post-box-avatar');
+      if (avatar) avatar.src = activeUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder';
     }
   }
 }
