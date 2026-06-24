@@ -2,7 +2,7 @@
   "name": "Apex Integrated School",
   "short_name": "Apex School",
   "description": "The official school portal for Apex Integrated School — news, announcements, calendar, and more.",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#1e40af",
@@ -27,7 +27,7 @@
       "name": "School News Feed",
       "short_name": "News",
       "description": "View the latest school news and announcements",
-      "url": "/#/home",
+      "url": "./#/home",
       "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
     }
   ]

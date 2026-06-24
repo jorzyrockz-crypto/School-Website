@@ -2,20 +2,20 @@
 // APEX SCHOOL PORTAL - SERVICE WORKER v1.6.0
 // ==========================================
 
-const CACHE_NAME = 'apex-school-v1.6.0';
+const CACHE_NAME = 'apex-school-v1.6.1';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/css/variables.css',
-  '/css/layout.css',
-  '/css/components.css',
-  '/js/db.js',
-  '/js/feed.js',
-  '/js/dashboard.js',
-  '/js/main.js',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
-  '/manifest.json'
+  './',
+  './index.html',
+  './css/variables.css',
+  './css/layout.css',
+  './css/components.css',
+  './js/db.js',
+  './js/feed.js',
+  './js/dashboard.js',
+  './js/main.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './manifest.json'
 ];
 
 // ── Install: cache all static assets ──────────────────────────────────────────
@@ -74,7 +74,7 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Offline fallback for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          return caches.match('./index.html');
         }
       });
     })
