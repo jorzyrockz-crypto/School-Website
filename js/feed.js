@@ -264,7 +264,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
 
         <!-- Comments Area (Hidden by default) -->
         <div id="comments-box-${a.id}" class="comments-section" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-color);">
-          <div id="comments-list-${a.id}"></div>
+          <div id="comments-list-${a.id}" style="max-height: 300px; overflow-y: auto; padding-right: 0.5rem;"></div>
           ${activeUser ? `
             <form class="comment-form" data-ann-id="${a.id}" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
               <input type="text" class="form-control" placeholder="Write a comment..." style="flex:1; border-radius:50px; font-size:0.85rem; padding:0.5rem 1rem;">
@@ -377,6 +377,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
       const box = document.getElementById(`comments-box-${annId}`);
       const isHidden = box.style.display === 'none';
       box.style.display = isHidden ? 'block' : 'none';
+      e.currentTarget.innerText = isHidden ? '💬 Hide Comments' : '💬 Comments';
       if (isHidden) {
         renderCommentsList(annId);
       }
