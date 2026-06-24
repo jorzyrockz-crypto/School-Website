@@ -1067,6 +1067,145 @@ button, input, select, textarea {
   border-color: var(--primary);
 }
 
+/* ========================================== */
+/* COMMUNITY FEED OVERHAUL (PHASE 2)          */
+/* ========================================== */
+
+/* Post Action Buttons */
+.post-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s ease;
+  color: var(--text-secondary); /* default text color */
+}
+.post-action-btn:hover {
+  background: var(--bg-primary);
+}
+.post-action-btn ion-icon {
+  font-size: 1.2rem;
+}
+
+/* Specialized Cards */
+.achievement-card {
+  border: 2px solid #fbbf24; /* gold border */
+  background: linear-gradient(180deg, rgba(251,191,36,0.1) 0%, var(--bg-secondary) 100%);
+  position: relative;
+  overflow: hidden;
+}
+.achievement-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: #fbbf24;
+  color: #78350f;
+  font-weight: 800;
+  font-size: 0.75rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.event-card .event-banner {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+}
+.event-card .event-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: var(--bg-primary);
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  border-left: 4px solid var(--primary);
+}
+
+.poll-card .poll-option {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.2s ease;
+}
+.poll-card .poll-option:hover {
+  border-color: var(--primary);
+}
+.poll-card .poll-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--sidebar-active-bg);
+  z-index: 1;
+  transition: width 0.5s ease;
+}
+.poll-card .poll-text {
+  position: relative;
+  z-index: 2;
+  font-weight: 600;
+}
+.poll-card .poll-percent {
+  position: relative;
+  z-index: 2;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+/* Custom Reactions Bar */
+.reactions-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-color);
+  flex-wrap: wrap;
+}
+.reaction-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.4rem 0.75rem;
+  border-radius: 50px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.reaction-btn:hover {
+  background: var(--sidebar-active-bg);
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+.reaction-btn.reacted {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
 /* Responsive Grid Utilities */
 .grid-2 {
   display: grid;

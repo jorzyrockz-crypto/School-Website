@@ -187,12 +187,19 @@
           </div>
           
           <!-- FB Create Post box (Only visible for Teacher and Admin) -->
-          <div id="fb-create-post-box" class="news-card" style="display:none; margin-bottom:2rem;">
-            <div style="display:flex; gap:1rem; align-items:center; margin-bottom:1rem;">
-              <img id="post-box-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" alt="avatar">
-              <button id="btn-open-announcement-modal" class="form-control" style="text-align:left; color:var(--text-secondary); cursor:pointer;">
-                What's happening in your class or school today?
+          <div id="fb-create-post-box" class="news-card" style="display:none; margin-bottom:2rem; padding:1.25rem;">
+            <div style="display:flex; gap:1rem; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:1rem;">
+              <img id="post-box-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" alt="avatar" style="width:48px; height:48px;">
+              <button id="btn-open-announcement-modal" class="form-control" style="text-align:left; color:var(--text-secondary); cursor:pointer; background:var(--bg-primary); border-radius:50px; border:none; padding:0.85rem 1.25rem; font-size:0.95rem; flex:1; box-shadow:none;">
+                What would you like to share with the school community?
               </button>
+            </div>
+            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+              <button class="post-action-btn" style="color:#ef4444;"><ion-icon name="image"></ion-icon> Photo/Video</button>
+              <button class="post-action-btn" style="color:#3b82f6;"><ion-icon name="document-text"></ion-icon> Document</button>
+              <button class="post-action-btn" style="color:#f59e0b;"><ion-icon name="calendar"></ion-icon> Event</button>
+              <button class="post-action-btn" style="color:#10b981;"><ion-icon name="bar-chart"></ion-icon> Poll</button>
+              <button class="post-action-btn" style="color:#8b5cf6;"><ion-icon name="trophy"></ion-icon> Achievement</button>
             </div>
           </div>
 
@@ -232,6 +239,28 @@
                   </li>
                 </ul>
                 <button id="btn-view-calendar" class="btn-secondary" style="width:100%; margin-top:1.5rem; font-size:0.85rem; padding:0.5rem;">View Full Calendar</button>
+              </div>
+
+              <!-- Trending Topics Widget -->
+              <div class="sidebar-widget" style="margin-top:1.5rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
+                  <h3 class="widget-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Trending Topics</h3>
+                  <ion-icon name="trending-up" style="color:var(--primary); font-size:1.2rem;"></ion-icon>
+                </div>
+                <ul style="list-style:none; display:flex; flex-direction:column; gap:0.75rem;">
+                  <li style="display:flex; flex-direction:column; gap:0.1rem; cursor:pointer;">
+                    <span style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">#BrigadaEskwela2026</span>
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">156 posts this week</span>
+                  </li>
+                  <li style="display:flex; flex-direction:column; gap:0.1rem; cursor:pointer;">
+                    <span style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">#Intramurals</span>
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">Trending in Grade 10</span>
+                  </li>
+                  <li style="display:flex; flex-direction:column; gap:0.1rem; cursor:pointer;">
+                    <span style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">#TeacherSpotlight</span>
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">42 discussions</span>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
