@@ -299,8 +299,7 @@ async function submitFloatingChat() {
   }
 }
 
-// Add event listeners for file attachment in floating chat once DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
+function setupFloatingChatAttachment() {
   const attachBtn = document.getElementById('btn-attach-floating-photo');
   const fileInput = document.getElementById('floating-chat-photo-input');
   
@@ -343,7 +342,13 @@ document.addEventListener('DOMContentLoaded', () => {
       reader.readAsDataURL(file);
     };
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', setupFloatingChatAttachment);
+} else {
+  setupFloatingChatAttachment();
+}
 
 function minimizeChatWindow() {
   const chatWindow = document.getElementById('floating-chat-window');
