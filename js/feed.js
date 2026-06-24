@@ -909,5 +909,18 @@ document.addEventListener('DOMContentLoaded', () => {
       closePhotoTheater();
     }
   });
-});
 
+  // Bind Agenda "Add Event" button
+  const addAgendaBtn = document.getElementById('btn-add-agenda-event');
+  if (addAgendaBtn) {
+    addAgendaBtn.addEventListener('click', () => {
+      // Find the event action button in the composer and click it programmatically
+      const eventActionBtn = document.querySelector('.post-action-btn[data-type="event"]');
+      if (eventActionBtn) {
+        eventActionBtn.click();
+        // Scroll to the top where the composer is
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+});
