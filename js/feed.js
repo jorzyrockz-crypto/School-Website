@@ -392,12 +392,17 @@ async function renderCommentsList(annId) {
     list.innerHTML = `<p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem;">No comments yet.</p>`;
   } else {
     list.innerHTML = comments.map(c => `
-      <div class="comment-item" style="padding:0.5rem; margin-bottom:0.5rem;">
-        <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem;">${c.author}</div>
-        <div style="font-size:0.85rem; margin-bottom:0.25rem;">${c.text}</div>
-        <div style="display:flex; gap:0.75rem; font-size:0.7rem; color:var(--text-secondary); font-weight:600;">
-          <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'" onclick="showToast('Reacted to comment!')">React</span>
-          <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'" onclick="showToast('Reply feature coming soon!')">Reply</span>
+      <div class="comment-item" style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+        <img src="${c.authorAvatar || `https://api.dicebear.com/7.x/micah/svg?seed=${c.author}`}" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0;">
+        <div style="flex:1;">
+          <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:1rem; padding:0.5rem 0.75rem; display:inline-block; min-width:150px;">
+            <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem; margin-bottom:0.1rem;">${c.author}</div>
+            <div style="font-size:0.85rem; color:var(--text-primary); word-break:break-word;">${c.text}</div>
+          </div>
+          <div style="display:flex; gap:0.75rem; font-size:0.7rem; color:var(--text-secondary); font-weight:600; margin-top:0.25rem; margin-left:0.5rem;">
+            <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="if(this.innerText==='React') this.style.color='var(--text-secondary)'" onclick="this.innerText = this.innerText === 'React' ? 'Liked' : 'React'; this.style.color = this.innerText === 'Liked' ? 'var(--primary)' : 'var(--text-secondary)'; showToast(this.innerText === 'Liked' ? 'Reacted to comment' : 'Reaction removed');">React</span>
+            <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'" onclick="const i = document.querySelector('.comment-form[data-ann-id=\\\'${annId}\\\'] input'); i.focus(); i.value = '@${c.author} ';">Reply</span>
+          </div>
         </div>
       </div>
     `).join('');
