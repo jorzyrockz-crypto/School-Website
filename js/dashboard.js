@@ -325,9 +325,9 @@ async function openChatWindow(targetUser) {
       } else if (m.imageData) {
         mediaItems.push(m.imageData);
         content += `
-          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'};">
+          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${m.imageData}', 'chat_${m.timestamp}')">
             <img src="${m.imageData}" alt="Image" style="max-width:220px; max-height:200px; border-radius:8px; display:block; border:1px solid rgba(255,255,255,0.2);">
-            <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
+            <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
               <ion-icon name="download-outline"></ion-icon>
             </a>
           </div>

@@ -226,16 +226,16 @@ async function openFloatingChat(encodedUser) {
           </div>
         </div>
       `;
-    } else if (m.imageData) {
-      content += `
-        <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'};">
-          <img src="${m.imageData}" style="max-width:200px; border-radius:12px; display:block;">
-          <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;">
-            <ion-icon name="download-outline" style="font-size:0.9rem;"></ion-icon>
-          </a>
-        </div>
-      `;
-    }
+      } else if (m.imageData) {
+        content += `
+          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${m.imageData}', 'float_${m.timestamp}')">
+            <img src="${m.imageData}" style="max-width:200px; border-radius:12px; display:block;">
+            <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
+              <ion-icon name="download-outline" style="font-size:0.9rem;"></ion-icon>
+            </a>
+          </div>
+        `;
+      }
     
     if (m.text) content += `<span>${m.text}</span>`;
     
