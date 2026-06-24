@@ -181,7 +181,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
             <div style="font-size:0.9rem; font-weight:600;">${doc.name}</div>
             <div style="font-size:0.75rem; color:var(--text-secondary);">${doc.size}</div>
           </div>
-          <button style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem;"><ion-icon name="download-outline" style="font-size:1.1rem; vertical-align:middle;"></ion-icon> Download</button>
+          <button onclick="showToast('Downloading ${doc.name}...')" style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem;"><ion-icon name="download-outline" style="font-size:1.1rem; vertical-align:middle;"></ion-icon> Download</button>
         </div>
       `;
     }
