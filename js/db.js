@@ -1,4 +1,4 @@
-﻿// Firebase Configuration & Local Mock Fallback Layer
+// Firebase Configuration & Local Mock Fallback Layer
 const firebaseConfig = {
   apiKey: "",
   authDomain: "",
@@ -270,37 +270,94 @@ const dbService = {
     const local = getLocalDB();
     return local.announcements;
   },
-  addAnnouncement: async (title, content, imageData) => {
+  addAnnouncement: async (content, type, imageData, audiences, extraData, status) => {
     const local = getLocalDB();
     const newAnn = {
       id: "ann_" + Date.now(),
       schoolId: currentSchoolId,
-      title,
       content,
+      type: type || 'standard',
       imageData: imageData || null,
+      audiences: audiences || ['all'],
+      extraData: extraData || {},
       author: activeUser.name,
       authorRole: activeUser.role,
       authorAvatar: activeUser.avatar,
       date: new Date().toISOString().split('T')[0],
-      status: activeUser.role === 'admin' ? 'approved' : 'pending',
-      likes: []
+      status: status || 'pending',
+      likes: [],
+      reactions: {} // { uid: 'love', uid2: 'celebrate' }
     };
     local.announcements.unshift(newAnn);
     
-    if (activeUser.role !== 'admin') {
+    if (status === 'pending') {
       local.notifications.unshift({
         id: "notif_" + Date.now(),
         schoolId: currentSchoolId,
         recipientId: "admin1",
         senderName: activeUser.name,
-        messageText: `submitted '${title}' for approval.`,
+        messageText: `submitted a post for approval.`,
         read: false,
         timestamp: Date.now()
       });
     }
-    
     saveLocalDB(local);
     return newAnn;
+  },
+  votePoll: async (postId, optionIndex, uid) => {
+    const local = getLocalDB();
+    const post = local.announcements.find(a => a.id === postId);
+    if (!post || post.type !== 'poll') return;
+    
+    if (post.extraData.votedUsers[uid] !== undefined) {
+      // Remove old vote
+      post.extraData.votes[post.extraData.votedUsers[uid]]--;
+    }
+    post.extraData.votes[optionIndex]++;
+    post.extraData.votedUsers[uid] = optionIndex;
+    saveLocalDB(local);
+  },
+  rsvpEvent: async (postId, uid) => {
+    const local = getLocalDB();
+    const post = local.announcements.find(a => a.id === postId);
+    if (!post || post.type !== 'event') return;
+    
+    if (!post.extraData.rsvps) post.extraData.rsvps = [];
+    if (!post.extraData.rsvps.includes(uid)) {
+      post.extraData.rsvps.push(uid);
+    } else {
+      post.extraData.rsvps = post.extraData.rsvps.filter(id => id !== uid);
+    }
+    saveLocalDB(local);
+  },
+  addReaction: async (postId, uid, reactionType) => {
+    const local = getLocalDB();
+    const post = local.announcements.find(a => a.id === postId);
+    if (!post) return;
+    if (!post.reactions) post.reactions = {};
+    if (post.reactions[uid] === reactionType) {
+      delete post.reactions[uid]; // Toggle off
+    } else {
+      post.reactions[uid] = reactionType;
+    }
+    saveLocalDB(local);
+  },
+  deleteAnnouncement: async (postId) => {
+    const local = getLocalDB();
+    local.announcements = local.announcements.filter(a => a.id !== postId);
+    saveLocalDB(local);
+  },
+  flagAnnouncement: async (postId) => {
+    const local = getLocalDB();
+    const post = local.announcements.find(a => a.id === postId);
+    if (post) post.status = 'flagged';
+    saveLocalDB(local);
+  },
+  updateAnnouncementText: async (postId, newText) => {
+    const local = getLocalDB();
+    const post = local.announcements.find(a => a.id === postId);
+    if (post) post.content = newText;
+    saveLocalDB(local);
   },
   toggleLike: async (annId) => {
     if (!activeUser) return;

@@ -1,4 +1,4 @@
-﻿// SESSION MANAGEMENT (MOCK BUTTONS & DROPDOWN)
+// SESSION MANAGEMENT (MOCK BUTTONS & DROPDOWN)
 // ==========================================
 
 const loginMenuBtn = document.getElementById('btn-login-menu');
@@ -150,12 +150,15 @@ function toggleAuthUIElements(isLoggedIn) {
   const logoutBox = document.getElementById('auth-logout-box');
   if (logoutBox) logoutBox.style.display = isLoggedIn ? 'block' : 'none';
 
-  // Toggle create-post box on newsfeed (Admin/Teacher only)
-  const canPost = isLoggedIn && activeUser && (activeUser.role === 'admin' || activeUser.role === 'teacher');
-  document.getElementById('fb-create-post-box').style.display = canPost ? 'block' : 'none';
-  
-  if (canPost && activeUser) {
-    document.getElementById('post-box-avatar').src = activeUser.avatar;
+  const fbCreatePost = document.getElementById('fb-create-post-box');
+  if (fbCreatePost) {
+    // Show composer for ALL logged-in users
+    fbCreatePost.style.display = isLoggedIn ? 'block' : 'none';
+    
+    const avatar = document.getElementById('post-box-avatar');
+    if (avatar && activeUser) {
+      avatar.src = activeUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder';
+    }
   }
 }
 
@@ -164,4 +167,3 @@ async function syncSchoolConfig(school) {
   document.getElementById('school-portal-name').innerText = school.name;
   document.getElementById('school-logo-img').src = school.logo;
 }
-

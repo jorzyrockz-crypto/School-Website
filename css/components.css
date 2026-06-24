@@ -869,3 +869,33 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Reactions and Interactions styling */
+.btn-reaction {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.btn-reaction:hover {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.btn-reaction.active-reaction {
+  color: var(--primary);
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.post-context-menu .btn-context-trigger:hover {
+  color: var(--text-primary);
+}
