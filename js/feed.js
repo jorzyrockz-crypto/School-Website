@@ -431,6 +431,8 @@ if (btnCancel) {
     composerInput.value = '';
     composerInput.style.height = 'auto';
     dynamicFields.innerHTML = '';
+    const attachmentsBox = document.getElementById('composer-attachments');
+    if (attachmentsBox) attachmentsBox.innerHTML = '';
     currentPostType = 'standard';
     composerImageData = null;
     fbPostBox.style.border = 'none';
@@ -477,11 +479,61 @@ function updateAudienceBtnText() {
   }
 }
 
-// Post Actions (Event, Poll, Photo, Achievement)
+// Post Actions (Event, Poll, Photo, Achievement, Document)
 document.querySelectorAll('.post-action-btn').forEach(btn => {
   btn.onclick = () => {
     composerArea.style.display = 'flex';
     const type = btn.dataset.type;
+    
+    // Photo Attachment Logic (Works across any post type)
+    if (type === 'photo') {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = 'image/*';
+      fileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          compressImage(ev.target.result, 800, (compressedData) => {
+            composerImageData = compressedData;
+            document.getElementById('composer-attachments').innerHTML = `
+              <div style="position:relative; display:inline-block; margin-top:0.5rem;">
+                <img src="${compressedData}" style="max-height:150px; border-radius:var(--radius-sm); border:1px solid var(--border-color);">
+                <button id="btn-remove-composer-img" style="position:absolute; top:0.25rem; right:0.25rem; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">&times;</button>
+              </div>
+            `;
+            document.getElementById('btn-remove-composer-img').onclick = () => {
+              composerImageData = null;
+              document.getElementById('composer-attachments').innerHTML = '';
+            };
+          });
+        };
+        reader.readAsDataURL(file);
+      };
+      fileInput.click();
+      return;
+    }
+
+    // Document Attachment Logic (Mock)
+    if (type === 'document') {
+      document.getElementById('composer-attachments').innerHTML = `
+        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.5rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.5rem;">
+          <ion-icon name="document-text" style="color:var(--primary); font-size:1.5rem;"></ion-icon>
+          <div style="flex:1;">
+            <div style="font-size:0.85rem; font-weight:600;">attached_document.pdf</div>
+            <div style="font-size:0.7rem; color:var(--text-secondary);">2.4 MB</div>
+          </div>
+          <button id="btn-remove-composer-doc" style="background:none; border:none; color:var(--danger); cursor:pointer;"><ion-icon name="close-circle"></ion-icon></button>
+        </div>
+      `;
+      document.getElementById('btn-remove-composer-doc').onclick = () => {
+        document.getElementById('composer-attachments').innerHTML = '';
+      };
+      return;
+    }
+
+    // Change Post Type Logic (Event, Poll, Achievement)
     currentPostType = type;
     dynamicFields.innerHTML = '';
     fbPostBox.style.border = 'none';
@@ -516,33 +568,6 @@ document.querySelectorAll('.post-action-btn').forEach(btn => {
         input.placeholder = `Option ${document.querySelectorAll('.poll-opt').length + 1}`;
         document.getElementById('poll-options-container').insertBefore(input, e.target);
       };
-    } else if (type === 'standard') {
-      // Photo/Video
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = 'image/*';
-      fileInput.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          compressImage(ev.target.result, 800, (compressedData) => {
-            composerImageData = compressedData;
-            dynamicFields.innerHTML = `
-              <div style="position:relative; display:inline-block; margin-top:0.5rem;">
-                <img src="${compressedData}" style="max-height:200px; border-radius:var(--radius-sm);">
-                <button id="btn-remove-composer-img" style="position:absolute; top:0.5rem; right:0.5rem; background:rgba(0,0,0,0.6); color:white; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer;">&times;</button>
-              </div>
-            `;
-            document.getElementById('btn-remove-composer-img').onclick = () => {
-              composerImageData = null;
-              dynamicFields.innerHTML = '';
-            };
-          });
-        };
-        reader.readAsDataURL(file);
-      };
-      fileInput.click();
     }
   };
 });

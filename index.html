@@ -167,8 +167,10 @@
                 
                 <!-- Hidden Expansion Area -->
                 <div id="composer-expansion-area" style="display:none; flex-direction:column; gap:1rem; margin-top:0.5rem;">
-                  <!-- Dynamic Fields Container -->
+                  <!-- Dynamic Fields Container (for Event/Poll inputs) -->
                   <div id="composer-dynamic-fields"></div>
+                  <!-- Attachments Container (for Photos/Docs) -->
+                  <div id="composer-attachments" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
                   
                   <!-- Audience & Submit -->
                   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-top:0.5rem; padding-top:1rem; border-top:1px dashed var(--border-color);">
@@ -193,7 +195,8 @@
             
             <!-- Action Triggers -->
             <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; align-items:center;">
-              <button class="post-action-btn" data-type="standard" style="color:#ef4444;"><ion-icon name="image"></ion-icon> Photo/Video</button>
+              <button class="post-action-btn" data-type="photo" style="color:#ef4444;"><ion-icon name="image"></ion-icon> Photo/Video</button>
+              <button class="post-action-btn" data-type="document" style="color:#3b82f6;"><ion-icon name="document-text"></ion-icon> Document</button>
               <button class="post-action-btn" data-type="event" style="color:#f59e0b;"><ion-icon name="calendar"></ion-icon> Event</button>
               <button class="post-action-btn" data-type="poll" style="color:#10b981;"><ion-icon name="bar-chart"></ion-icon> Poll</button>
               <button class="post-action-btn" data-type="achievement" style="color:#8b5cf6;"><ion-icon name="trophy"></ion-icon> Achievement</button>
