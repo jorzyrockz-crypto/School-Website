@@ -168,7 +168,16 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
 
     // Global Photo Appending
     if (a.imageData) {
-      innerCardHTML += `<img src="${a.imageData}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); margin-bottom:1rem; border:1px solid var(--border-color);">`;
+      innerCardHTML += `
+        <div style="position:relative; margin-bottom:1rem; width:100%;">
+          <a href="${a.imageData}" download="post_image_${a.id}.png" target="_blank" style="display:block; cursor:pointer;" title="Click to view full image">
+            <img src="${a.imageData}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--border-color); display:block; transition: filter 0.2s;" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='brightness(1)'">
+          </a>
+          <a href="${a.imageData}" download="post_image_${a.id}.png" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.65); color:white; padding:0.4rem 0.8rem; border-radius:50px; font-size:0.8rem; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:0.3rem; backdrop-filter:blur(4px); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.65)'" title="Download Image">
+            <ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Save
+          </a>
+        </div>
+      `;
     }
 
     // Global Document Appending
