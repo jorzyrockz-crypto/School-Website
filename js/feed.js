@@ -1032,25 +1032,25 @@ window.addFeedSource = async () => {
   // Show loading state
   if (addBtn) { addBtn.textContent = 'Checking...'; addBtn.disabled = true; }
 
-  // Auto-detect RSS feed URL
-  const resolvedUrl = await autoDetectRssFeed(url);
+  // Auto-detect RSS feed URL and title
+  const feedInfo = await autoDetectRssFeed(url);
 
   if (addBtn) { addBtn.textContent = 'Add'; addBtn.disabled = false; }
 
-  if (!resolvedUrl) {
+  if (!feedInfo) {
     alert('Could not find an RSS feed at that URL. Please enter the direct RSS/Atom feed link (e.g. https://example.com/feed/)');
     return;
   }
 
   const sources = await dbService.getFeedSources();
-  if (sources.some(s => s.url === resolvedUrl)) {
+  if (sources.some(s => s.url === feedInfo.url)) {
     alert('This feed source is already added.');
     return;
   }
   sources.push({
     id: 'fs' + Date.now(),
-    url: resolvedUrl,
-    type: 'Custom Source',
+    url: feedInfo.url,
+    type: feedInfo.title || 'Custom Source',
     tag: 'rss-outline',
     color: 'var(--accent)'
   });
@@ -1079,7 +1079,7 @@ async function autoDetectRssFeed(url) {
       const res = await fetch('https://api.rss2json.com/v1/api.json?rss_url=' + encodeURIComponent(candidate));
       const data = await res.json();
       if (data.status === 'ok' && data.items && data.items.length > 0) {
-        return candidate;
+        return { url: candidate, title: data.feed?.title || '' };
       }
     } catch(e) { /* try next */ }
   }
