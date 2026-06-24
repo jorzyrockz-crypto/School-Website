@@ -772,6 +772,19 @@ if (loginForm) {
       showToast("Invalid credentials. Try demo credentials!");
     }
   };
+
+  // Quick Login Mock Toggles
+  const quickBtns = document.querySelectorAll('.quick-login-btn');
+  quickBtns.forEach(btn => {
+    btn.onclick = async (e) => {
+      const email = e.currentTarget.dataset.email;
+      const user = await dbService.getUser(email);
+      if (user) {
+        sessionStorage.setItem('activeUser', JSON.stringify(user));
+        window.location.href = "portal.html";
+      }
+    };
+  });
 }
 
 const logoutBtn = document.getElementById('btn-logout');

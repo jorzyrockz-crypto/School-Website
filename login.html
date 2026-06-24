@@ -44,13 +44,15 @@
           </div>
           <button type="submit" class="btn-action" style="width:100%;">Sign In</button>
         </form>
-        
-        <div style="margin-top:1.5rem; font-size:0.8rem; background:rgba(30,58,138,0.05); padding:1rem; border-radius:var(--radius-sm); border:1px dashed var(--border-color)">
-          <strong style="display:block; margin-bottom:0.25rem;">Demo Credentials (Password: any):</strong>
-          Admin: <code>admin@school.edu</code><br>
-          Teacher: <code>teacher@school.edu</code><br>
-          Parent: <code>parent@school.edu</code><br>
-          Learner: <code>learner@school.edu</code>
+
+        <div style="margin-top:1.5rem; border-top: 1px solid var(--border-color); padding-top:1.25rem;">
+          <label style="font-weight:600; font-size:0.85rem; text-align:center; display:block; margin-bottom:0.75rem; color:var(--text-secondary)">Quick Login (Bypass password for testing):</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
+            <button type="button" class="btn-secondary quick-login-btn" data-email="admin@school.edu" style="padding:0.5rem; font-size:0.8rem; text-align:center;">Admin Portal</button>
+            <button type="button" class="btn-secondary quick-login-btn" data-email="teacher@school.edu" style="padding:0.5rem; font-size:0.8rem; text-align:center;">Teacher Portal</button>
+            <button type="button" class="btn-secondary quick-login-btn" data-email="parent@school.edu" style="padding:0.5rem; font-size:0.8rem; text-align:center;">Parent Portal</button>
+            <button type="button" class="btn-secondary quick-login-btn" data-email="learner@school.edu" style="padding:0.5rem; font-size:0.8rem; text-align:center;">Learner Portal</button>
+          </div>
         </div>
       </div>
     </section>
