@@ -960,7 +960,7 @@ async function renderCalendarNewsFeed() {
               <ion-icon name="${typeIcon}" style="color:${typeColor}; font-size:0.8rem; flex-shrink:0;"></ion-icon>
               <span style="font-size:0.7rem; color:${typeColor}; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">${post.type || 'Post'}</span>
             </div>
-            <p style="font-weight:600; font-size:0.9rem; margin:0 0 0.25rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${post.title || 'Untitled'}</p>
+            <p style="font-weight:600; font-size:0.9rem; margin:0 0 0.25rem; line-height:1.3; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; text-overflow:ellipsis;">${post.title || 'Untitled'}</p>
             <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 0.3rem; line-height:1.4;">${snippet}</p>
             <span style="font-size:0.72rem; color:var(--text-secondary);"><ion-icon name="time-outline" style="vertical-align:middle;"></ion-icon> ${timeAgo}</span>
           </div>
