@@ -369,7 +369,12 @@
                 <!-- Messages -->
               </div>
               <form id="chat-input-form" class="chat-input-bar">
-                <input type="text" id="chat-msg-input" placeholder="Type a message..." required>
+                <!-- Hidden file input for image attachment -->
+                <input type="file" id="chat-photo-input" accept="image/*" style="display:none;">
+                <button type="button" id="btn-attach-chat-photo" title="Attach photo" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.4rem; display:flex; align-items:center; padding:0 0.5rem; flex-shrink:0;">
+                  <ion-icon name="image-outline"></ion-icon>
+                </button>
+                <input type="text" id="chat-msg-input" placeholder="Type a message...">
                 <button type="submit" class="btn-send">Send</button>
               </form>
             </div>
@@ -411,11 +416,22 @@
                 </div>
                 
                 <div class="form-group">
-                  <label>School Logo URL</label>
-                  <input type="text" id="school-logo-input" class="form-control" placeholder="https://..." required>
-                  <div style="margin-top:0.5rem; font-size:0.85rem; color:var(--text-secondary);">
-                    💡 Uploading a logo will automatically set the best matching accents.
+                  <label>School Logo</label>
+                  <!-- Hidden file input -->
+                  <input type="file" id="school-logo-file-input" accept="image/*" style="display:none;">
+                  <!-- Visible trigger button -->
+                  <button type="button" id="btn-upload-logo" class="btn-secondary" style="width:100%; display:flex; align-items:center; justify-content:center; gap:0.5rem; margin-bottom:0.75rem;">
+                    <ion-icon name="cloud-upload-outline" style="font-size:1.2rem;"></ion-icon> Upload Logo from Device
+                  </button>
+                  <!-- Live logo preview -->
+                  <div style="display:flex; align-items:center; gap:1rem; background:var(--bg-primary); padding:0.75rem; border-radius:var(--radius-md);">
+                    <img id="logo-upload-preview" style="width:64px; height:64px; object-fit:contain; border-radius:var(--radius-sm); border:1px solid var(--border-color); background:white;" src="" alt="Logo Preview">
+                    <div style="font-size:0.8rem; color:var(--text-secondary);">
+                      Current logo preview.<br>Upload a new image to replace it.
+                    </div>
                   </div>
+                  <!-- Keep hidden URL field for saving -->
+                  <input type="hidden" id="school-logo-input">
                 </div>
 
                 <div class="form-group">
@@ -446,8 +462,7 @@
     </main>
   </div>
 
-  <!-- Announcement Creation Modal (FB Style Post Writer) -->
-  <div id="announcement-modal" class="toast" style="background:var(--bg-secondary); color:var(--text-primary); border:1px solid var(--border-color); max-width:500px; width:90%; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); display:none; flex-direction:column; padding:2rem;">
+  <div id="announcement-modal" class="toast" style="background:var(--bg-secondary); color:var(--text-primary); border:1px solid var(--border-color); max-width:520px; width:90%; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); display:none; flex-direction:column; padding:2rem; border-radius:var(--radius-lg); z-index:500;">
     <h3 class="widget-title">Draft New School Announcement</h3>
     <form id="announcement-form" style="margin-top:1rem;">
       <div class="form-group">
@@ -456,9 +471,22 @@
       </div>
       <div class="form-group">
         <label>Announcement Details</label>
-        <textarea id="ann-content" class="form-control" rows="5" placeholder="Enter content details..." required></textarea>
+        <textarea id="ann-content" class="form-control" rows="4" placeholder="Enter content details..."></textarea>
       </div>
-      <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:1.5rem;">
+
+      <!-- Photo Attach -->
+      <div class="form-group">
+        <input type="file" id="ann-photo-input" accept="image/*" style="display:none;">
+        <button type="button" id="btn-attach-ann-photo" class="btn-secondary" style="width:100%; display:flex; align-items:center; justify-content:center; gap:0.5rem;">
+          <ion-icon name="image-outline" style="font-size:1.2rem;"></ion-icon> Attach Photo
+        </button>
+        <div id="ann-photo-preview-wrap" style="display:none; margin-top:0.75rem; position:relative;">
+          <img id="ann-photo-preview" style="width:100%; max-height:200px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--border-color);" src="" alt="Preview">
+          <button type="button" id="btn-remove-ann-photo" style="position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); border:none; color:white; border-radius:50%; width:28px; height:28px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">✕</button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:1rem; margin-top:1rem;">
         <button type="button" id="btn-close-ann-modal" class="btn-secondary">Cancel</button>
         <button type="submit" class="btn-action">Publish Post</button>
       </div>

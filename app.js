@@ -197,13 +197,14 @@ const dbService = {
     const local = getLocalDB();
     return local.announcements;
   },
-  addAnnouncement: async (title, content, author) => {
+  addAnnouncement: async (title, content, imageData) => {
     const local = getLocalDB();
     const newAnn = {
       id: "ann_" + Date.now(),
       schoolId: currentSchoolId,
       title,
       content,
+      imageData: imageData || null,
       author: activeUser.name,
       authorRole: activeUser.role,
       authorAvatar: activeUser.avatar,
@@ -327,14 +328,15 @@ const dbService = {
     const local = getLocalDB();
     return local.chats[chatId] || [];
   },
-  sendMessage: async (chatId, senderId, text) => {
+  sendMessage: async (chatId, senderId, text, imageData) => {
     const local = getLocalDB();
     if (!local.chats[chatId]) {
       local.chats[chatId] = [];
     }
     const newMsg = {
       senderId,
-      text,
+      text: text || '',
+      imageData: imageData || null,
       timestamp: Date.now()
     };
     local.chats[chatId].push(newMsg);
@@ -484,6 +486,7 @@ async function renderNewsfeed() {
 
         <h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${a.title}</h3>
         <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${a.content}</p>
+        ${a.imageData ? `<img src="${a.imageData}" alt="Post image" style="width:100%; max-height:360px; object-fit:cover; border-radius:var(--radius-md); margin-bottom:1rem; border:1px solid var(--border-color);">` : ''}
         
         <!-- Interactive Like & Comment Status bar -->
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-secondary); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); padding:0.5rem 0; margin-bottom:0.75rem;">
@@ -842,11 +845,16 @@ async function openChatWindow(targetUser) {
   const messages = await dbService.getMessages(chatId);
   
   const body = document.getElementById('chat-messages-body');
-  body.innerHTML = messages.map(m => `
-    <div class="message-bubble ${m.senderId === activeUser.uid ? 'outgoing' : 'incoming'}">
-      ${m.text}
-    </div>
-  `).join('');
+  body.innerHTML = messages.map(m => {
+    const isOut = m.senderId === activeUser.uid;
+    const cls = isOut ? 'outgoing' : 'incoming';
+    let content = '';
+    if (m.imageData) {
+      content = `<img src="${m.imageData}" alt="Image" style="max-width:220px; max-height:200px; border-radius:var(--radius-md); display:block; margin-bottom:${m.text ? '0.4rem' : '0'};">`;
+    }
+    if (m.text) content += `<span>${m.text}</span>`;
+    return `<div class="message-bubble ${cls}">${content}</div>`;
+  }).join('');
   
   body.scrollTop = body.scrollHeight;
 
@@ -870,6 +878,32 @@ if (chatBackBtn) {
 }
 
 const chatForm = document.getElementById('chat-input-form');
+const chatAttachBtn = document.getElementById('btn-attach-chat-photo');
+const chatPhotoInput = document.getElementById('chat-photo-input');
+
+// Wire up the photo attach button in chat
+if (chatAttachBtn && chatPhotoInput) {
+  chatAttachBtn.onclick = () => chatPhotoInput.click();
+  chatPhotoInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file || !activeChatThread || !activeUser) {
+      if (!activeChatThread) showToast("Select a conversation first!");
+      chatPhotoInput.value = '';
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const imageData = ev.target.result;
+      const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
+      await dbService.sendMessage(chatId, activeUser.uid, '', imageData);
+      chatPhotoInput.value = '';
+      openChatWindow(activeChatThread);
+      showToast('Photo sent!');
+    };
+    reader.readAsDataURL(file);
+  };
+}
+
 if (chatForm) {
   chatForm.onsubmit = async (e) => {
     e.preventDefault();
@@ -884,7 +918,7 @@ if (chatForm) {
     if (!text) return;
     
     const chatId = [activeUser.uid, activeChatThread.uid].sort().join('_');
-    await dbService.sendMessage(chatId, activeUser.uid, text);
+    await dbService.sendMessage(chatId, activeUser.uid, text, null);
     input.value = '';
     
     openChatWindow(activeChatThread);
@@ -928,7 +962,10 @@ function initProfilePanel() {
     
     dbService.getSchool(currentSchoolId).then(school => {
       document.getElementById('school-name-input').value = school.name;
+      // Populate hidden input and logo preview
       document.getElementById('school-logo-input').value = school.logo;
+      const logoPreview = document.getElementById('logo-upload-preview');
+      if (logoPreview) logoPreview.src = school.logo;
       
       document.querySelectorAll('.theme-card').forEach(card => {
         card.classList.remove('selected');
@@ -937,6 +974,28 @@ function initProfilePanel() {
         }
       });
     });
+
+    // Wire up logo file upload
+    const logoFileBtn = document.getElementById('btn-upload-logo');
+    const logoFileInput = document.getElementById('school-logo-file-input');
+    if (logoFileBtn && logoFileInput) {
+      logoFileBtn.onclick = () => logoFileInput.click();
+      logoFileInput.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+          const dataUrl = ev.target.result;
+          document.getElementById('school-logo-input').value = dataUrl;
+          const logoPreview = document.getElementById('logo-upload-preview');
+          if (logoPreview) logoPreview.src = dataUrl;
+          // Apply to sidebar live preview
+          document.getElementById('school-logo-img').src = dataUrl;
+          showToast('Logo uploaded! Click Save to apply.');
+        };
+        reader.readAsDataURL(file);
+      };
+    }
 
     document.querySelectorAll('.theme-card').forEach(card => {
       card.onclick = (e) => {
@@ -1139,6 +1198,37 @@ const closeAnnModalBtn = document.getElementById('btn-close-ann-modal');
 if (closeAnnModalBtn) {
   closeAnnModalBtn.onclick = () => {
     document.getElementById('announcement-modal').style.display = 'none';
+    // Reset photo state
+    document.getElementById('ann-photo-preview-wrap').style.display = 'none';
+    document.getElementById('ann-photo-preview').src = '';
+    document.getElementById('ann-photo-input').value = '';
+  };
+}
+
+// Announcement photo attach wiring
+const annPhotoBtn = document.getElementById('btn-attach-ann-photo');
+const annPhotoInput = document.getElementById('ann-photo-input');
+const annRemovePhotoBtn = document.getElementById('btn-remove-ann-photo');
+
+if (annPhotoBtn && annPhotoInput) {
+  annPhotoBtn.onclick = () => annPhotoInput.click();
+  annPhotoInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      document.getElementById('ann-photo-preview').src = ev.target.result;
+      document.getElementById('ann-photo-preview-wrap').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  };
+}
+
+if (annRemovePhotoBtn) {
+  annRemovePhotoBtn.onclick = () => {
+    document.getElementById('ann-photo-preview').src = '';
+    document.getElementById('ann-photo-preview-wrap').style.display = 'none';
+    document.getElementById('ann-photo-input').value = '';
   };
 }
 
@@ -1148,10 +1238,19 @@ if (annForm) {
     e.preventDefault();
     const title = document.getElementById('ann-title').value.trim();
     const content = document.getElementById('ann-content').value.trim();
-    
-    await dbService.addAnnouncement(title, content, activeUser.name);
+    const previewImg = document.getElementById('ann-photo-preview');
+    const imageData = (previewImg && previewImg.src && !previewImg.src.endsWith('undefined')) ? previewImg.src : null;
+
+    if (!title) { showToast('Please enter a title.'); return; }
+
+    await dbService.addAnnouncement(title, content, imageData);
+
+    // Reset form
     document.getElementById('ann-title').value = '';
     document.getElementById('ann-content').value = '';
+    document.getElementById('ann-photo-preview-wrap').style.display = 'none';
+    document.getElementById('ann-photo-preview').src = '';
+    document.getElementById('ann-photo-input').value = '';
     document.getElementById('announcement-modal').style.display = 'none';
     
     showToast(activeUser.role === 'admin' ? "Announcement posted!" : "Submitted for review.");
