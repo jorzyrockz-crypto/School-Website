@@ -1,14 +1,106 @@
-import { getLocalDB, saveLocalDB, useFirebase } from './firebase-config.js';
+// Firebase Configuration & Local Mock Fallback Layer
+// This file connects to your Firebase project, but falls back to localStorage automatically if credentials are empty or if running offline.
+
+const firebaseConfig = {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
+};
 
 // ==========================================
-// 1. SESSION MANAGEMENT & STATE
+// MOCK DATABASE & LOCAL CONFIG
+// ==========================================
+
+// Auto-detect if we should use Firebase or Local Fallback
+const useFirebase = !!(firebaseConfig.apiKey && firebaseConfig.projectId);
+
+// Local DB State structure for mock fallback
+const DEFAULT_LOCAL_DB = {
+  schools: {
+    "default-school": {
+      name: "Apex Integrated School",
+      logo: "https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80",
+      theme: "blue-gold",
+      accentColor: "#d4af37",
+      transparencyDocs: [
+        { title: "Citizen's Charter 2026", url: "#" },
+        { title: "School Report Card (SRC) FY 2025", url: "#" },
+        { title: "Annual Procurement Plan (APP)", url: "#" }
+      ]
+    }
+  },
+  users: {
+    "admin1": { uid: "admin1", email: "admin@school.edu", name: "Maria Santos (Admin)", role: "admin", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=admin" },
+    "teacher1": { uid: "teacher1", email: "teacher@school.edu", name: "Teacher Jose (Math)", role: "teacher", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=teacher" },
+    "parent1": { uid: "parent1", email: "parent@school.edu", name: "Mrs. Cruz (Parent)", role: "parent", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=parent" },
+    "learner1": { uid: "learner1", email: "learner@school.edu", name: "Juan Cruz (Grade 10)", role: "learner", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=learner" }
+  },
+  announcements: [
+    {
+      id: "ann1",
+      schoolId: "default-school",
+      title: "Enrollment for Academic Year 2026-2027 Open",
+      content: "We are pleased to announce that enrollment for both Junior and Senior High School is now officially open. Please submit requirements to the registrar's office.",
+      author: "Maria Santos",
+      date: "2026-06-24",
+      status: "approved"
+    },
+    {
+      id: "ann2",
+      schoolId: "default-school",
+      title: "Upcoming Brigada Eskwela Activities",
+      content: "Join us this coming Monday for our annual school maintenance and cleanup drive. Let's work together to prepare classrooms for our learners.",
+      author: "Teacher Jose",
+      date: "2026-06-23",
+      status: "pending"
+    }
+  ],
+  comments: [
+    { id: "c1", announcementId: "ann1", author: "Guest Parent", text: "Are the enrollment forms downloadable online?", timestamp: Date.now() }
+  ],
+  attendance: {}, // format: { "default-school": { "learner1": { "2026-06-24": "present" } } }
+  chats: {}, // format: { "chatId": [ { senderId: "teacher1", text: "Hello, just checking in", timestamp: 1782292020000 } ] }
+  notifications: [
+    { id: "n1", schoolId: "default-school", recipientId: "admin1", senderName: "Teacher Jose", messageText: "submitted 'Upcoming Brigada Eskwela' for approval.", read: false, timestamp: Date.now() }
+  ],
+  schedules: {
+    "learner1": [
+      { time: "07:30 AM - 08:30 AM", subject: "Mathematics 10", room: "Room 102", teacher: "Teacher Jose" },
+      { time: "08:30 AM - 09:30 AM", subject: "English 10", room: "Room 102", teacher: "Teacher Reyes" },
+      { time: "09:45 AM - 10:45 AM", subject: "Science 10", room: "Lab A", teacher: "Teacher Lim" }
+    ],
+    "teacher1": [
+      { time: "07:30 AM - 08:30 AM", subject: "Mathematics 10", room: "Room 102", class: "Grade 10-A" },
+      { time: "10:45 AM - 11:45 AM", subject: "Mathematics 9", room: "Room 204", class: "Grade 9-B" }
+    ]
+  }
+};
+
+// Initialize LocalStorage DB if empty
+if (!localStorage.getItem("deped_saas_db")) {
+  localStorage.setItem("deped_saas_db", JSON.stringify(DEFAULT_LOCAL_DB));
+}
+
+function getLocalDB() {
+  return JSON.parse(localStorage.getItem("deped_saas_db"));
+}
+
+function saveLocalDB(data) {
+  localStorage.setItem("deped_saas_db", JSON.stringify(data));
+}
+
+// ==========================================
+// SESSION MANAGEMENT & STATE
 // ==========================================
 
 let activeUser = JSON.parse(sessionStorage.getItem('activeUser')) || null;
 let currentSchoolId = "default-school";
 
 // ==========================================
-// 2. DATA ACCESS LAYER
+// DATA ACCESS LAYER
 // ==========================================
 
 const dbService = {
@@ -191,7 +283,7 @@ const dbService = {
 };
 
 // ==========================================
-// 3. THEME ENGINE CONTROLLER
+// THEME ENGINE CONTROLLER
 // ==========================================
 
 function applyTheme(themeName, customLogo = null) {
@@ -216,7 +308,7 @@ function applyTheme(themeName, customLogo = null) {
 }
 
 // ==========================================
-// 4. PORTAL TABS ROUTER (INSIDE portal.html)
+// PORTAL TABS ROUTER (INSIDE portal.html)
 // ==========================================
 
 function initPortalTabs() {
@@ -262,7 +354,7 @@ function switchPortalPanel(panelName) {
 }
 
 // ==========================================
-// 5. RENDERING BLOCKS (PORTAL VIEWS)
+// RENDERING BLOCKS (PORTAL VIEWS)
 // ==========================================
 
 async function renderRolePortal() {
@@ -394,76 +486,80 @@ async function renderAdminView() {
   const pendings = announcements.filter(a => a.status === 'pending');
   
   const pendingContainer = document.getElementById('admin-pending-announcements');
-  if (pendings.length === 0) {
-    pendingContainer.innerHTML = `<p style="color:var(--text-secondary); padding:1rem 0;">No announcements currently pending review.</p>`;
-  } else {
-    pendingContainer.innerHTML = pendings.map(p => `
-      <div class="news-card">
-        <div class="news-meta">
-          <span>Author: ${p.author}</span>
-          <span>Date Submitted: ${p.date}</span>
+  if (pendingContainer) {
+    if (pendings.length === 0) {
+      pendingContainer.innerHTML = `<p style="color:var(--text-secondary); padding:1rem 0;">No announcements currently pending review.</p>`;
+    } else {
+      pendingContainer.innerHTML = pendings.map(p => `
+        <div class="news-card">
+          <div class="news-meta">
+            <span>Author: ${p.author}</span>
+            <span>Date Submitted: ${p.date}</span>
+          </div>
+          <h4 class="news-title">${p.title}</h4>
+          <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">${p.content}</p>
+          <div style="display:flex; gap:1rem;">
+            <button class="btn-approve btn-action" data-id="${p.id}" style="padding:0.4rem 1rem; background-color:var(--success)">Approve</button>
+            <button class="btn-reject btn-secondary" data-id="${p.id}" style="padding:0.4rem 1rem; border-color:var(--danger); color:var(--danger)">Reject</button>
+          </div>
         </div>
-        <h4 class="news-title">${p.title}</h4>
-        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">${p.content}</p>
-        <div style="display:flex; gap:1rem;">
-          <button class="btn-approve btn-action" data-id="${p.id}" style="padding:0.4rem 1rem; background-color:var(--success)">Approve</button>
-          <button class="btn-reject btn-secondary" data-id="${p.id}" style="padding:0.4rem 1rem; border-color:var(--danger); color:var(--danger)">Reject</button>
-        </div>
-      </div>
-    `).join('');
+      `).join('');
 
-    pendingContainer.querySelectorAll('.btn-approve').forEach(btn => {
-      btn.onclick = async (e) => {
-        await dbService.moderateAnnouncement(e.target.dataset.id, 'approved');
-        showToast("Announcement approved!");
-        renderAdminView();
-        updateNotificationsList();
-      };
-    });
+      pendingContainer.querySelectorAll('.btn-approve').forEach(btn => {
+        btn.onclick = async (e) => {
+          await dbService.moderateAnnouncement(e.target.dataset.id, 'approved');
+          showToast("Announcement approved!");
+          renderAdminView();
+          updateNotificationsList();
+        };
+      });
 
-    pendingContainer.querySelectorAll('.btn-reject').forEach(btn => {
-      btn.onclick = async (e) => {
-        await dbService.moderateAnnouncement(e.target.dataset.id, 'rejected');
-        showToast("Announcement rejected.");
-        renderAdminView();
-      };
-    });
+      pendingContainer.querySelectorAll('.btn-reject').forEach(btn => {
+        btn.onclick = async (e) => {
+          await dbService.moderateAnnouncement(e.target.dataset.id, 'rejected');
+          showToast("Announcement rejected.");
+          renderAdminView();
+        };
+      });
+    }
   }
 
   const attendance = await dbService.getAttendance();
   const grid = document.getElementById('admin-attendance-grid');
-  const dateStr = new Date().toISOString().split('T')[0];
-  const students = [{ name: "Juan Cruz", id: "learner1" }];
-  
-  grid.innerHTML = `
-    <table class="data-table">
-      <thead>
-        <tr>
-          <th>Learner Name</th>
-          <th>Status (${dateStr})</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${students.map(s => {
-          const status = (attendance[s.id] || {})[dateStr] || 'Unmarked';
-          return `
-            <tr>
-              <td><strong>${s.name}</strong></td>
-              <td>
-                <span style="font-weight:700; color:${status === 'present' ? 'var(--success)' : status === 'absent' ? 'var(--danger)' : 'var(--text-secondary)'}">
-                  ${status.toUpperCase()}
-                </span>
-              </td>
-            </tr>
-          `;
-        }).join('')}
-      </tbody>
-    </table>
-  `;
+  if (grid) {
+    const dateStr = new Date().toISOString().split('T')[0];
+    const students = [{ name: "Juan Cruz", id: "learner1" }];
+    
+    grid.innerHTML = `
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Learner Name</th>
+            <th>Status (${dateStr})</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${students.map(s => {
+            const status = (attendance[s.id] || {})[dateStr] || 'Unmarked';
+            return `
+              <tr>
+                <td><strong>${s.name}</strong></td>
+                <td>
+                  <span style="font-weight:700; color:${status === 'present' ? 'var(--success)' : status === 'absent' ? 'var(--danger)' : 'var(--text-secondary)'}">
+                    ${status.toUpperCase()}
+                  </span>
+                </td>
+              </tr>
+            `;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  }
 }
 
 // ==========================================
-// 6. PRIVATE MESSAGES & CHAT
+// PRIVATE MESSAGES & CHAT
 // ==========================================
 
 let activeChatThread = null;
@@ -539,7 +635,7 @@ if (chatForm) {
 }
 
 // ==========================================
-// 7. PUBLIC PAGES POPULATION
+// PUBLIC PAGES POPULATION
 // ==========================================
 
 async function renderPublicAnnouncements() {
@@ -638,7 +734,7 @@ async function renderTransparencyDocs() {
 }
 
 // ==========================================
-// 8. PROFILE & BRANDING CONTROLLER
+// PROFILE & BRANDING CONTROLLER
 // ==========================================
 
 function initProfilePanel() {
@@ -708,7 +804,7 @@ function initProfilePanel() {
 }
 
 // ==========================================
-// 9. REAL-TIME NOTIFICATIONS
+// REAL-TIME NOTIFICATIONS
 // ==========================================
 
 async function updateNotificationsList() {
@@ -755,37 +851,35 @@ if (bellTrigger) {
 }
 
 // ==========================================
-// 10. LOGIN / LOGOUT WORKFLOWS
+// LOGIN DROPDOWN MENU HANDLERS
 // ==========================================
 
-const loginForm = document.getElementById('login-form');
-if (loginForm) {
-  loginForm.onsubmit = async (e) => {
+const loginMenuBtn = document.getElementById('btn-login-menu');
+if (loginMenuBtn) {
+  loginMenuBtn.onclick = (e) => {
+    e.stopPropagation();
+    document.getElementById('login-menu-dropdown').classList.toggle('show');
+  };
+  
+  document.addEventListener('click', () => {
+    const dropdown = document.getElementById('login-menu-dropdown');
+    if (dropdown) dropdown.classList.remove('show');
+  });
+}
+
+// Dynamic portal redirect when clicking quick login options from the menu
+const menuLoginTriggers = document.querySelectorAll('.menu-login-trigger');
+menuLoginTriggers.forEach(trigger => {
+  trigger.onclick = async (e) => {
     e.preventDefault();
-    const email = document.getElementById('login-email').value.trim();
+    const email = e.currentTarget.dataset.email;
     const user = await dbService.getUser(email);
-    
     if (user) {
       sessionStorage.setItem('activeUser', JSON.stringify(user));
       window.location.href = "portal.html";
-    } else {
-      showToast("Invalid credentials. Try demo credentials!");
     }
   };
-
-  // Quick Login Mock Toggles
-  const quickBtns = document.querySelectorAll('.quick-login-btn');
-  quickBtns.forEach(btn => {
-    btn.onclick = async (e) => {
-      const email = e.currentTarget.dataset.email;
-      const user = await dbService.getUser(email);
-      if (user) {
-        sessionStorage.setItem('activeUser', JSON.stringify(user));
-        window.location.href = "portal.html";
-      }
-    };
-  });
-}
+});
 
 const logoutBtn = document.getElementById('btn-logout');
 if (logoutBtn) {
@@ -837,14 +931,13 @@ function showToast(msg) {
 }
 
 // ==========================================
-// 11. GLOBAL INITIALIZATION
+// GLOBAL INITIALIZATION
 // ==========================================
 
 async function initPage() {
   const school = await dbService.getSchool(currentSchoolId);
   applyTheme(school.theme, school.logo);
   
-  // Sync page header logo/name if public layout exists
   const publicSchoolName = document.getElementById('public-school-name');
   if (publicSchoolName) publicSchoolName.innerText = school.name;
   
@@ -857,17 +950,15 @@ async function initPage() {
   // Page Specific Init
   const path = window.location.pathname;
   
-  if (path.endsWith('index.html') || path.endsWith('/')) {
+  if (path.endsWith('index.html') || path.endsWith('/') || path.split('/').pop() === '') {
     renderPublicAnnouncements();
   } else if (path.endsWith('transparency.html')) {
     renderTransparencyDocs();
   } else if (path.endsWith('portal.html')) {
-    // Portal Guard
     if (!activeUser) {
-      window.location.href = "login.html";
+      window.location.href = "index.html"; // Guard: Take to home page with menu login if not authenticated
       return;
     }
-    // Initialize user profile details in sidebar
     document.getElementById('user-avatar').src = activeUser.avatar;
     document.getElementById('user-name').innerText = activeUser.name;
     document.getElementById('user-role').innerText = activeUser.role;
