@@ -286,7 +286,8 @@ const dbService = {
       date: new Date().toISOString().split('T')[0],
       status: status || 'pending',
       likes: [],
-      reactions: {} // { uid: 'love', uid2: 'celebrate' }
+      reactions: {}, // { uid: 'love', uid2: 'celebrate' }
+      isPinned: false
     };
     local.announcements.unshift(newAnn);
     
@@ -303,6 +304,14 @@ const dbService = {
     }
     saveLocalDB(local);
     return newAnn;
+  },
+  togglePinAnnouncement: async (postId) => {
+    const local = getLocalDB();
+    const post = local.announcements.find(a => a.id === postId);
+    if (post) {
+      post.isPinned = !post.isPinned;
+      saveLocalDB(local);
+    }
   },
   votePoll: async (postId, optionIndex, uid) => {
     const local = getLocalDB();

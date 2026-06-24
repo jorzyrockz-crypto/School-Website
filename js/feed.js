@@ -204,6 +204,11 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
       if (activeUser.role === 'teacher' && activeUser.name !== a.author) {
         menuItems.push(`<button class="btn-flag-post" data-id="${a.id}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:#f59e0b;"><ion-icon name="flag"></ion-icon> Flag for Review</button>`);
       }
+      if (activeUser.role === 'admin' || activeUser.role === 'teacher') {
+        const pinText = a.isPinned ? "Unpin Post" : "Pin Post";
+        const pinIcon = a.isPinned ? "close-circle" : "pin";
+        menuItems.push(`<button class="btn-pin-post" data-id="${a.id}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="${pinIcon}"></ion-icon> ${pinText}</button>`);
+      }
       if (menuItems.length > 0) {
         contextMenuHTML = `
           <div style="position:relative;" class="post-context-menu">
@@ -329,6 +334,14 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
       await dbService.flagAnnouncement(e.currentTarget.dataset.id);
       showToast("Post flagged and hidden for review.");
       renderNewsfeed();
+    };
+  });
+
+  container.querySelectorAll('.btn-pin-post').forEach(btn => {
+    btn.onclick = async (e) => {
+      await dbService.togglePinAnnouncement(e.currentTarget.dataset.id);
+      renderNewsfeed();
+      renderPinnedPosts();
     };
   });
 
@@ -691,3 +704,138 @@ document.querySelectorAll('.filter-pill').forEach(pill => {
   });
 });
 
+// ==========================================
+// DYNAMIC WIDGETS (SIDEBARS & CALENDAR)
+// ==========================================
+
+async function renderPinnedPosts() {
+  const container = document.getElementById('pinned-posts-widget');
+  if (!container) return;
+
+  const announcements = await dbService.getAnnouncements();
+  const pinned = announcements.filter(a => a.isPinned);
+
+  if (pinned.length === 0) {
+    container.innerHTML = `<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:1rem;">No pinned posts yet.</div>`;
+    return;
+  }
+
+  container.innerHTML = pinned.map(p => {
+    let typeColor = 'var(--primary)';
+    if (p.type === 'announcement') typeColor = 'var(--danger)';
+    if (p.type === 'achievement') typeColor = '#f59e0b';
+    if (p.type === 'event') typeColor = '#10b981';
+
+    return `
+      <div class="pinned-item" onclick="window.location.hash='#/home'; setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);" style="background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border-left:4px solid ${typeColor}; display:flex; flex-direction:column; gap:0.25rem; cursor:pointer; transition:var(--transition);">
+        <span style="font-size:0.65rem; font-weight:700; color:${typeColor}; text-transform:uppercase;">${p.type} &bull; ${p.author}</span>
+        <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary); line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${p.title || p.content || (p.extraData && p.extraData.eventTitle)}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function renderAgenda() {
+  const container = document.getElementById('agenda-widget-list');
+  if (!container) return;
+
+  const announcements = await dbService.getAnnouncements();
+  const events = announcements.filter(a => a.type === 'event' && a.extraData && a.extraData.date);
+
+  // Sort by date ascending
+  events.sort((a, b) => new Date(a.extraData.date) - new Date(b.extraData.date));
+
+  // Filter next 5 days
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const fiveDaysLater = new Date(today);
+  fiveDaysLater.setDate(today.getDate() + 5);
+
+  const upcomingEvents = events.filter(e => {
+    const d = new Date(e.extraData.date);
+    return d >= today && d <= fiveDaysLater;
+  });
+
+  if (upcomingEvents.length === 0) {
+    container.innerHTML = `<li style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:1rem;">No events in the next 5 days.</li>`;
+    return;
+  }
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+  container.innerHTML = upcomingEvents.map(e => {
+    const d = new Date(e.extraData.date);
+    const month = monthNames[d.getMonth()];
+    const day = String(d.getDate()).padStart(2, '0');
+    
+    return `
+      <li style="display:flex; gap:1rem; align-items:flex-start;">
+        <div style="background:var(--bg-primary); padding:0.4rem; border-radius:8px; text-align:center; min-width:50px; border:1px solid var(--border-color);">
+          <div style="font-size:0.7rem; color:var(--danger); font-weight:700; text-transform:uppercase;">${month}</div>
+          <div style="font-size:1.2rem; font-weight:700; color:var(--text-primary); line-height:1; margin-top:2px;">${day}</div>
+        </div>
+        <div>
+          <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">${e.extraData.eventTitle || e.title}</div>
+          <div style="font-size:0.8rem; color:var(--text-secondary)">${e.extraData.time}</div>
+        </div>
+      </li>
+    `;
+  }).join('');
+}
+
+async function renderCalendar() {
+  const container = document.getElementById('full-calendar-list');
+  if (!container) return;
+
+  const announcements = await dbService.getAnnouncements();
+  const events = announcements.filter(a => a.type === 'event' && a.extraData && a.extraData.date);
+
+  // Sort by date ascending
+  events.sort((a, b) => new Date(a.extraData.date) - new Date(b.extraData.date));
+
+  if (events.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-secondary); text-align:center;">No events have been scheduled yet.</p>`;
+    return;
+  }
+
+  const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  container.innerHTML = events.map(e => {
+    const d = new Date(e.extraData.date);
+    const month = monthNames[d.getMonth()];
+    const day = String(d.getDate()).padStart(2, '0');
+    const isPast = d < today;
+    const opacity = isPast ? '0.6' : '1';
+    
+    return `
+      <div style="display:flex; gap:1.5rem; align-items:center; background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); opacity:${opacity};">
+        <div style="background:var(--bg-primary); padding:0.5rem; border-radius:8px; text-align:center; min-width:60px; border:1px solid var(--border-color); box-shadow:var(--shadow-sm);">
+          <div style="font-size:0.8rem; color:var(--danger); font-weight:700; text-transform:uppercase;">${month}</div>
+          <div style="font-size:1.5rem; font-weight:700; color:var(--text-primary); line-height:1; margin-top:2px;">${day}</div>
+        </div>
+        <div style="flex:1;">
+          <h3 style="margin-bottom:0.25rem; font-size:1.1rem; color:${isPast ? 'var(--text-secondary)' : 'var(--text-primary)'};">${e.extraData.eventTitle || e.title} ${isPast ? '(Past)' : ''}</h3>
+          <p style="font-size:0.9rem; color:var(--text-secondary); margin-bottom:0.5rem;"><ion-icon name="time-outline" style="vertical-align:middle;"></ion-icon> ${e.extraData.time} &nbsp;&bull;&nbsp; <ion-icon name="location-outline" style="vertical-align:middle;"></ion-icon> ${e.extraData.location}</p>
+          <p style="font-size:0.95rem; color:var(--text-primary);">${e.content}</p>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// Intercept renderNewsfeed to also render widgets
+const originalRenderNewsfeed = renderNewsfeed;
+renderNewsfeed = async (filter) => {
+  await originalRenderNewsfeed(filter);
+  renderPinnedPosts();
+  renderAgenda();
+  renderCalendar();
+};
+
+setTimeout(() => {
+  renderPinnedPosts();
+  renderAgenda();
+  renderCalendar();
+}, 500);

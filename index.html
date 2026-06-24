@@ -72,6 +72,9 @@
         <li class="menu-item active" data-view="home">
           <a href="#/home"><ion-icon name="home-outline"></ion-icon> School Feed</a>
         </li>
+        <li class="menu-item" data-view="calendar">
+          <a href="#/calendar"><ion-icon name="calendar-outline"></ion-icon> Full Calendar</a>
+        </li>
         <li class="menu-item" data-view="about">
           <a href="#/about"><ion-icon name="school-outline"></ion-icon> About Us</a>
         </li>
@@ -213,77 +216,45 @@
             
             <!-- Right Widget column -->
             <div>
-              <!-- PINNED ANNOUNCEMENTS WIDGET -->
+              <!-- PINNED POSTS WIDGET -->
               <div class="sidebar-widget">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
                   <div style="display:flex; align-items:center; gap:0.5rem;">
                     <ion-icon name="pin" style="color:var(--danger); font-size:1.2rem; transform:rotate(-45deg);"></ion-icon>
-                    <h3 class="widget-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Pinned Memoranda</h3>
+                    <h3 class="widget-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Pinned Posts</h3>
                   </div>
                 </div>
-                <div class="pinned-list" style="display:flex; flex-direction:column; gap:0.5rem;">
-                  <div class="pinned-item" style="background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border-left:4px solid var(--danger); display:flex; flex-direction:column; gap:0.25rem; cursor:pointer; transition:var(--transition);">
-                    <span style="font-size:0.65rem; font-weight:700; color:var(--danger); text-transform:uppercase;">Emergency</span>
-                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary); line-height:1.3;">Class Suspensions Due to Inclement Weather</span>
-                  </div>
-                  <div class="pinned-item" style="background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border-left:4px solid var(--primary); display:flex; flex-direction:column; gap:0.25rem; cursor:pointer; transition:var(--transition);">
-                    <span style="font-size:0.65rem; font-weight:700; color:var(--primary); text-transform:uppercase;">Info</span>
-                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary); line-height:1.3;">AY 2026-2027 Enrollment Open</span>
-                  </div>
+                <div id="pinned-posts-widget" style="display:flex; flex-direction:column; gap:0.5rem;">
+                  <!-- Dynamic pinned posts go here -->
                 </div>
               </div>
 
+              <!-- AGENDA WIDGET -->
               <div class="sidebar-widget">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                  <h3 class="widget-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Agenda</h3>
-                  <button style="background:none; border:none; color:var(--primary); font-size:1.4rem; cursor:pointer;" title="Add Event (Admin Only)"><ion-icon name="add-circle"></ion-icon></button>
+                  <h3 class="widget-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Agenda (Next 5 Days)</h3>
+                  <button id="btn-add-agenda-event" style="background:none; border:none; color:var(--primary); font-size:1.4rem; cursor:pointer;" title="Add Event (Admin/Teacher Only)"><ion-icon name="add-circle"></ion-icon></button>
                 </div>
-                <ul id="agenda-widget-list" style="list-style:none; display:flex; flex-direction:column; gap:1rem;">
-                  <li style="display:flex; gap:1rem; align-items:flex-start;">
-                    <div style="background:var(--bg-primary); padding:0.4rem; border-radius:8px; text-align:center; min-width:50px; border:1px solid var(--border-color);">
-                      <div style="font-size:0.7rem; color:var(--danger); font-weight:700; text-transform:uppercase;">Jul</div>
-                      <div style="font-size:1.2rem; font-weight:700; color:var(--text-primary); line-height:1; margin-top:2px;">01</div>
-                    </div>
-                    <div>
-                      <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">First Day of Class</div>
-                      <div style="font-size:0.8rem; color:var(--text-secondary)">AY 2026-2027</div>
-                    </div>
-                  </li>
-                  <li style="display:flex; gap:1rem; align-items:flex-start;">
-                    <div style="background:var(--bg-primary); padding:0.4rem; border-radius:8px; text-align:center; min-width:50px; border:1px solid var(--border-color);">
-                      <div style="font-size:0.7rem; color:var(--danger); font-weight:700; text-transform:uppercase;">Jul</div>
-                      <div style="font-size:1.2rem; font-weight:700; color:var(--text-primary); line-height:1; margin-top:2px;">15</div>
-                    </div>
-                    <div>
-                      <div style="font-weight:600; color:var(--text-primary); font-size:0.95rem;">Brigada Eskwela</div>
-                      <div style="font-size:0.8rem; color:var(--text-secondary)">School Assembly</div>
-                    </div>
-                  </li>
+                <ul id="agenda-widget-list" style="list-style:none; display:flex; flex-direction:column; gap:1rem; max-height: 250px; overflow-y: auto; padding-right: 0.5rem;">
+                  <!-- Dynamic agenda events go here -->
                 </ul>
-                <button id="btn-view-calendar" class="btn-secondary" style="width:100%; margin-top:1.5rem; font-size:0.85rem; padding:0.5rem;">View Full Calendar</button>
+                <button id="btn-view-calendar" onclick="window.location.hash='#/calendar'" class="btn-secondary" style="width:100%; margin-top:1.5rem; font-size:0.85rem; padding:0.5rem;">View Full Calendar</button>
               </div>
+            </div>
+          </div>
+        </div>
 
-              <!-- Trending Topics Widget -->
-              <div class="sidebar-widget" style="margin-top:1.5rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
-                  <h3 class="widget-title" style="margin-bottom:0; border-bottom:none; padding-bottom:0;">Trending Posts</h3>
-                  <ion-icon name="trending-up" style="color:var(--primary); font-size:1.2rem;"></ion-icon>
-                </div>
-                <ul style="list-style:none; display:flex; flex-direction:column; gap:0.75rem;">
-                  <li style="display:flex; flex-direction:column; gap:0.1rem; cursor:pointer;">
-                    <span style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">#BrigadaEskwela2026</span>
-                    <span style="font-size:0.75rem; color:var(--text-secondary);">156 posts this week</span>
-                  </li>
-                  <li style="display:flex; flex-direction:column; gap:0.1rem; cursor:pointer;">
-                    <span style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">#Intramurals</span>
-                    <span style="font-size:0.75rem; color:var(--text-secondary);">Trending in Grade 10</span>
-                  </li>
-                  <li style="display:flex; flex-direction:column; gap:0.1rem; cursor:pointer;">
-                    <span style="font-weight:600; font-size:0.9rem; color:var(--text-primary);">#TeacherSpotlight</span>
-                    <span style="font-size:0.75rem; color:var(--text-secondary);">42 discussions</span>
-                  </li>
-                </ul>
-              </div>
+        <!-- ================= VIEW: CALENDAR ================= -->
+        <div id="view-calendar" class="route-view" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+            <h1 class="hero-title" style="margin-bottom:0;">School Calendar</h1>
+            <button class="btn-primary" onclick="window.location.hash='#/home'; setTimeout(() => document.getElementById('btn-add-agenda-event').click(), 100);" style="display:none;" id="btn-calendar-add-event"><ion-icon name="add"></ion-icon> Create Event</button>
+          </div>
+          
+          <div class="news-card">
+            <h2 class="widget-title" style="border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1rem;">Upcoming & Past Events</h2>
+            <div id="full-calendar-list" style="display:flex; flex-direction:column; gap:1.5rem;">
+              <!-- Dynamic calendar list goes here -->
             </div>
           </div>
         </div>
