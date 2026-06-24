@@ -1349,18 +1349,22 @@ function syncSidebarProfile() {
 
     // Role-based background color for the profile card
     if (profileBox) {
+      // Reset all borders to avoid compounding if roles switch
+      profileBox.style.border = 'none';
+      profileBox.style.borderLeft = '4px solid transparent';
+      
       if (activeUser.role === 'admin') {
-        profileBox.style.background = 'rgba(24, 119, 242, 0.15)';
-        profileBox.style.border = '1px solid rgba(24, 119, 242, 0.3)';
+        profileBox.style.background = 'linear-gradient(90deg, rgba(24, 119, 242, 0.35) 0%, rgba(24, 119, 242, 0.05) 100%)';
+        profileBox.style.borderLeft = '4px solid #1877f2';
       } else if (activeUser.role === 'teacher') {
-        profileBox.style.background = 'rgba(45, 158, 107, 0.15)';
-        profileBox.style.border = '1px solid rgba(45, 158, 107, 0.3)';
+        profileBox.style.background = 'linear-gradient(90deg, rgba(45, 158, 107, 0.35) 0%, rgba(45, 158, 107, 0.05) 100%)';
+        profileBox.style.borderLeft = '4px solid #2d9e6b';
       } else if (activeUser.role === 'learner') {
-        profileBox.style.background = 'rgba(245, 158, 11, 0.15)';
-        profileBox.style.border = '1px solid rgba(245, 158, 11, 0.3)';
+        profileBox.style.background = 'linear-gradient(90deg, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.05) 100%)';
+        profileBox.style.borderLeft = '4px solid #f59e0b';
       } else if (activeUser.role === 'parent') {
-        profileBox.style.background = 'rgba(124, 58, 237, 0.15)';
-        profileBox.style.border = '1px solid rgba(124, 58, 237, 0.3)';
+        profileBox.style.background = 'linear-gradient(90deg, rgba(124, 58, 237, 0.35) 0%, rgba(124, 58, 237, 0.05) 100%)';
+        profileBox.style.borderLeft = '4px solid #7c3aed';
       }
     }
 
@@ -1371,6 +1375,7 @@ function syncSidebarProfile() {
     if (profileBox) {
       profileBox.style.background = 'rgba(255, 255, 255, 0.03)';
       profileBox.style.border = 'none';
+      profileBox.style.borderLeft = '4px solid transparent';
     }
   }
 }
