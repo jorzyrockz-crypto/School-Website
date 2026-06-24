@@ -1,6 +1,4 @@
 // Firebase Configuration & Local Mock Fallback Layer
-// This file connects to your Firebase project, but falls back to localStorage automatically if credentials are empty or if running offline.
-
 const firebaseConfig = {
   apiKey: "",
   authDomain: "",
@@ -10,14 +8,9 @@ const firebaseConfig = {
   appId: ""
 };
 
-// ==========================================
-// MOCK DATABASE & LOCAL CONFIG
-// ==========================================
-
-// Auto-detect if we should use Firebase or Local Fallback
 const useFirebase = !!(firebaseConfig.apiKey && firebaseConfig.projectId);
 
-// Local DB State structure for mock fallback
+// Local DB State structure for mock fallback (Facebook School Edition)
 const DEFAULT_LOCAL_DB = {
   schools: {
     "default-school": {
@@ -42,27 +35,45 @@ const DEFAULT_LOCAL_DB = {
     {
       id: "ann1",
       schoolId: "default-school",
-      title: "Enrollment for Academic Year 2026-2027 Open",
+      title: "AY 2026-2027 Enrollment Open",
       content: "We are pleased to announce that enrollment for both Junior and Senior High School is now officially open. Please submit requirements to the registrar's office.",
       author: "Maria Santos",
+      authorRole: "admin",
+      authorAvatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=admin",
       date: "2026-06-24",
-      status: "approved"
+      status: "approved",
+      likes: ["learner1", "parent1"]
     },
     {
       id: "ann2",
       schoolId: "default-school",
+      title: "Class Suspensions Due to Inclement Weather",
+      content: "In compliance with DepEd local directives, classes in all levels are suspended today due to heavy monsoon rains. Stay safe inside, learners!",
+      author: "Teacher Jose",
+      authorRole: "teacher",
+      authorAvatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=teacher",
+      date: "2026-06-23",
+      status: "approved",
+      likes: ["parent1"]
+    },
+    {
+      id: "ann3",
+      schoolId: "default-school",
       title: "Upcoming Brigada Eskwela Activities",
       content: "Join us this coming Monday for our annual school maintenance and cleanup drive. Let's work together to prepare classrooms for our learners.",
       author: "Teacher Jose",
+      authorRole: "teacher",
+      authorAvatar: "https://api.dicebear.com/7.x/adventurer/svg?seed=teacher",
       date: "2026-06-23",
-      status: "pending"
+      status: "pending",
+      likes: []
     }
   ],
   comments: [
-    { id: "c1", announcementId: "ann1", author: "Guest Parent", text: "Are the enrollment forms downloadable online?", timestamp: Date.now() }
+    { id: "c1", announcementId: "ann1", author: "Mrs. Cruz (Parent)", text: "Are the enrollment forms downloadable online?", timestamp: Date.now() }
   ],
   attendance: {}, // format: { "default-school": { "learner1": { "2026-06-24": "present" } } }
-  chats: {}, // format: { "chatId": [ { senderId: "teacher1", text: "Hello, just checking in", timestamp: 1782292020000 } ] }
+  chats: {}, 
   notifications: [
     { id: "n1", schoolId: "default-school", recipientId: "admin1", senderName: "Teacher Jose", messageText: "submitted 'Upcoming Brigada Eskwela' for approval.", read: false, timestamp: Date.now() }
   ],
@@ -140,9 +151,12 @@ const dbService = {
       schoolId: currentSchoolId,
       title,
       content,
-      author,
+      author: activeUser.name,
+      authorRole: activeUser.role,
+      authorAvatar: activeUser.avatar,
       date: new Date().toISOString().split('T')[0],
-      status: activeUser.role === 'admin' ? 'approved' : 'pending'
+      status: activeUser.role === 'admin' ? 'approved' : 'pending',
+      likes: []
     };
     local.announcements.unshift(newAnn);
     
@@ -160,6 +174,22 @@ const dbService = {
     
     saveLocalDB(local);
     return newAnn;
+  },
+  toggleLike: async (annId) => {
+    if (!activeUser) return;
+    const local = getLocalDB();
+    const annIndex = local.announcements.findIndex(a => a.id === annId);
+    if (annIndex !== -1) {
+      const likes = local.announcements[annIndex].likes || [];
+      const userIndex = likes.indexOf(activeUser.uid);
+      if (userIndex === -1) {
+        likes.push(activeUser.uid);
+      } else {
+        likes.splice(userIndex, 1);
+      }
+      local.announcements[annIndex].likes = likes;
+      saveLocalDB(local);
+    }
   },
   moderateAnnouncement: async (annId, status) => {
     const local = getLocalDB();
@@ -308,53 +338,204 @@ function applyTheme(themeName, customLogo = null) {
 }
 
 // ==========================================
-// PORTAL TABS ROUTER (INSIDE portal.html)
+// CENTRAL APPLICATION ROUTER (HASH BASED)
 // ==========================================
 
-function initPortalTabs() {
-  const handlePortalRouting = () => {
-    const hash = window.location.hash || '#/dashboard';
+function initRouter() {
+  const handleRouting = () => {
+    const hash = window.location.hash || '#/home';
     
-    let panel = 'dashboard';
-    if (hash.startsWith('#/dashboard/')) {
-      panel = hash.split('#/dashboard/')[1];
+    let viewName = 'home';
+    if (hash.startsWith('#/')) {
+      viewName = hash.split('#/')[1].split('/')[0];
     }
-    
-    switchPortalPanel(panel);
+
+    // Guard portal routes
+    const authRoutes = ['dashboard', 'messages', 'profile'];
+    if (authRoutes.includes(viewName) && !activeUser) {
+      window.location.hash = '#/home';
+      showToast("Please log in to access this portal section!");
+      return;
+    }
+
+    switchView(viewName);
   };
 
-  window.addEventListener('hashchange', handlePortalRouting);
-  handlePortalRouting();
+  window.addEventListener('hashchange', handleRouting);
+  handleRouting();
 }
 
-function switchPortalPanel(panelName) {
-  document.querySelectorAll('.portal-panel').forEach(panel => {
-    panel.style.display = 'none';
+function switchView(viewName) {
+  // Toggle visibility of route blocks
+  document.querySelectorAll('.route-view').forEach(view => {
+    view.style.display = 'none';
   });
-  
-  const targetPanel = document.getElementById(`panel-${panelName}`);
-  if (targetPanel) {
-    targetPanel.style.display = 'block';
+
+  const activeView = document.getElementById(`view-${viewName}`);
+  if (activeView) {
+    activeView.style.display = 'block';
   }
 
+  // Update sidebar active highlights
   document.querySelectorAll('.menu-item').forEach(item => {
     item.classList.remove('active');
-    if (item.dataset.panel === panelName) {
+    if (item.dataset.view === viewName) {
       item.classList.add('active');
     }
   });
 
-  if (panelName === 'dashboard') {
+  // Specific module loaders
+  if (viewName === 'home') {
+    renderNewsfeed();
+  } else if (viewName === 'transparency') {
+    renderTransparencyDocs();
+  } else if (viewName === 'dashboard') {
     renderRolePortal();
-  } else if (panelName === 'messages') {
+  } else if (viewName === 'messages') {
     initMessagesPanel();
-  } else if (panelName === 'profile') {
+  } else if (viewName === 'profile') {
     initProfilePanel();
   }
 }
 
 // ==========================================
-// RENDERING BLOCKS (PORTAL VIEWS)
+// DYNAMIC VIEW RENDERERS (FB SCHOOL NEWSFEED)
+// ==========================================
+
+async function renderNewsfeed() {
+  const container = document.getElementById('school-newsfeed-container');
+  if (!container) return;
+
+  const announcements = await dbService.getAnnouncements();
+  const approved = announcements.filter(a => a.status === 'approved');
+
+  if (approved.length === 0) {
+    container.innerHTML = `<p style="padding: 2rem; text-align: center; color:var(--text-secondary)">No news or announcements have been posted yet.</p>`;
+    return;
+  }
+
+  container.innerHTML = approved.map(a => {
+    const likes = a.likes || [];
+    const userHasLiked = activeUser ? likes.includes(activeUser.uid) : false;
+    
+    return `
+      <article class="news-card" style="margin-bottom:1.5rem;">
+        <!-- Card Header (FB Style) -->
+        <div style="display:flex; align-items:center; gap:0.75rem; margin-bottom:1rem;">
+          <img class="thread-avatar" src="${a.authorAvatar || 'https://api.dicebear.com/7.x/adventurer/svg?seed=placeholder'}" alt="avatar">
+          <div>
+            <strong style="font-size:0.95rem; display:block;">${a.author}</strong>
+            <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${a.authorRole} • ${a.date}</span>
+          </div>
+        </div>
+
+        <h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${a.title}</h3>
+        <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${a.content}</p>
+        
+        <!-- Interactive Like & Comment Status bar -->
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-secondary); border-top:1px solid var(--border-color); border-bottom:1px solid var(--border-color); padding:0.5rem 0; margin-bottom:0.75rem;">
+          <span id="likes-count-${a.id}">👍 ${likes.length} Likes</span>
+          <span style="cursor:pointer;" class="btn-expand-comments" data-id="${a.id}">💬 Comments</span>
+        </div>
+
+        <!-- FB Action Buttons -->
+        <div style="display:flex; gap:1.5rem; margin-bottom:0.75rem;">
+          <button class="btn-like-post ${userHasLiked ? 'active' : ''}" data-id="${a.id}" style="background:none; border:none; color:${userHasLiked ? 'var(--primary)' : 'var(--text-secondary)'}; font-weight:600; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.25rem;">
+            <ion-icon name="${userHasLiked ? 'thumbs-up' : 'thumbs-up-outline'}"></ion-icon> Like
+          </button>
+          <button class="btn-expand-comments" data-id="${a.id}" style="background:none; border:none; color:var(--text-secondary); font-weight:600; font-size:0.85rem; cursor:pointer; display:flex; align-items:center; gap:0.25rem;">
+            <ion-icon name="chatbubble-outline"></ion-icon> Comment
+          </button>
+        </div>
+
+        <!-- Comments Section drawer -->
+        <div id="comments-box-${a.id}" class="comments-section" style="display:none; background:var(--bg-primary); padding:1rem; border-radius:var(--radius-md);">
+          <div id="comments-list-${a.id}"></div>
+          <form class="comment-form" data-ann-id="${a.id}" style="display:flex; gap:0.5rem; margin-top:0.75rem;">
+            <input type="text" class="form-control" style="padding:0.4rem; font-size:0.85rem;" placeholder="Write a comment..." required>
+            <button type="submit" class="btn-action" style="padding:0.4rem 1rem; font-size:0.85rem;">Post</button>
+          </form>
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  // Likes trigger bindings
+  container.querySelectorAll('.btn-like-post').forEach(btn => {
+    btn.onclick = async (e) => {
+      if (!activeUser) {
+        showToast("Please log in to like posts!");
+        return;
+      }
+      const annId = e.currentTarget.dataset.id;
+      await dbService.toggleLike(annId);
+      renderNewsfeed();
+    };
+  });
+
+  // Comments drawer expand bindings
+  container.querySelectorAll('.btn-expand-comments').forEach(btn => {
+    btn.onclick = async (e) => {
+      const annId = e.currentTarget.dataset.id;
+      const box = document.getElementById(`comments-box-${annId}`);
+      const isHidden = box.style.display === 'none';
+      box.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        renderCommentsList(annId);
+      }
+    };
+  });
+}
+
+async function renderCommentsList(annId) {
+  const comments = await dbService.getComments(annId);
+  const list = document.getElementById(`comments-list-${annId}`);
+  
+  if (comments.length === 0) {
+    list.innerHTML = `<p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem;">No comments yet.</p>`;
+  } else {
+    list.innerHTML = comments.map(c => `
+      <div class="comment-item" style="padding:0.5rem; margin-bottom:0.5rem;">
+        <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem;">${c.author}</div>
+        <div style="font-size:0.85rem;">${c.text}</div>
+      </div>
+    `).join('');
+  }
+
+  const form = document.querySelector(`.comment-form[data-ann-id="${annId}"]`);
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const input = form.querySelector('input');
+    const text = input.value.trim();
+    if (!text) return;
+    
+    const authorName = activeUser ? activeUser.name : "Guest Parent";
+    await dbService.addComment(annId, authorName, text);
+    input.value = '';
+    renderCommentsList(annId);
+  };
+}
+
+async function renderTransparencyDocs() {
+  const list = document.getElementById('transparency-docs-list');
+  if (!list) return;
+
+  const school = await dbService.getSchool(currentSchoolId);
+  list.innerHTML = school.transparencyDocs.map(d => `
+    <tr>
+      <td><strong>${d.title}</strong></td>
+      <td>June 2026</td>
+      <td>
+        <a href="${d.url}" class="nav-link" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
+          <ion-icon name="download-outline"></ion-icon> View Document
+        </a>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ==========================================
+// AUTH PORTAL DASHBOARDS
 // ==========================================
 
 async function renderRolePortal() {
@@ -635,106 +816,7 @@ if (chatForm) {
 }
 
 // ==========================================
-// PUBLIC PAGES POPULATION
-// ==========================================
-
-async function renderPublicAnnouncements() {
-  const list = document.getElementById('public-announcements-list');
-  if (!list) return;
-
-  const announcements = await dbService.getAnnouncements();
-  const approved = announcements.filter(a => a.status === 'approved');
-
-  if (approved.length === 0) {
-    list.innerHTML = `<p style="color:var(--text-secondary)">No announcements posted yet.</p>`;
-    return;
-  }
-
-  list.innerHTML = approved.map(a => `
-    <article class="news-card">
-      <div class="news-meta">
-        <span class="news-badge">News</span>
-        <span>Date: ${a.date}</span>
-        <span>By: ${a.author}</span>
-      </div>
-      <h3 class="news-title">${a.title}</h3>
-      <p style="color:var(--text-secondary); margin-bottom:1rem;">${a.content}</p>
-      
-      <button class="news-comments-btn" data-id="${a.id}">
-        <ion-icon name="chatbubble-ellipses-outline"></ion-icon> Comments
-      </button>
-
-      <div id="comments-box-${a.id}" class="comments-section" style="display:none;">
-        <div id="comments-list-${a.id}"></div>
-        <form class="comment-form" data-ann-id="${a.id}">
-          <input type="text" placeholder="Add a public comment or inquiry..." required>
-          <button type="submit">Post</button>
-        </form>
-      </div>
-    </article>
-  `).join('');
-
-  list.querySelectorAll('.news-comments-btn').forEach(btn => {
-    btn.onclick = async (e) => {
-      const annId = e.currentTarget.dataset.id;
-      const box = document.getElementById(`comments-box-${annId}`);
-      const isHidden = box.style.display === 'none';
-      box.style.display = isHidden ? 'block' : 'none';
-      if (isHidden) {
-        renderCommentsList(annId);
-      }
-    };
-  });
-}
-
-async function renderCommentsList(annId) {
-  const comments = await dbService.getComments(annId);
-  const list = document.getElementById(`comments-list-${annId}`);
-  
-  if (comments.length === 0) {
-    list.innerHTML = `<p style="font-size:0.75rem; color:var(--text-secondary); margin-bottom:0.5rem;">No comments yet. Be the first to ask!</p>`;
-  } else {
-    list.innerHTML = comments.map(c => `
-      <div class="comment-item">
-        <div class="comment-meta">${c.author}</div>
-        <div>${c.text}</div>
-      </div>
-    `).join('');
-  }
-
-  const form = document.querySelector(`.comment-form[data-ann-id="${annId}"]`);
-  form.onsubmit = async (e) => {
-    e.preventDefault();
-    const input = form.querySelector('input');
-    const text = input.value.trim();
-    if (!text) return;
-    
-    await dbService.addComment(annId, "Guest User", text);
-    input.value = '';
-    renderCommentsList(annId);
-  };
-}
-
-async function renderTransparencyDocs() {
-  const list = document.getElementById('transparency-docs-list');
-  if (!list) return;
-
-  const school = await dbService.getSchool(currentSchoolId);
-  list.innerHTML = school.transparencyDocs.map(d => `
-    <tr>
-      <td><strong>${d.title}</strong></td>
-      <td>June 2026</td>
-      <td>
-        <a href="${d.url}" class="nav-link" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
-          <ion-icon name="download-outline"></ion-icon> View Document
-        </a>
-      </td>
-    </tr>
-  `).join('');
-}
-
-// ==========================================
-// PROFILE & BRANDING CONTROLLER
+// PROFILE MANAGEMENT
 // ==========================================
 
 function initProfilePanel() {
@@ -759,8 +841,8 @@ function initProfilePanel() {
     sessionStorage.setItem('activeUser', JSON.stringify(activeUser));
     showToast("Profile details updated!");
     
-    document.getElementById('user-name').innerText = activeUser.name;
-    document.getElementById('user-avatar').src = activeUser.avatar;
+    // Sync UI elements
+    syncSidebarProfile();
   };
 
   const adminBox = document.getElementById('admin-branding-settings');
@@ -796,6 +878,7 @@ function initProfilePanel() {
 
       const updated = await dbService.saveSchool(currentSchoolId, { name, logo, theme });
       applyTheme(updated.theme, updated.logo);
+      syncSchoolConfig(updated);
       showToast("Branding settings saved successfully!");
     };
   } else {
@@ -804,7 +887,7 @@ function initProfilePanel() {
 }
 
 // ==========================================
-// REAL-TIME NOTIFICATIONS
+// SYSTEM NOTIFICATIONS
 // ==========================================
 
 async function updateNotificationsList() {
@@ -851,7 +934,7 @@ if (bellTrigger) {
 }
 
 // ==========================================
-// LOGIN DROPDOWN MENU HANDLERS
+// SESSION MANAGEMENT (MOCK BUTTONS & DROPDOWN)
 // ==========================================
 
 const loginMenuBtn = document.getElementById('btn-login-menu');
@@ -867,7 +950,6 @@ if (loginMenuBtn) {
   });
 }
 
-// Dynamic portal redirect when clicking quick login options from the menu
 const menuLoginTriggers = document.querySelectorAll('.menu-login-trigger');
 menuLoginTriggers.forEach(trigger => {
   trigger.onclick = async (e) => {
@@ -875,8 +957,14 @@ menuLoginTriggers.forEach(trigger => {
     const email = e.currentTarget.dataset.email;
     const user = await dbService.getUser(email);
     if (user) {
+      activeUser = user;
       sessionStorage.setItem('activeUser', JSON.stringify(user));
-      window.location.href = "portal.html";
+      showToast(`Welcome back, ${user.name}!`);
+      
+      // Update layouts
+      syncSidebarProfile();
+      toggleAuthUIElements(true);
+      window.location.hash = "#/dashboard"; // Jump to workspace dashboard
     }
   };
 });
@@ -884,9 +972,63 @@ menuLoginTriggers.forEach(trigger => {
 const logoutBtn = document.getElementById('btn-logout');
 if (logoutBtn) {
   logoutBtn.onclick = () => {
+    activeUser = null;
+    activeChatThread = null;
     sessionStorage.removeItem('activeUser');
-    window.location.href = "index.html";
+    showToast("Signed out successfully.");
+    
+    // Clear sidebar layout
+    syncSidebarProfile();
+    toggleAuthUIElements(false);
+    window.location.hash = "#/home"; // Redirect to homepage feed
   };
+}
+
+// ==========================================
+// LAYOUT HELPERS
+// ==========================================
+
+function syncSidebarProfile() {
+  const avatar = document.getElementById('user-avatar');
+  const name = document.getElementById('user-name');
+  const role = document.getElementById('user-role');
+
+  if (activeUser) {
+    avatar.src = activeUser.avatar;
+    name.innerText = activeUser.name;
+    role.innerText = activeUser.role.toUpperCase();
+    role.style.background = "rgba(255,255,255,0.25)";
+  } else {
+    avatar.src = "https://api.dicebear.com/7.x/adventurer/svg?seed=guest";
+    name.innerText = "Guest User";
+    role.innerText = "Guest";
+    role.style.background = "rgba(255,255,255,0.1)";
+  }
+}
+
+function toggleAuthUIElements(isLoggedIn) {
+  // Show / Hide auth-only menu links
+  document.querySelectorAll('.menu-item.auth-only').forEach(item => {
+    item.style.display = isLoggedIn ? 'block' : 'none';
+  });
+
+  // Toggle logout vs quick login dropdown
+  document.getElementById('guest-login-box').style.display = isLoggedIn ? 'none' : 'block';
+  document.getElementById('btn-logout').style.display = isLoggedIn ? 'block' : 'none';
+
+  // Toggle create-post box on newsfeed (Admin/Teacher only)
+  const canPost = isLoggedIn && (activeUser.role === 'admin' || activeUser.role === 'teacher');
+  document.getElementById('fb-create-post-box').style.display = canPost ? 'block' : 'none';
+  
+  if (canPost) {
+    document.getElementById('post-box-avatar').src = activeUser.avatar;
+  }
+}
+
+async function syncSchoolConfig(school) {
+  document.getElementById('school-sidebar-name').innerText = school.name;
+  document.getElementById('school-portal-name').innerText = school.name;
+  document.getElementById('school-logo-img').src = school.logo;
 }
 
 // Announcements Creation Modal (Teacher Dashboard)
@@ -917,7 +1059,8 @@ if (annForm) {
     document.getElementById('announcement-modal').style.display = 'none';
     
     showToast(activeUser.role === 'admin' ? "Announcement posted!" : "Submitted for review.");
-    renderRolePortal();
+    renderNewsfeed();
+    if (activeUser.role === 'admin') renderRolePortal();
   };
 }
 
@@ -937,33 +1080,16 @@ function showToast(msg) {
 async function initPage() {
   const school = await dbService.getSchool(currentSchoolId);
   applyTheme(school.theme, school.logo);
-  
-  const publicSchoolName = document.getElementById('public-school-name');
-  if (publicSchoolName) publicSchoolName.innerText = school.name;
-  
-  const publicLogo = document.getElementById('public-logo');
-  if (publicLogo) publicLogo.src = school.logo;
+  syncSchoolConfig(school);
 
-  const schoolPortalName = document.getElementById('school-portal-name');
-  if (schoolPortalName) schoolPortalName.innerText = school.name;
+  // Sync sidebar session state on load
+  syncSidebarProfile();
+  toggleAuthUIElements(activeUser !== null);
 
-  // Page Specific Init
-  const path = window.location.pathname;
+  // Initialize Router
+  initRouter();
   
-  if (path.endsWith('index.html') || path.endsWith('/') || path.split('/').pop() === '') {
-    renderPublicAnnouncements();
-  } else if (path.endsWith('transparency.html')) {
-    renderTransparencyDocs();
-  } else if (path.endsWith('portal.html')) {
-    if (!activeUser) {
-      window.location.href = "index.html"; // Guard: Take to home page with menu login if not authenticated
-      return;
-    }
-    document.getElementById('user-avatar').src = activeUser.avatar;
-    document.getElementById('user-name').innerText = activeUser.name;
-    document.getElementById('user-role').innerText = activeUser.role;
-
-    initPortalTabs();
+  if (activeUser) {
     updateNotificationsList();
   }
 }
