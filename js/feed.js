@@ -265,10 +265,10 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
 
         <!-- Custom School Reactions Bar -->
         <div class="reactions-bar" style="display:flex; gap:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
-          <button class="btn-reaction ${userReaction === 'love' ? 'active-reaction' : ''}" data-id="${a.id}" data-react="love"><ion-icon name="heart"></ion-icon> Love</button>
-          <button class="btn-reaction ${userReaction === 'celebrate' ? 'active-reaction' : ''}" data-id="${a.id}" data-react="celebrate"><ion-icon name="medal"></ion-icon> Celebrate</button>
-          <button class="btn-reaction ${userReaction === 'inspired' ? 'active-reaction' : ''}" data-id="${a.id}" data-react="inspired"><ion-icon name="bulb"></ion-icon> Inspired</button>
-          <button class="btn-reaction ${userReaction === 'helpful' ? 'active-reaction' : ''}" data-id="${a.id}" data-react="helpful"><ion-icon name="information-circle"></ion-icon> Helpful</button>
+          <button class="reaction-btn ${userReaction === 'love' ? 'reacted' : ''}" data-id="${a.id}" data-react="love"><ion-icon name="heart"></ion-icon> Love</button>
+          <button class="reaction-btn ${userReaction === 'celebrate' ? 'reacted' : ''}" data-id="${a.id}" data-react="celebrate"><ion-icon name="medal"></ion-icon> Celebrate</button>
+          <button class="reaction-btn ${userReaction === 'inspired' ? 'reacted' : ''}" data-id="${a.id}" data-react="inspired"><ion-icon name="bulb"></ion-icon> Inspired</button>
+          <button class="reaction-btn ${userReaction === 'helpful' ? 'reacted' : ''}" data-id="${a.id}" data-react="helpful"><ion-icon name="information-circle"></ion-icon> Helpful</button>
         </div>
 
         <!-- Comments Area (Hidden by default) -->
@@ -286,7 +286,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
   }).join('');
 
   // Interaction Bindings
-  container.querySelectorAll('.btn-reaction').forEach(btn => {
+  container.querySelectorAll('.reaction-btn').forEach(btn => {
     btn.onclick = async (e) => {
       if (!activeUser) return showToast("Please log in to react!");
       const annId = e.currentTarget.dataset.id;
