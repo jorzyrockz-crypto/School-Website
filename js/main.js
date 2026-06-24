@@ -67,7 +67,8 @@ async function updateMessengerDropdownList() {
       recentThreads.push({ ...t, lastMsg });
       
       // Simulate unread if the last message is not from the active user and was sent recently
-      if (lastMsg.senderId !== activeUser.uid) {
+      const readTimestamp = window.mockReadChats ? (window.mockReadChats[activeUser.uid] || 0) : 0;
+      if (lastMsg.senderId !== activeUser.uid && lastMsg.timestamp > readTimestamp) {
         unreadCount++;
       }
     }
@@ -126,6 +127,18 @@ dropdownTriggers.forEach(({triggerId, menuId}) => {
         if (d !== menu) d.classList.remove('show');
       });
       menu.classList.toggle('show');
+      
+      // Clear messenger badge when opened
+      if (triggerId === 'messenger-widget-trigger') {
+        const badge = document.getElementById('messenger-badge-count');
+        if (badge && badge.style.display !== 'none') {
+          badge.style.display = 'none';
+          badge.innerText = '0';
+          // Mark all last messages as 'read' locally in memory to prevent badge reappearing
+          window.mockReadChats = window.mockReadChats || {};
+          window.mockReadChats[activeUser?.uid] = Date.now();
+        }
+      }
     };
     
     // Prevent clicks inside menu from closing it
@@ -459,4 +472,14 @@ window.insertEmoji = function(emoji) {
     input.focus();
   }
 };
+
+// Cross-tab synchronization
+window.addEventListener('storage', (e) => {
+  if (e.key === 'deped_saas_db') {
+    if (typeof updateNotificationsList === 'function') updateNotificationsList();
+    if (typeof updateMessengerDropdownList === 'function') updateMessengerDropdownList();
+    if (typeof initFloatingChatHeads === 'function') initFloatingChatHeads();
+  }
+});
+
 initPage();
