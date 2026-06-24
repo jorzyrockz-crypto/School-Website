@@ -90,7 +90,18 @@ const DEFAULT_LOCAL_DB = {
   }
 };
 
-// Initialize LocalStorage DB if empty
+// Initialize LocalStorage DB with Version check to force resets on updates
+const DB_VERSION = "v3";
+try {
+  if (localStorage.getItem("deped_saas_db_version") !== DB_VERSION) {
+    localStorage.removeItem("deped_saas_db");
+    sessionStorage.removeItem("activeUser");
+    localStorage.setItem("deped_saas_db_version", DB_VERSION);
+  }
+} catch(e) {
+  console.error("Storage versioning failed", e);
+}
+
 try {
   if (!localStorage.getItem("deped_saas_db")) {
     localStorage.setItem("deped_saas_db", JSON.stringify(DEFAULT_LOCAL_DB));
@@ -104,12 +115,31 @@ function getLocalDB() {
     const data = localStorage.getItem("deped_saas_db");
     if (data) {
       const parsed = JSON.parse(data);
-      if (parsed && parsed.schools) return parsed;
+      if (parsed && typeof parsed === 'object') {
+        // Ensure all required default keys are present in local DB (auto-healing)
+        let updated = false;
+        const keys = Object.keys(DEFAULT_LOCAL_DB);
+        for (let i = 0; i < keys.length; i++) {
+          const k = keys[i];
+          if (parsed[k] === undefined || parsed[k] === null) {
+            parsed[k] = DEFAULT_LOCAL_DB[k];
+            updated = true;
+          }
+        }
+        if (updated) {
+          localStorage.setItem("deped_saas_db", JSON.stringify(parsed));
+        }
+        return parsed;
+      }
     }
   } catch(e) {
     console.error("Local database corrupted, resetting to defaults...", e);
   }
-  localStorage.setItem("deped_saas_db", JSON.stringify(DEFAULT_LOCAL_DB));
+  try {
+    localStorage.setItem("deped_saas_db", JSON.stringify(DEFAULT_LOCAL_DB));
+  } catch(e) {
+    console.error("Failed to write to local storage", e);
+  }
   return DEFAULT_LOCAL_DB;
 }
 
@@ -125,7 +155,12 @@ function saveLocalDB(data) {
 // SESSION MANAGEMENT & STATE
 // ==========================================
 
-let activeUser = JSON.parse(sessionStorage.getItem('activeUser')) || null;
+let activeUser = null;
+try {
+  activeUser = JSON.parse(sessionStorage.getItem('activeUser')) || null;
+} catch(e) {
+  console.error("Session storage blocked or unavailable", e);
+}
 let currentSchoolId = "default-school";
 
 // ==========================================
@@ -557,6 +592,7 @@ async function renderTransparencyDocs() {
 // ==========================================
 
 async function renderRolePortal() {
+  if (!activeUser) return;
   const role = activeUser.role;
   
   document.getElementById('portal-view-learner').style.display = 'none';
@@ -581,6 +617,7 @@ async function renderRolePortal() {
 }
 
 async function renderLearnerView() {
+  if (!activeUser) return;
   const sched = await dbService.getSchedule('learner', activeUser.uid);
   const list = document.getElementById('learner-schedule-list');
   list.innerHTML = sched.map(s => `
@@ -640,6 +677,7 @@ async function renderParentView() {
 }
 
 async function renderTeacherView() {
+  if (!activeUser) return;
   const sched = await dbService.getSchedule('teacher', activeUser.uid);
   const list = document.getElementById('teacher-schedule-list');
   list.innerHTML = sched.map(s => `
@@ -764,6 +802,7 @@ async function renderAdminView() {
 let activeChatThread = null;
 
 async function initMessagesPanel() {
+  if (!activeUser) return;
   const threads = await dbService.getChatThreads(activeUser.uid);
   const threadListContainer = document.getElementById('chat-thread-list');
   
@@ -834,6 +873,7 @@ const chatForm = document.getElementById('chat-input-form');
 if (chatForm) {
   chatForm.onsubmit = async (e) => {
     e.preventDefault();
+    if (!activeUser) return;
     if (!activeChatThread) {
       showToast("Please select a thread first!");
       return;
@@ -856,6 +896,7 @@ if (chatForm) {
 // ==========================================
 
 function initProfilePanel() {
+  if (!activeUser) return;
   document.getElementById('profile-avatar-preview').src = activeUser.avatar;
   document.getElementById('profile-name-input').value = activeUser.name;
   
@@ -1056,10 +1097,10 @@ function toggleAuthUIElements(isLoggedIn) {
   document.getElementById('btn-logout').style.display = isLoggedIn ? 'block' : 'none';
 
   // Toggle create-post box on newsfeed (Admin/Teacher only)
-  const canPost = isLoggedIn && (activeUser.role === 'admin' || activeUser.role === 'teacher');
+  const canPost = isLoggedIn && activeUser && (activeUser.role === 'admin' || activeUser.role === 'teacher');
   document.getElementById('fb-create-post-box').style.display = canPost ? 'block' : 'none';
   
-  if (canPost) {
+  if (canPost && activeUser) {
     document.getElementById('post-box-avatar').src = activeUser.avatar;
   }
 }
