@@ -1,0 +1,234 @@
+﻿/* Unified 2-Panel Layout */
+.portal-container {
+  display: flex;
+  min-height: 100vh;
+  width: 100vw;
+}
+
+/* Left Sidebar Navigation (Sticky) */
+.portal-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--sidebar-bg);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 50;
+  box-shadow: 2px 0 20px var(--sidebar-glow, rgba(0,0,0,0.2));
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/* â”€â”€ Sidebar Branding Header â”€â”€ */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  flex-shrink: 0;
+  min-height: 72px;
+  overflow: hidden;
+}
+
+/* Fixed square container so ANY logo shape looks consistent */
+.sidebar-brand-logo-wrap {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.12); /* subtle bg for transparent PNGs */
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* The logo image always fits inside the box, never distorts */
+.sidebar-brand-logo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain; /* scale proportionally, never crop */
+  display: block;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* allow flex children to shrink and truncate */
+  flex: 1;
+}
+
+/* School name: max 2 lines, then ellipsis */
+.sidebar-brand-name {
+  color: white;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.25;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+.sidebar-brand-tag {
+  font-size: 0.6rem;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 0.2rem;
+  white-space: nowrap;
+}
+
+
+.sidebar-profile {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: rgba(255,255,255,0.03);
+  margin: 1rem;
+  border-radius: var(--radius-md);
+}
+
+.profile-avatar {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--bg-secondary);
+  object-fit: cover;
+}
+
+.profile-name {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-role {
+  flex-shrink: 0;
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 50px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+}
+
+.sidebar-menu {
+  flex: 1;
+  padding: 1rem 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  overflow-y: auto;
+}
+
+.menu-item a {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  margin: 0 1rem;
+  border-radius: 50px;
+  color: #e4e6eb;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  border: none;
+}
+
+.menu-item:hover a, .menu-item.active a {
+  color: white;
+  background: var(--sidebar-active-bg, rgba(255,255,255,0.07));
+  transform: translateX(4px);
+}
+
+.menu-item a ion-icon {
+  font-size: 1.25rem;
+}
+
+.sidebar-footer {
+  padding: 0.5rem 1.5rem 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  flex-shrink: 0;
+}
+
+/* Guest login box wrapper inside sidebar */
+#guest-login-box {
+  position: relative;
+  padding: 0.75rem 1rem 0.5rem;
+  flex-shrink: 0;
+}
+
+/* Sidebar sign-in/sign-out action area */
+.sidebar-auth-action {
+  padding: 0.65rem 1rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.btn-logout {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  border: none;
+  background: var(--btn-gradient, rgba(255,255,255,0.1));
+  color: white;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  letter-spacing: 0.01em;
+}
+
+.btn-logout:hover {
+  filter: brightness(1.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+  transform: translateY(-1px);
+}
+
+/* Sign Out button â€” danger-tinted variant */
+#btn-logout {
+  background: rgba(240, 40, 73, 0.2);
+  border: 1px solid rgba(240, 40, 73, 0.4);
+  box-shadow: none;
+}
+#btn-logout:hover {
+  background: rgba(240, 40, 73, 0.35);
+  border-color: rgba(240, 40, 73, 0.7);
+  transform: none;
+  filter: none;
+}
+
+/* Right Main Panel */
+.portal-main {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+

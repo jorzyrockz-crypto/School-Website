@@ -1,0 +1,184 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Smooth theme-switch animation on the whole page */
+html {
+  transition: background-color 0.4s ease, color 0.3s ease;
+}
+
+:root {
+  /* â”€â”€ DepEd Blue Gold (default) â”€â”€ */
+  --primary:           #1877f2;
+  --primary-hover:     #166fe5;
+  --accent:            #d4af37;
+  --accent-hover:      #c5a028;
+  --sidebar-bg:        #1c1e21;
+  --sidebar-glow:      rgba(24, 119, 242, 0.25);
+  --sidebar-active-bg: rgba(24, 119, 242, 0.18);
+  --btn-gradient:      linear-gradient(135deg, #1877f2, #0d5bce);
+  --bg-primary:        #f0f2f5;
+  --bg-secondary:      #ffffff;
+  --bg-tint:           #eef4ff;
+  --text-primary:      #050505;
+  --text-secondary:    #65676b;
+  --border-color:      #e4e6eb;
+  --success:           #31a24c;
+  --danger:            #f02849;
+  --warning:           #f59e0b;
+  --radius-sm:         8px;
+  --radius-md:         16px;
+  --radius-lg:         24px;
+  --shadow-sm:         0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md:         0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg:         0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --sidebar-width:     280px;
+  --transition:        all 0.2s ease;
+}
+
+/* â”€â”€ Forest Green â”€â”€ */
+[data-theme="forest-green"] {
+  --primary:           #2d9e6b;
+  --primary-hover:     #1b7a50;
+  --accent:            #95d5b2;
+  --accent-hover:      #74c69d;
+  --sidebar-bg:        #0d2117;
+  --sidebar-glow:      rgba(45, 158, 107, 0.3);
+  --sidebar-active-bg: rgba(45, 158, 107, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #2d9e6b, #1b7a50);
+  --bg-primary:        #f0f7f4;
+  --bg-tint:           #e8f5ee;
+}
+
+/* â”€â”€ Maroon Elite â”€â”€ */
+[data-theme="maroon-crimson"] {
+  --primary:           #9e2a2b;
+  --primary-hover:     #7a1c1c;
+  --accent:            #e09f3e;
+  --accent-hover:      #c8861f;
+  --sidebar-bg:        #1e0a0a;
+  --sidebar-glow:      rgba(158, 42, 43, 0.3);
+  --sidebar-active-bg: rgba(158, 42, 43, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #9e2a2b, #7a1c1c);
+  --bg-primary:        #fdf4f4;
+  --bg-tint:           #fceaea;
+}
+
+/* â”€â”€ Midnight Purple â”€â”€ */
+[data-theme="midnight-purple"] {
+  --primary:           #7c3aed;
+  --primary-hover:     #6d28d9;
+  --accent:            #f0abfc;
+  --accent-hover:      #e879f9;
+  --sidebar-bg:        #13082a;
+  --sidebar-glow:      rgba(124, 58, 237, 0.35);
+  --sidebar-active-bg: rgba(124, 58, 237, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #7c3aed, #6d28d9);
+  --bg-primary:        #f5f3ff;
+  --bg-tint:           #ede9fe;
+}
+
+/* â”€â”€ Sunset Orange â”€â”€ */
+[data-theme="sunset-orange"] {
+  --primary:           #ea580c;
+  --primary-hover:     #c2410c;
+  --accent:            #fbbf24;
+  --accent-hover:      #f59e0b;
+  --sidebar-bg:        #1c0f05;
+  --sidebar-glow:      rgba(234, 88, 12, 0.3);
+  --sidebar-active-bg: rgba(234, 88, 12, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #ea580c, #c2410c);
+  --bg-primary:        #fff7ed;
+  --bg-tint:           #ffedd5;
+}
+
+/* â”€â”€ Teal Ocean â”€â”€ */
+[data-theme="teal-ocean"] {
+  --primary:           #0891b2;
+  --primary-hover:     #0e7490;
+  --accent:            #22d3ee;
+  --accent-hover:      #06b6d4;
+  --sidebar-bg:        #042a32;
+  --sidebar-glow:      rgba(8, 145, 178, 0.3);
+  --sidebar-active-bg: rgba(8, 145, 178, 0.2);
+  --btn-gradient:      linear-gradient(135deg, #0891b2, #0e7490);
+  --bg-primary:        #f0fdfe;
+  --bg-tint:           #cffafe;
+}
+
+/* â”€â”€ Auto Dark Mode (Reacts to Device Settings) â”€â”€ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-primary:        #121212;
+    --bg-secondary:      #1e1e1e;
+    --bg-tint:           #2c2c2c;
+    --text-primary:      #e3e3e3;
+    --text-secondary:    #a0a0a0;
+    --border-color:      #333333;
+  }
+  
+  [data-theme="forest-green"] {
+    --bg-primary:        #121b16;
+    --bg-tint:           #1a2d22;
+  }
+  
+  [data-theme="maroon-crimson"] {
+    --bg-primary:        #1b0c0c;
+    --bg-tint:           #2b1212;
+  }
+  
+  [data-theme="midnight-purple"] {
+    --bg-primary:        #120a22;
+    --bg-tint:           #1b0f34;
+  }
+  
+  [data-theme="sunset-orange"] {
+    --bg-primary:        #1a0c05;
+    --bg-tint:           #2a1409;
+  }
+  
+  [data-theme="teal-ocean"] {
+    --bg-primary:        #061a1e;
+    --bg-tint:           #092b33;
+  }
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: #ccd0d5;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #bcc1c7;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+}
+
