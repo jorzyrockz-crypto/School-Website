@@ -114,7 +114,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
       const eData = a.extraData || {};
       const rsvps = eData.rsvps || [];
       const userGoing = activeUser ? rsvps.includes(activeUser.uid) : false;
-      const goingBtnStyle = userGoing ? "background:var(--primary); color:white;" : "background:var(--bg-secondary);";
+      const goingBtnStyle = userGoing ? "background:var(--primary); color:white;" : "background:var(--bg-secondary); color:var(--primary);";
       
       innerCardHTML = `
         <h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${eData.eventTitle || a.title || 'School Event'}</h3>
