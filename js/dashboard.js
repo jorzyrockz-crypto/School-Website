@@ -1,4 +1,4 @@
-﻿// AUTH PORTAL DASHBOARDS
+// AUTH PORTAL DASHBOARDS
 // ==========================================
 
 async function renderRolePortal() {
@@ -34,7 +34,7 @@ async function renderLearnerView() {
     <div class="schedule-item">
       <div>
         <div style="font-weight:700;">${s.subject}</div>
-        <div style="font-size:0.85rem; color:var(--text-secondary);">${s.room} â€¢ ${s.teacher}</div>
+        <div style="font-size:0.85rem; color:var(--text-secondary);">${s.room} &bull; ${s.teacher}</div>
       </div>
       <div class="schedule-time">${s.time}</div>
     </div>
@@ -94,7 +94,7 @@ async function renderTeacherView() {
     <div class="schedule-item">
       <div>
         <div style="font-weight:700;">${s.subject}</div>
-        <div style="font-size:0.85rem; color:var(--text-secondary);">${s.room} â€¢ ${s.class}</div>
+        <div style="font-size:0.85rem; color:var(--text-secondary);">${s.room} &bull; ${s.class}</div>
       </div>
       <div class="schedule-time">${s.time}</div>
     </div>

@@ -75,7 +75,7 @@ async function renderNewsfeed() {
           <img class="thread-avatar" src="${a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder'}" alt="avatar">
           <div>
             <strong style="font-size:0.95rem; display:block;">${a.author}</strong>
-            <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${a.authorRole} â€¢ ${a.date}</span>
+            <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${a.authorRole} &bull; ${a.date}</span>
           </div>
         </div>
 
