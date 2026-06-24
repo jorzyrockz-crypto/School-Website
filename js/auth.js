@@ -110,6 +110,10 @@ function toggleAuthUIElements(isLoggedIn) {
   // Toggle Chat Heads Dock
   const chatDock = document.getElementById('chat-heads-dock');
   if (chatDock) chatDock.style.display = isLoggedIn ? 'flex' : 'none';
+  
+  if (isLoggedIn && typeof initFloatingChatHeads === 'function') {
+    initFloatingChatHeads();
+  }
 
   const fbCreatePost = document.getElementById('fb-create-post-box');
   if (fbCreatePost) {

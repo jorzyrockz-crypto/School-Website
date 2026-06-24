@@ -305,6 +305,9 @@ if (chatAttachBtn && chatPhotoInput) {
         await dbService.sendMessage(chatId, activeUser.uid, '', compressedData);
         chatPhotoInput.value = '';
         openChatWindow(activeChatThread);
+        if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
+          if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)));
+        }
         showToast('Photo sent!');
       });
     };
@@ -330,6 +333,9 @@ if (chatForm) {
     input.value = '';
     
     openChatWindow(activeChatThread);
+    if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
+      if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)));
+    }
   };
 }
 

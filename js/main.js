@@ -88,15 +88,123 @@ document.addEventListener('click', () => {
 });
 
 // Floating Chat Window Logic
-function openFloatingChat(title) {
+let activeFloatingChatThread = null;
+
+async function initFloatingChatHeads() {
+  if (!activeUser) return;
+  const threads = await dbService.getChatThreads(activeUser.uid);
+  const dock = document.getElementById('chat-heads-dock');
+  if (!dock) return;
+
+  // Clear existing dynamic heads, leave the "Add" button
+  const addBtnHTML = `
+    <div class="chat-head-bubble" title="New Message" onclick="window.location.hash='#/messages'">
+      <div style="background:var(--bg-secondary); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:1.5rem;">
+        <ion-icon name="add"></ion-icon>
+      </div>
+    </div>
+  `;
+
+  // Render top 4 threads to avoid clutter
+  const topThreads = threads.slice(0, 4);
+  const threadsHTML = topThreads.map(t => {
+    // Escape JSON so it can be passed as a string
+    const tJson = encodeURIComponent(JSON.stringify(t));
+    return `
+      <div class="chat-head-bubble" onclick="openFloatingChat('${tJson}')" title="${t.name}">
+        <img src="${t.avatar}" alt="${t.name}">
+      </div>
+    `;
+  }).join('');
+
+  dock.innerHTML = threadsHTML + addBtnHTML;
+}
+
+async function openFloatingChat(encodedUser) {
+  const targetUser = JSON.parse(decodeURIComponent(encodedUser));
+  activeFloatingChatThread = targetUser;
+  
   const chatWindow = document.getElementById('floating-chat-window');
-  if (chatWindow) {
-    document.getElementById('chat-window-title').innerText = title;
-    chatWindow.style.display = 'flex';
-    // Small timeout to allow display:flex to apply before adding class for transition
-    setTimeout(() => {
-      chatWindow.classList.add('show');
-    }, 10);
+  if (!chatWindow) return;
+
+  // Set Header Info
+  document.getElementById('chat-window-title').innerText = targetUser.name;
+  document.getElementById('floating-chat-subtitle').innerText = targetUser.role.toUpperCase();
+  document.getElementById('floating-chat-avatar').src = targetUser.avatar;
+
+  // Fetch and Render Messages
+  const chatId = [activeUser.uid, targetUser.uid].sort().join('_');
+  const messages = await dbService.getMessages(chatId);
+  const body = document.getElementById('floating-chat-messages-body');
+  
+  // Keep pattern, render messages
+  let html = `<div class="chat-bg-pattern"></div>`;
+  html += messages.map(m => {
+    const isOut = m.senderId === activeUser.uid;
+    const rowCls = isOut ? 'sent' : 'received';
+    const bubbleCls = isOut ? 'bg-green' : 'bg-dark';
+    
+    let content = '';
+    if (m.imageData) content += `<img src="${m.imageData}" style="max-width:200px; border-radius:12px; margin-bottom:${m.text ? '0.4rem' : '0'}; display:block;">`;
+    if (m.text) content += `<span>${m.text}</span>`;
+    
+    if (isOut) {
+      return `
+        <div class="chat-msg-row sent">
+          <div style="display:flex; flex-direction:column; align-items:flex-end; max-width:85%;">
+            <div class="chat-msg-bubble bg-green">${content}</div>
+          </div>
+        </div>
+      `;
+    } else {
+      return `
+        <div class="chat-msg-row received">
+          <img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">
+          <div style="display:flex; flex-direction:column; max-width:75%;">
+            <div class="chat-msg-bubble bg-dark">${content}</div>
+          </div>
+        </div>
+      `;
+    }
+  }).join('');
+
+  body.innerHTML = html;
+  
+  // Show Window
+  chatWindow.style.display = 'flex';
+  setTimeout(() => {
+    chatWindow.classList.add('show');
+    body.scrollTop = body.scrollHeight; // Scroll to bottom after show
+  }, 10);
+}
+
+async function submitFloatingChat() {
+  if (!activeUser || !activeFloatingChatThread) return;
+  const input = document.getElementById('floating-chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const chatId = [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
+  await dbService.saveMessage(chatId, {
+    id: 'msg_' + Date.now(),
+    senderId: activeUser.uid,
+    text: text,
+    timestamp: Date.now()
+  });
+
+  input.value = '';
+  // Re-render the floating chat to show new message
+  openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)));
+  
+  // If the user is on the messages page and it's the same thread, sync it!
+  if (window.location.hash.includes('#/messages') && typeof initMessagesPanel === 'function') {
+    if (typeof activeChatThread !== 'undefined' && activeChatThread && activeChatThread.uid === activeFloatingChatThread.uid) {
+      // openChatWindow is the dashboard.js function!
+      // But we renamed the floating one, so calling openChatWindow here updates the main page!
+      if (typeof openChatWindow === 'function') {
+        openChatWindow(activeChatThread);
+      }
+    }
   }
 }
 

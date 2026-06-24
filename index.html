@@ -673,18 +673,7 @@
   <!-- ================= FLOATING CHAT SYSTEM ================= -->
   <!-- Chat Heads Dock -->
   <div id="chat-heads-dock" class="chat-heads-dock auth-only" style="display:none;">
-    <div class="chat-head-bubble" onclick="openFloatingChat('Main chat')">
-      <img src="https://api.dicebear.com/7.x/initials/svg?seed=MC&backgroundColor=0369a1" alt="Main chat">
-      <div class="chat-head-badge">7</div>
-    </div>
-    <div class="chat-head-bubble" onclick="openFloatingChat('Ricky')">
-      <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ricky" alt="Ricky">
-      <div class="chat-head-badge">1</div>
-    </div>
-    <div class="chat-head-bubble" onclick="openFloatingChat('PTA Board')">
-      <img src="https://api.dicebear.com/7.x/initials/svg?seed=PTA&backgroundColor=15803d" alt="PTA">
-      <div class="chat-head-badge">2</div>
-    </div>
+    <!-- Dynamic chat heads go here -->
     <div class="chat-head-bubble" title="New Message">
       <div style="background:var(--bg-secondary); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:1.5rem;">
         <ion-icon name="add"></ion-icon>
@@ -697,10 +686,10 @@
     <!-- Chat Header -->
     <div class="chat-window-header">
       <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
-        <img id="chat-window-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=MC&backgroundColor=0369a1" style="width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,0.2);">
+        <img id="floating-chat-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=MC&backgroundColor=0369a1" style="width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,0.2);">
         <div style="display:flex; flex-direction:column;">
-          <span id="chat-window-title" style="font-weight:700; font-size:0.95rem; line-height:1.2;">Main chat</span>
-          <span style="font-size:0.75rem; opacity:0.8;">DepED Oquendo Elementary School</span>
+          <span id="floating-chat-title" style="font-weight:700; font-size:0.95rem; line-height:1.2;">Main chat</span>
+          <span id="floating-chat-subtitle" style="font-size:0.75rem; opacity:0.8;">DepED Oquendo Elementary School</span>
         </div>
       </div>
       <div class="chat-window-actions">
@@ -710,43 +699,26 @@
     </div>
     
     <!-- Chat Body -->
-    <div class="chat-window-body">
+    <div class="chat-window-body" id="floating-chat-messages-body">
       <!-- Chat Background Pattern -->
       <div class="chat-bg-pattern"></div>
       
-      <!-- Messages -->
-      <div class="chat-msg-row received">
-        <img class="chat-msg-avatar" src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ricky" alt="Ricky">
-        <div style="display:flex; flex-direction:column; max-width:75%;">
-          <span style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:0.2rem; text-shadow:0 1px 2px rgba(0,0,0,0.5);">Ricky</span>
-          <div class="chat-msg-bubble bg-dark">sir kamusta ka eon</div>
-        </div>
-      </div>
-      
-      <div class="chat-msg-row sent">
-        <div style="display:flex; flex-direction:column; align-items:flex-end; max-width:85%;">
-          <div style="font-size:0.75rem; margin-bottom:0.2rem; opacity:0.8; display:flex; align-items:center; gap:0.3rem;"><ion-icon name="arrow-undo"></ion-icon> You replied to Ricky</div>
-          <div class="chat-msg-bubble bg-green">
-            Remind lang ako sa aton mga teachers basi may naila mag share it help para sa linog ngato, pls send lamg sa district office on Monday.
-          </div>
-          <span style="font-size:0.65rem; color:var(--text-secondary); margin-top:0.2rem; text-shadow:0 1px 2px rgba(0,0,0,0.5);">Sent 2h ago</span>
-        </div>
-      </div>
+      <!-- Dynamic Messages go here -->
     </div>
     
     <!-- Chat Input Bar -->
-    <div class="chat-window-input-area">
-      <button class="chat-input-btn add-btn"><ion-icon name="add-circle"></ion-icon></button>
-      <button class="chat-input-btn"><ion-icon name="image"></ion-icon></button>
-      <button class="chat-input-btn"><ion-icon name="happy"></ion-icon></button>
+    <form id="floating-chat-form" class="chat-window-input-area" onsubmit="event.preventDefault(); submitFloatingChat();">
+      <button type="button" class="chat-input-btn add-btn"><ion-icon name="add-circle"></ion-icon></button>
+      <button type="button" class="chat-input-btn"><ion-icon name="image"></ion-icon></button>
+      <button type="button" class="chat-input-btn"><ion-icon name="happy"></ion-icon></button>
       
       <div class="chat-input-wrap">
-        <input type="text" placeholder="Aa" class="chat-text-input">
-        <button class="chat-emoji-btn"><ion-icon name="happy-outline"></ion-icon></button>
+        <input type="text" id="floating-chat-input" placeholder="Aa" class="chat-text-input" autocomplete="off">
+        <button type="button" class="chat-emoji-btn"><ion-icon name="happy-outline"></ion-icon></button>
       </div>
       
-      <button class="chat-input-btn like-btn"><ion-icon name="thumbs-up"></ion-icon></button>
-    </div>
+      <button type="submit" class="chat-input-btn like-btn" style="color:var(--primary);"><ion-icon name="send"></ion-icon></button>
+    </form>
   </div>
 
   <!-- Toast Notification element -->
