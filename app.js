@@ -1026,6 +1026,33 @@ function initProfilePanel() {
         <div class="form-group" style="margin-bottom:0;"><label>Employee ID Number</label><input type="text" id="rf-empid" class="form-control" value="${roleData.empId || ''}"></div>
         <div class="form-group" style="margin-bottom:0;"><label>PRC License Number</label><input type="text" id="rf-prc" class="form-control" value="${roleData.prc || ''}"></div>
         <div class="form-group" style="margin-bottom:0;"><label>Department / Subject</label><input type="text" id="rf-dept" class="form-control" value="${roleData.dept || ''}" placeholder="e.g. Mathematics"></div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>ECCP Teaching Position</label>
+          <select id="rf-position" class="form-control">
+            <option value="">Select Position...</option>
+            <optgroup label="Classroom Teaching Career Line">
+              <option value="Teacher I" ${roleData.position === 'Teacher I' ? 'selected' : ''}>Teacher I</option>
+              <option value="Teacher II" ${roleData.position === 'Teacher II' ? 'selected' : ''}>Teacher II</option>
+              <option value="Teacher III" ${roleData.position === 'Teacher III' ? 'selected' : ''}>Teacher III</option>
+              <option value="Teacher IV" ${roleData.position === 'Teacher IV' ? 'selected' : ''}>Teacher IV (ECCP)</option>
+              <option value="Teacher V" ${roleData.position === 'Teacher V' ? 'selected' : ''}>Teacher V (ECCP)</option>
+              <option value="Teacher VI" ${roleData.position === 'Teacher VI' ? 'selected' : ''}>Teacher VI (ECCP)</option>
+              <option value="Teacher VII" ${roleData.position === 'Teacher VII' ? 'selected' : ''}>Teacher VII (ECCP)</option>
+            </optgroup>
+            <optgroup label="Master Teachers">
+              <option value="Master Teacher I" ${roleData.position === 'Master Teacher I' ? 'selected' : ''}>Master Teacher I</option>
+              <option value="Master Teacher II" ${roleData.position === 'Master Teacher II' ? 'selected' : ''}>Master Teacher II</option>
+              <option value="Master Teacher III" ${roleData.position === 'Master Teacher III' ? 'selected' : ''}>Master Teacher III</option>
+              <option value="Master Teacher IV" ${roleData.position === 'Master Teacher IV' ? 'selected' : ''}>Master Teacher IV</option>
+              <option value="Master Teacher V" ${roleData.position === 'Master Teacher V' ? 'selected' : ''}>Master Teacher V (ECCP)</option>
+            </optgroup>
+            <optgroup label="Head Teachers">
+              <option value="Head Teacher I" ${roleData.position === 'Head Teacher I' ? 'selected' : ''}>Head Teacher I</option>
+              <option value="Head Teacher III" ${roleData.position === 'Head Teacher III' ? 'selected' : ''}>Head Teacher III</option>
+              <option value="Head Teacher VI" ${roleData.position === 'Head Teacher VI' ? 'selected' : ''}>Head Teacher VI</option>
+            </optgroup>
+          </select>
+        </div>
       `;
     } else if (activeUser.role === 'parent') {
       html = `
@@ -1036,7 +1063,30 @@ function initProfilePanel() {
     } else if (activeUser.role === 'admin') {
       html = `
         <div class="form-group" style="margin-bottom:0;"><label>Employee ID Number</label><input type="text" id="rf-empid" class="form-control" value="${roleData.empId || ''}"></div>
-        <div class="form-group" style="margin-bottom:0;"><label>Official Title</label><input type="text" id="rf-title" class="form-control" value="${roleData.title || ''}" placeholder="e.g. School Principal"></div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>School Administration Career Line</label>
+          <select id="rf-position" class="form-control">
+            <option value="">Select Official Title...</option>
+            <optgroup label="School Principals">
+              <option value="School Principal I" ${roleData.position === 'School Principal I' ? 'selected' : ''}>School Principal I</option>
+              <option value="School Principal II" ${roleData.position === 'School Principal II' ? 'selected' : ''}>School Principal II</option>
+              <option value="School Principal III" ${roleData.position === 'School Principal III' ? 'selected' : ''}>School Principal III</option>
+              <option value="School Principal IV" ${roleData.position === 'School Principal IV' ? 'selected' : ''}>School Principal IV</option>
+              <option value="School Principal V" ${roleData.position === 'School Principal V' ? 'selected' : ''}>School Principal V (ECCP)</option>
+            </optgroup>
+            <optgroup label="Assistant Principals">
+              <option value="Asst. School Principal I" ${roleData.position === 'Asst. School Principal I' ? 'selected' : ''}>Assistant School Principal I</option>
+              <option value="Asst. School Principal II" ${roleData.position === 'Asst. School Principal II' ? 'selected' : ''}>Assistant School Principal II</option>
+              <option value="Asst. School Principal III" ${roleData.position === 'Asst. School Principal III' ? 'selected' : ''}>Assistant School Principal III</option>
+            </optgroup>
+            <optgroup label="Administrative Support">
+              <option value="Administrative Officer V" ${roleData.position === 'Administrative Officer V' ? 'selected' : ''}>Administrative Officer V</option>
+              <option value="Administrative Officer II" ${roleData.position === 'Administrative Officer II' ? 'selected' : ''}>Administrative Officer II</option>
+              <option value="Administrative Assistant III" ${roleData.position === 'Administrative Assistant III' ? 'selected' : ''}>Administrative Assistant III (Senior Bookkeeper)</option>
+              <option value="Administrative Assistant II" ${roleData.position === 'Administrative Assistant II' ? 'selected' : ''}>Administrative Assistant II (Clerk)</option>
+            </optgroup>
+          </select>
+        </div>
       `;
     }
     
@@ -1059,13 +1109,14 @@ function initProfilePanel() {
       roleData.empId = document.getElementById('rf-empid').value.trim();
       roleData.prc = document.getElementById('rf-prc').value.trim();
       roleData.dept = document.getElementById('rf-dept').value.trim();
+      roleData.position = document.getElementById('rf-position').value;
     } else if (activeUser.role === 'parent') {
       roleData.contact = document.getElementById('rf-contact').value.trim();
       roleData.learnerName = document.getElementById('rf-learner').value.trim();
       roleData.relationship = document.getElementById('rf-rel').value.trim();
     } else if (activeUser.role === 'admin') {
       roleData.empId = document.getElementById('rf-empid').value.trim();
-      roleData.title = document.getElementById('rf-title').value.trim();
+      roleData.position = document.getElementById('rf-position').value;
     }
 
     activeUser = await dbService.saveUser(activeUser.uid, { name, avatar, roleData });
@@ -1282,8 +1333,11 @@ function syncSidebarProfile() {
     // Position text logic
     let posText = '';
     const rd = activeUser.roleData || {};
-    if (activeUser.role === 'admin' && rd.title) posText = rd.title;
-    else if (activeUser.role === 'teacher' && rd.dept) posText = rd.dept + ' Teacher';
+    if (activeUser.role === 'admin' && rd.position) posText = rd.position;
+    else if (activeUser.role === 'teacher') {
+      if (rd.position) posText = rd.position;
+      else if (rd.dept) posText = rd.dept + ' Teacher';
+    }
     else if (activeUser.role === 'learner' && rd.grade) posText = `${rd.grade}${rd.section ? ' - ' + rd.section : ''}`;
     else if (activeUser.role === 'parent' && rd.learnerName) posText = `Parent of ${rd.learnerName}`;
 
