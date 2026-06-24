@@ -1020,7 +1020,15 @@ if (loginMenuBtn) {
     e.stopPropagation();
     document.getElementById('login-menu-dropdown').classList.toggle('show');
   };
-  
+
+  // Stop clicks INSIDE the dropdown from bubbling up and auto-closing it
+  const loginDropdown = document.getElementById('login-menu-dropdown');
+  if (loginDropdown) {
+    loginDropdown.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+  }
+
   document.addEventListener('click', () => {
     const dropdown = document.getElementById('login-menu-dropdown');
     if (dropdown) dropdown.classList.remove('show');
@@ -1031,11 +1039,17 @@ const menuLoginTriggers = document.querySelectorAll('.menu-login-trigger');
 menuLoginTriggers.forEach(trigger => {
   trigger.onclick = async (e) => {
     e.preventDefault();
+    e.stopPropagation(); // Prevent document click from closing dropdown before we finish
     const email = trigger.dataset.email;
+
+    // Close the dropdown first
+    const dropdown = document.getElementById('login-menu-dropdown');
+    if (dropdown) dropdown.classList.remove('show');
+
     const user = await dbService.getUser(email);
     if (user) {
       activeUser = user;
-      sessionStorage.setItem('activeUser', JSON.stringify(user));
+      try { sessionStorage.setItem('activeUser', JSON.stringify(user)); } catch(err) {}
       showToast(`Welcome back, ${user.name}!`);
       
       // Update layouts
@@ -1045,6 +1059,8 @@ menuLoginTriggers.forEach(trigger => {
       // Force routing and panel rendering immediately
       window.location.hash = "#/dashboard";
       switchView("dashboard");
+    } else {
+      showToast("Login failed: user not found in database.");
     }
   };
 });
