@@ -848,10 +848,44 @@ async function renderCalendarNewsFeed() {
   if (!container) return;
 
   const announcements = await dbService.getAnnouncements();
-  const newsPosts = announcements
-    .filter(a => a.status === 'approved' || !a.status)
-    .sort((a, b) => b.timestamp - a.timestamp)
-    .slice(0, 6);
+
+  // Try to fetch live DepEd news via rss2json
+  let newsPosts = [];
+  try {
+    const rssRes = await fetch("https://api.rss2json.com/v1/api.json?rss_url=https://www.deped.gov.ph/feed/");
+    const rssData = await rssRes.json();
+    if (rssData.status === 'ok') {
+      newsPosts = rssData.items.slice(0, 6).map(item => {
+        // Strip HTML from description for snippet
+        const tmp = document.createElement('div');
+        tmp.innerHTML = item.description || item.content;
+        const textContent = tmp.textContent || tmp.innerText || "";
+        
+        // Try to find image in description if no thumbnail
+        let imgUrl = item.thumbnail;
+        if (!imgUrl && item.description) {
+          const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+          if (imgMatch) imgUrl = imgMatch[1];
+        }
+
+        return {
+          title: item.title,
+          content: textContent,
+          timestamp: new Date(item.pubDate).getTime(),
+          imageData: imgUrl,
+          type: 'Official News',
+          link: item.link
+        };
+      });
+    }
+  } catch(e) {
+    console.error("Failed to fetch DepEd feed", e);
+    // Fallback to local posts if external fetch fails
+    newsPosts = announcements
+      .filter(a => a.status === 'approved' || !a.status)
+      .sort((a, b) => b.timestamp - a.timestamp)
+      .slice(0, 6);
+  }
 
   if (newsPosts.length === 0) {
     container.innerHTML = `<p style="color:var(--text-secondary); text-align:center; font-size:0.9rem; padding:1rem 0;">No news posts yet.</p>`;
@@ -859,11 +893,14 @@ async function renderCalendarNewsFeed() {
     container.innerHTML = newsPosts.map(post => {
       const timeAgo = getTimeAgo(post.timestamp);
       const hasImage = !!post.imageData;
-      const typeIcon = post.type === 'event' ? 'calendar-outline' : post.type === 'announcement' ? 'megaphone-outline' : 'chatbubble-ellipses-outline';
-      const typeColor = post.type === 'event' ? 'var(--warning)' : post.type === 'announcement' ? 'var(--danger)' : 'var(--primary)';
+      const typeIcon = post.type === 'Official News' ? 'globe-outline' : post.type === 'event' ? 'calendar-outline' : post.type === 'announcement' ? 'megaphone-outline' : 'chatbubble-ellipses-outline';
+      const typeColor = post.type === 'Official News' ? 'var(--primary)' : post.type === 'event' ? 'var(--warning)' : post.type === 'announcement' ? 'var(--danger)' : 'var(--primary)';
       const snippet = (post.content || '').slice(0, 100) + ((post.content || '').length > 100 ? '…' : '');
+      const targetLink = post.link ? post.link : '#/home';
+      const targetAttr = post.link ? 'target="_blank"' : '';
+
       return `
-        <div style="display:flex; gap:0.75rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border-color); cursor:pointer; transition:opacity 0.2s;" onclick="window.location.hash='#/home'" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+        <a href="${targetLink}" ${targetAttr} style="display:flex; gap:0.75rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border-color); cursor:pointer; transition:opacity 0.2s; text-decoration:none; color:inherit;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
           ${hasImage
             ? `<img src="${post.imageData}" alt="News" style="width:68px; height:68px; border-radius:8px; object-fit:cover; flex-shrink:0;">`
             : `<div style="width:68px; height:68px; border-radius:8px; background:var(--bg-primary); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><ion-icon name="${typeIcon}" style="font-size:1.75rem; color:${typeColor};"></ion-icon></div>`
@@ -877,7 +914,7 @@ async function renderCalendarNewsFeed() {
             <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 0.3rem; line-height:1.4;">${snippet}</p>
             <span style="font-size:0.72rem; color:var(--text-secondary);"><ion-icon name="time-outline" style="vertical-align:middle;"></ion-icon> ${timeAgo}</span>
           </div>
-        </div>
+        </a>
       `;
     }).join('');
   }
