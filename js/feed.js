@@ -845,6 +845,44 @@ async function renderCalendar() {
 let currentFeedPage = 0;
 const ITEMS_PER_PAGE = 6;
 let cachedFeedPosts = null;
+let lastFetchedAt = null;
+const AUTO_REFRESH_MS = 15 * 60 * 1000; // 15 minutes
+
+// Update the "last updated" label in the header
+function updateFeedTimestamp() {
+  const label = document.getElementById('feed-last-updated-text');
+  if (!label) return;
+  if (!lastFetchedAt) { label.textContent = 'Not loaded yet'; return; }
+  const diff = Math.floor((Date.now() - lastFetchedAt) / 1000);
+  if (diff < 60) label.textContent = `Updated just now · Auto-refreshes every 15 min`;
+  else if (diff < 3600) label.textContent = `Updated ${Math.floor(diff / 60)}m ago · Auto-refreshes every 15 min`;
+  else label.textContent = `Updated ${Math.floor(diff / 3600)}h ago · Auto-refreshes every 15 min`;
+}
+
+// Manual refresh with spinning animation
+window.refreshNewsFeed = async () => {
+  const btn = document.getElementById('feed-refresh-btn');
+  if (btn) {
+    btn.style.animation = 'spin 0.8s linear infinite';
+    btn.disabled = true;
+  }
+  cachedFeedPosts = null;
+  currentFeedPage = 0;
+  await renderCalendarNewsFeed(true);
+  if (btn) {
+    btn.style.animation = '';
+    btn.disabled = false;
+  }
+};
+
+// Start auto-refresh every 15 minutes
+setInterval(async () => {
+  cachedFeedPosts = null;
+  await renderCalendarNewsFeed(true);
+}, AUTO_REFRESH_MS);
+
+// Also update the timestamp display every minute
+setInterval(updateFeedTimestamp, 60 * 1000);
 
 async function renderCalendarNewsFeed(forceRefresh = false) {
   const container = document.getElementById('calendar-news-feed');
@@ -918,6 +956,8 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
       }));
 
     cachedFeedPosts = [...externalItems, ...localNews].sort((a, b) => b.timestamp - a.timestamp);
+    lastFetchedAt = Date.now();
+    updateFeedTimestamp();
   }
 
   // Pagination slice
