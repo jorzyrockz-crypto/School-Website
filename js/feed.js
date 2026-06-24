@@ -838,6 +838,89 @@ async function renderCalendar() {
   }).join('');
 }
 
+// ==========================================
+// CALENDAR NEWS FEED & QUICK STATS
+// ==========================================
+
+async function renderCalendarNewsFeed() {
+  const container = document.getElementById('calendar-news-feed');
+  const statsContainer = document.getElementById('calendar-quick-stats');
+  if (!container) return;
+
+  const announcements = await dbService.getAnnouncements();
+  const newsPosts = announcements
+    .filter(a => a.status === 'approved' || !a.status)
+    .sort((a, b) => b.timestamp - a.timestamp)
+    .slice(0, 6);
+
+  if (newsPosts.length === 0) {
+    container.innerHTML = `<p style="color:var(--text-secondary); text-align:center; font-size:0.9rem; padding:1rem 0;">No news posts yet.</p>`;
+  } else {
+    container.innerHTML = newsPosts.map(post => {
+      const timeAgo = getTimeAgo(post.timestamp);
+      const hasImage = !!post.imageData;
+      const typeIcon = post.type === 'event' ? 'calendar-outline' : post.type === 'announcement' ? 'megaphone-outline' : 'chatbubble-ellipses-outline';
+      const typeColor = post.type === 'event' ? 'var(--warning)' : post.type === 'announcement' ? 'var(--danger)' : 'var(--primary)';
+      const snippet = (post.content || '').slice(0, 100) + ((post.content || '').length > 100 ? '…' : '');
+      return `
+        <div style="display:flex; gap:0.75rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border-color); cursor:pointer; transition:opacity 0.2s;" onclick="window.location.hash='#/home'" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+          ${hasImage
+            ? `<img src="${post.imageData}" alt="News" style="width:68px; height:68px; border-radius:8px; object-fit:cover; flex-shrink:0;">`
+            : `<div style="width:68px; height:68px; border-radius:8px; background:var(--bg-primary); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><ion-icon name="${typeIcon}" style="font-size:1.75rem; color:${typeColor};"></ion-icon></div>`
+          }
+          <div style="flex:1; min-width:0;">
+            <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem;">
+              <ion-icon name="${typeIcon}" style="color:${typeColor}; font-size:0.8rem; flex-shrink:0;"></ion-icon>
+              <span style="font-size:0.7rem; color:${typeColor}; text-transform:uppercase; font-weight:700; letter-spacing:0.5px;">${post.type || 'Post'}</span>
+            </div>
+            <p style="font-weight:600; font-size:0.9rem; margin:0 0 0.25rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${post.title || 'Untitled'}</p>
+            <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 0.3rem; line-height:1.4;">${snippet}</p>
+            <span style="font-size:0.72rem; color:var(--text-secondary);"><ion-icon name="time-outline" style="vertical-align:middle;"></ion-icon> ${timeAgo}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (statsContainer) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const thisMonth = today.getMonth();
+    const thisYear = today.getFullYear();
+    const events = announcements.filter(a => a.type === 'event' && a.extraData?.date);
+    const monthEvents = events.filter(e => {
+      const d = new Date(e.extraData.date);
+      return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    });
+    const upcomingEvents = events.filter(e => new Date(e.extraData.date) >= today);
+    const totalPosts = announcements.filter(a => a.status === 'approved' || !a.status).length;
+    const stat = (icon, label, value, color) => `
+      <div style="display:flex; align-items:center; justify-content:space-between; background:var(--bg-primary); padding:0.6rem 0.85rem; border-radius:8px; border:1px solid var(--border-color);">
+        <div style="display:flex; align-items:center; gap:0.5rem;">
+          <ion-icon name="${icon}" style="color:${color}; font-size:1rem;"></ion-icon>
+          <span style="font-size:0.85rem; color:var(--text-secondary);">${label}</span>
+        </div>
+        <span style="font-weight:700; font-size:1rem; color:var(--text-primary);">${value}</span>
+      </div>
+    `;
+    statsContainer.innerHTML = [
+      stat('calendar-outline', 'Events This Month', monthEvents.length, 'var(--primary)'),
+      stat('arrow-forward-circle-outline', 'Upcoming Events', upcomingEvents.length, 'var(--success)'),
+      stat('newspaper-outline', 'Total News Posts', totalPosts, 'var(--warning)'),
+    ].join('');
+  }
+}
+
+function getTimeAgo(timestamp) {
+  const diff = Date.now() - timestamp;
+  const mins = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  if (hours < 24) return `${hours}h ago`;
+  return `${days}d ago`;
+}
+
 // Intercept renderNewsfeed to also render widgets
 const originalRenderNewsfeed = renderNewsfeed;
 renderNewsfeed = async (filter) => {
@@ -845,12 +928,14 @@ renderNewsfeed = async (filter) => {
   renderPinnedPosts();
   renderAgenda();
   renderCalendar();
+  renderCalendarNewsFeed();
 };
 
 setTimeout(() => {
   renderPinnedPosts();
   renderAgenda();
   renderCalendar();
+  renderCalendarNewsFeed();
 }, 500);
 
 // ==========================================

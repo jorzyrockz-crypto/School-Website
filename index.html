@@ -270,15 +270,48 @@
         <!-- ================= VIEW: CALENDAR ================= -->
         <div id="view-calendar" class="route-view" style="display:none;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-            <h1 class="hero-title" style="margin-bottom:0;">School Calendar</h1>
+            <h1 class="hero-title" style="margin-bottom:0;">Calendar & News</h1>
             <button class="btn-primary" onclick="window.location.hash='#/home'; setTimeout(() => document.getElementById('btn-add-agenda-event').click(), 100);" style="display:none;" id="btn-calendar-add-event"><ion-icon name="add"></ion-icon> Create Event</button>
           </div>
-          
-          <div class="news-card">
-            <h2 class="widget-title" style="border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1rem;">Upcoming & Past Events</h2>
-            <div id="full-calendar-list" style="display:flex; flex-direction:column; gap:1.5rem;">
-              <!-- Dynamic calendar list goes here -->
+
+          <div style="display:grid; grid-template-columns:1fr 380px; gap:2rem; align-items:start;">
+
+            <!-- LEFT: Events Calendar -->
+            <div class="news-card">
+              <h2 class="widget-title" style="border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+                <ion-icon name="calendar" style="color:var(--primary);"></ion-icon> Upcoming & Past Events
+              </h2>
+              <div id="full-calendar-list" style="display:flex; flex-direction:column; gap:1.5rem;">
+                <!-- Dynamic calendar list goes here -->
+              </div>
             </div>
+
+            <!-- RIGHT: News Feed -->
+            <div style="display:flex; flex-direction:column; gap:1.5rem;">
+              <!-- News Feed Header Card -->
+              <div class="news-card" style="padding:1.25rem;">
+                <h2 class="widget-title" style="border-bottom:1px solid var(--border-color); padding-bottom:1rem; margin-bottom:1.25rem; display:flex; align-items:center; gap:0.5rem;">
+                  <ion-icon name="newspaper" style="color:var(--primary);"></ion-icon> School News Feed
+                </h2>
+                <div id="calendar-news-feed" style="display:flex; flex-direction:column; gap:1.25rem;">
+                  <!-- Dynamic news items -->
+                </div>
+                <button class="btn-secondary" onclick="window.location.hash='#/home'" style="width:100%; margin-top:1.25rem; font-size:0.85rem; padding:0.5rem;">
+                  View All Posts
+                </button>
+              </div>
+
+              <!-- Quick Stats Card -->
+              <div class="news-card" style="padding:1.25rem;">
+                <h3 class="widget-title" style="border-bottom:1px solid var(--border-color); padding-bottom:0.75rem; margin-bottom:1rem; display:flex; align-items:center; gap:0.5rem;">
+                  <ion-icon name="stats-chart" style="color:var(--primary);"></ion-icon> This Month
+                </h3>
+                <div id="calendar-quick-stats" style="display:flex; flex-direction:column; gap:0.75rem;">
+                  <!-- Dynamic stats -->
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
