@@ -2,7 +2,54 @@
 // DYNAMIC VIEW RENDERERS (FB SCHOOL NEWSFEED)
 // ==========================================
 
+function generateStories() {
+  const container = document.getElementById('stories-container-feed');
+  if (!container) return;
+  
+  let html = `
+    <div class="story-card add-story">
+      <div class="story-avatar"><ion-icon name="add"></ion-icon></div>
+      <span class="story-name">Create Story</span>
+    </div>
+  `;
+
+  // Scrape pinned memos from the sidebar
+  document.querySelectorAll('.pinned-item').forEach(item => {
+    const title = item.querySelector('span:nth-child(2)').innerText;
+    const isEmergency = item.querySelector('span:first-child').innerText.toLowerCase() === 'emergency';
+    const bgSrc = isEmergency ? 'https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=150&auto=format&fit=crop&q=80' : 'https://api.dicebear.com/7.x/micah/svg?seed=' + encodeURIComponent(title);
+    
+    html += `
+      <div class="story-card has-story" title="Pinned: ${title}">
+        <img src="${bgSrc}" class="story-avatar">
+        <span class="story-name">${title}</span>
+      </div>
+    `;
+  });
+
+  // Scrape agenda items
+  const agendaList = document.getElementById('agenda-widget-list');
+  if (agendaList) {
+    agendaList.querySelectorAll('li').forEach(item => {
+      // The agenda title is the first div inside the second flex child
+      const textDivs = item.querySelectorAll('div > div');
+      if (textDivs.length >= 3) {
+        const title = textDivs[2].innerText; // The title is the 3rd deepest div text
+        html += `
+          <div class="story-card has-story" title="Agenda: ${title}">
+            <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=150&auto=format&fit=crop&q=80" class="story-avatar">
+            <span class="story-name">${title}</span>
+          </div>
+        `;
+      }
+    });
+  }
+
+  container.innerHTML = html;
+}
+
 async function renderNewsfeed() {
+  generateStories();
   const container = document.getElementById('school-newsfeed-container');
   if (!container) return;
 
