@@ -1,4 +1,4 @@
-﻿// THEME ENGINE CONTROLLER
+// THEME ENGINE CONTROLLER
 // ==========================================
 
 function applyTheme(themeName, customLogo = null) {
@@ -68,6 +68,7 @@ if (bellTrigger) {
   });
 }
 
+function showToast(msg) {
   const toast = document.getElementById('toast');
   if (toast) {
     toast.innerText = msg;
