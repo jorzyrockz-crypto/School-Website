@@ -88,7 +88,7 @@ document.addEventListener('click', () => {
 });
 
 // Floating Chat Window Logic
-function openChatWindow(title) {
+function openFloatingChat(title) {
   const chatWindow = document.getElementById('floating-chat-window');
   if (chatWindow) {
     document.getElementById('chat-window-title').innerText = title;
