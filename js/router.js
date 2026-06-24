@@ -1,4 +1,4 @@
-﻿// CENTRAL APPLICATION ROUTER (HASH BASED)
+// CENTRAL APPLICATION ROUTER (HASH BASED)
 // ==========================================
 
 function initRouter() {
@@ -49,6 +49,16 @@ function switchView(viewName) {
   const activeView = document.getElementById(`view-${viewName}`);
   if (activeView) {
     activeView.style.display = 'block';
+  }
+
+  // Remove workspace padding when in messaging view for full-height layout
+  const workspace = document.querySelector('.portal-workspace');
+  if (workspace) {
+    if (viewName === 'messages') {
+      workspace.classList.add('no-padding');
+    } else {
+      workspace.classList.remove('no-padding');
+    }
   }
 
   // Update sidebar active highlights

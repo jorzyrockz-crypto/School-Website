@@ -185,6 +185,13 @@
   margin: 0 auto;
 }
 
+.portal-workspace.no-padding {
+  padding: 0;
+  max-width: none;
+  height: calc(100vh - 70px);
+  overflow: hidden;
+}
+
 /* FB style Newsfeed cards / Material Cards */
 .news-card {
   background: var(--bg-secondary);
