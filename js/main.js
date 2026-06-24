@@ -56,17 +56,36 @@ if (clearNotifsBtn) {
   };
 }
 
-const bellTrigger = document.getElementById('notif-bell-trigger');
-if (bellTrigger) {
-  bellTrigger.onclick = (e) => {
-    e.stopPropagation();
-    document.getElementById('notif-dropdown-menu').classList.toggle('show');
-  };
-  document.addEventListener('click', () => {
-    const dropdown = document.getElementById('notif-dropdown-menu');
-    if (dropdown) dropdown.classList.remove('show');
-  });
-}
+// Header Dropdown Toggles
+const dropdownTriggers = [
+  { triggerId: 'notif-bell-trigger', menuId: 'notif-dropdown-menu' },
+  { triggerId: 'messenger-widget-trigger', menuId: 'messenger-dropdown-menu' },
+  { triggerId: 'profile-widget-trigger', menuId: 'profile-dropdown-menu' }
+];
+
+dropdownTriggers.forEach(({triggerId, menuId}) => {
+  const trigger = document.getElementById(triggerId);
+  const menu = document.getElementById(menuId);
+  
+  if (trigger && menu) {
+    trigger.onclick = (e) => {
+      e.stopPropagation();
+      // Close all others first
+      document.querySelectorAll('.header-dropdown').forEach(d => {
+        if (d !== menu) d.classList.remove('show');
+      });
+      menu.classList.toggle('show');
+    };
+    
+    // Prevent clicks inside menu from closing it
+    menu.onclick = (e) => e.stopPropagation();
+  }
+});
+
+// Click outside to close all dropdowns
+document.addEventListener('click', () => {
+  document.querySelectorAll('.header-dropdown').forEach(d => d.classList.remove('show'));
+});
 
 function showToast(msg) {
   const toast = document.getElementById('toast');

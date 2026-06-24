@@ -49,23 +49,6 @@
         </div>
       </div>
 
-      <!-- User Profile Box -->
-      <div class="sidebar-profile">
-        <img id="user-avatar" class="profile-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest" alt="Avatar">
-        <div style="display:flex; flex-direction:column; flex:1; min-width:0; gap:0.25rem;">
-          <div id="user-name" class="profile-name">Guest User</div>
-          <div style="display:flex; align-items:center; gap:0.4rem; white-space:nowrap; overflow:hidden;">
-            <span id="user-position" style="font-size:0.75rem; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; display:none;"></span>
-          </div>
-        </div>
-      </div>
-
-
-      <!-- Auth Logout Trigger (Hidden by default) -->
-      <div id="auth-logout-box" class="sidebar-auth-action" style="display:none;">
-        <button id="btn-logout" class="btn-logout"><ion-icon name="log-out-outline" style="font-size:1.1rem;"></ion-icon> Sign Out</button>
-      </div>
-
       <!-- Unified Navigation List -->
       <ul class="sidebar-menu" id="sidebar-menu-list">
         <!-- Public Navigation Links -->
@@ -89,12 +72,6 @@
         <li class="menu-item auth-only" data-view="dashboard" style="display:none; border-top: 1px solid rgba(255,255,255,0.1); padding-top:0.5rem;">
           <a href="#/dashboard"><ion-icon name="grid-outline"></ion-icon> My Hub / Portal</a>
         </li>
-        <li class="menu-item auth-only" data-view="messages" style="display:none;">
-          <a href="#/messages"><ion-icon name="chatbubbles-outline"></ion-icon> Direct Messages</a>
-        </li>
-        <li class="menu-item auth-only" data-view="profile" style="display:none;">
-          <a href="#/profile"><ion-icon name="person-outline"></ion-icon> Portal Settings</a>
-        </li>
       </ul>
 
       <!-- Sidebar Footer (Version / Branding strip) -->
@@ -114,22 +91,74 @@
           </button>
           <span id="school-portal-name">Apex Integrated School</span>
         </div>
-        <div class="header-actions">
-          <!-- Notification Bell -->
-          <div class="notif-wrapper" id="notif-bell-trigger">
-            <ion-icon class="notif-bell" name="notifications-outline"></ion-icon>
-            <span id="notif-badge-count" class="notif-badge">0</span>
+        <div class="header-actions" style="display:flex; align-items:center; gap:0.5rem;">
+          
+          <!-- Messenger Dropdown -->
+          <div class="header-widget-wrap" id="messenger-widget-trigger" style="position:relative;">
+            <div class="header-action-btn" title="Messages">
+              <ion-icon name="chatbubble-ellipses"></ion-icon>
+              <span class="header-badge">0</span>
+            </div>
             
-            <div id="notif-dropdown-menu" class="notif-dropdown">
-              <div class="notif-header">
-                <span>Notifications</span>
-                <span id="btn-clear-notifs" style="font-size:0.75rem; color:var(--primary); font-weight:600; cursor:pointer;">Clear All</span>
+            <div id="messenger-dropdown-menu" class="header-dropdown" style="display:none;">
+              <div class="header-dropdown-header" style="display:flex; justify-content:space-between; align-items:center; padding:1rem; border-bottom:1px solid var(--border-color);">
+                <span style="font-weight:700; font-size:1.1rem;">Messages</span>
+                <a href="#/messages" style="color:var(--primary); font-size:1.2rem; cursor:pointer;" title="Open Full Messenger"><ion-icon name="expand-outline"></ion-icon></a>
               </div>
-              <div id="notif-items-list" class="notif-list">
+              <div class="header-dropdown-content" style="padding:1rem; text-align:center; color:var(--text-secondary); font-size:0.9rem;">
+                No recent messages
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification Dropdown -->
+          <div class="header-widget-wrap" id="notif-bell-trigger" style="position:relative;">
+            <div class="header-action-btn" title="Notifications">
+              <ion-icon name="notifications"></ion-icon>
+              <span id="notif-badge-count" class="header-badge">0</span>
+            </div>
+            
+            <div id="notif-dropdown-menu" class="header-dropdown" style="display:none;">
+              <div class="header-dropdown-header" style="display:flex; justify-content:space-between; align-items:center; padding:1rem; border-bottom:1px solid var(--border-color);">
+                <span style="font-weight:700; font-size:1.1rem;">Notifications</span>
+                <span id="btn-clear-notifs" style="font-size:0.8rem; color:var(--primary); font-weight:600; cursor:pointer;">Clear All</span>
+              </div>
+              <div id="notif-items-list" class="header-dropdown-content">
                 <!-- Dynamically populated notifications -->
               </div>
             </div>
           </div>
+
+          <!-- Profile Widget Dropdown -->
+          <div class="header-widget-wrap auth-only" id="profile-widget-trigger" style="position:relative; display:none; margin-left:0.5rem;">
+            <div class="profile-widget-btn" style="position:relative; cursor:pointer;">
+              <img id="header-user-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest" alt="Avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color);">
+              <div style="position:absolute; bottom:-2px; right:-2px; background:var(--bg-secondary); border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg-primary);">
+                <ion-icon name="chevron-down-outline" style="font-size:0.6rem; color:var(--text-primary);"></ion-icon>
+              </div>
+            </div>
+
+            <div id="profile-dropdown-menu" class="header-dropdown" style="display:none; right:0; width:300px;">
+              <div style="padding:1rem; border-bottom:1px solid var(--border-color); display:flex; align-items:center; gap:0.75rem;">
+                <img id="dropdown-user-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest" style="width:40px; height:40px; border-radius:50%;">
+                <div style="display:flex; flex-direction:column;">
+                  <span id="header-user-name" style="font-weight:700; font-size:1rem;">Guest User</span>
+                  <span style="font-size:0.85rem; color:var(--text-secondary);">See your profile</span>
+                </div>
+              </div>
+              <div style="padding:0.5rem;">
+                <a href="#/profile" class="dropdown-menu-item">
+                  <div class="dropdown-icon-bg"><ion-icon name="settings"></ion-icon></div>
+                  <span>Portal Settings</span>
+                </a>
+                <div id="header-btn-logout" class="dropdown-menu-item">
+                  <div class="dropdown-icon-bg"><ion-icon name="log-out"></ion-icon></div>
+                  <span>Sign Out</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </header>
 

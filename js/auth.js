@@ -51,7 +51,7 @@ mockLoginTriggers.forEach(trigger => {
   };
 });
 
-const logoutBtn = document.getElementById('btn-logout');
+const logoutBtn = document.getElementById('header-btn-logout');
 if (logoutBtn) {
   logoutBtn.onclick = () => {
     activeUser = null;
@@ -59,10 +59,13 @@ if (logoutBtn) {
     sessionStorage.removeItem('activeUser');
     showToast("Signed out successfully.");
     
-    // Clear sidebar layout
+    // Clear sidebar/header layout
     syncSidebarProfile();
     toggleAuthUIElements(false);
     
+    // Close dropdowns
+    document.getElementById('profile-dropdown-menu').style.display = 'none';
+
     // Show login overlay immediately upon logout
     const loginOverlay = document.getElementById('login-screen-overlay');
     if (loginOverlay) loginOverlay.style.display = 'flex';
@@ -75,80 +78,34 @@ if (logoutBtn) {
 // ==========================================
 
 function syncSidebarProfile() {
-  const avatar = document.getElementById('user-avatar');
-  const name = document.getElementById('user-name');
-  const position = document.getElementById('user-position');
-  const profileBox = document.querySelector('.sidebar-profile');
+  const headerAvatar = document.getElementById('header-user-avatar');
+  const dropdownAvatar = document.getElementById('dropdown-user-avatar');
+  const name = document.getElementById('header-user-name');
 
   if (activeUser) {
-    avatar.src = activeUser.avatar;
-    name.innerText = activeUser.name;
-    
-    // Position text logic
-    let posText = '';
-    const rd = activeUser.roleData || {};
-    if (activeUser.role === 'admin' && rd.position) posText = rd.position;
-    else if (activeUser.role === 'teacher') {
-      if (rd.position) posText = rd.position;
-      else if (rd.dept) posText = rd.dept + ' Teacher';
-    }
-    else if (activeUser.role === 'learner' && rd.grade) posText = `${rd.grade}${rd.section ? ' - ' + rd.section : ''}`;
-    else if (activeUser.role === 'parent' && rd.learnerName) posText = `Parent of ${rd.learnerName}`;
-
-    if (position) {
-      if (posText) {
-        position.innerText = posText;
-        position.style.display = 'block';
-      } else {
-        position.style.display = 'none';
-      }
-    }
-
-    // Role-based background color for the profile card
-    if (profileBox) {
-      // Reset all borders to avoid compounding if roles switch
-      profileBox.style.border = 'none';
-      profileBox.style.borderLeft = '4px solid transparent';
-      
-      if (activeUser.role === 'admin') {
-        profileBox.style.background = 'linear-gradient(90deg, rgba(24, 119, 242, 0.35) 0%, rgba(24, 119, 242, 0.05) 100%)';
-        profileBox.style.borderLeft = '4px solid #1877f2';
-      } else if (activeUser.role === 'teacher') {
-        profileBox.style.background = 'linear-gradient(90deg, rgba(45, 158, 107, 0.35) 0%, rgba(45, 158, 107, 0.05) 100%)';
-        profileBox.style.borderLeft = '4px solid #2d9e6b';
-      } else if (activeUser.role === 'learner') {
-        profileBox.style.background = 'linear-gradient(90deg, rgba(245, 158, 11, 0.35) 0%, rgba(245, 158, 11, 0.05) 100%)';
-        profileBox.style.borderLeft = '4px solid #f59e0b';
-      } else if (activeUser.role === 'parent') {
-        profileBox.style.background = 'linear-gradient(90deg, rgba(124, 58, 237, 0.35) 0%, rgba(124, 58, 237, 0.05) 100%)';
-        profileBox.style.borderLeft = '4px solid #7c3aed';
-      }
-    }
-
+    if (headerAvatar) headerAvatar.src = activeUser.avatar;
+    if (dropdownAvatar) dropdownAvatar.src = activeUser.avatar;
+    if (name) name.innerText = activeUser.name;
   } else {
-    avatar.src = "https://api.dicebear.com/7.x/micah/svg?seed=guest";
-    name.innerText = "Guest User";
-    if (position) position.style.display = 'none';
-    if (profileBox) {
-      profileBox.style.background = 'rgba(255, 255, 255, 0.03)';
-      profileBox.style.border = 'none';
-      profileBox.style.borderLeft = '4px solid transparent';
-    }
+    if (headerAvatar) headerAvatar.src = "https://api.dicebear.com/7.x/micah/svg?seed=guest";
+    if (dropdownAvatar) dropdownAvatar.src = "https://api.dicebear.com/7.x/micah/svg?seed=guest";
+    if (name) name.innerText = "Guest User";
   }
 }
 
 function toggleAuthUIElements(isLoggedIn) {
-  // Show / Hide auth-only menu links
+  // Show / Hide auth-only menu links (in sidebar)
   document.querySelectorAll('.menu-item.auth-only').forEach(item => {
     item.style.display = isLoggedIn ? 'block' : 'none';
   });
 
-  // Toggle logout dropdown
+  // Toggle guest login widget in sidebar
   const guestBox = document.getElementById('guest-login-box');
   if (guestBox) guestBox.style.display = isLoggedIn ? 'none' : 'block';
   
-  const logoutBox = document.getElementById('auth-logout-box');
-  if (logoutBox) logoutBox.style.display = isLoggedIn ? 'block' : 'none';
+  // Toggle the new Profile Widget in the Header
+  const profileWidget = document.getElementById('profile-widget-trigger');
+  if (profileWidget) profileWidget.style.display = isLoggedIn ? 'block' : 'none';
 
   const fbCreatePost = document.getElementById('fb-create-post-box');
   if (fbCreatePost) {
