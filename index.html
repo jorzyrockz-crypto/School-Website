@@ -3,7 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Apex Integrated School - FB School Edition</title>
+  <title>Apex Integrated School Portal</title>
+
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="Apex School">
+  <meta name="description" content="The official school portal for Apex Integrated School — news, announcements, calendar, and more.">
+  <meta name="theme-color" content="#1e40af">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Apex School">
+  <meta name="msapplication-TileColor" content="#1e40af">
+  <meta name="msapplication-TileImage" content="icons/icon-192.png">
+
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <!-- App Icons -->
+  <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="css/variables.css?v=6">
   <link rel="stylesheet" href="css/layout.css?v=6">
   <link rel="stylesheet" href="css/components.css?v=6">
@@ -878,5 +900,28 @@
   <script src="js/dashboard.js?v=6"></script>
   <script src="js/router.js?v=6"></script>
   <script src="js/main.js?v=6"></script>
+
+  <!-- PWA Service Worker Registration -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => {
+            console.log('[PWA] Service Worker registered:', reg.scope);
+            // Check for updates and notify user
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              newWorker.addEventListener('statechange', () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('[PWA] New version available — will activate on next visit.');
+                }
+              });
+            });
+          })
+          .catch((err) => console.warn('[PWA] SW registration failed:', err));
+      });
+    }
+  </script>
 </body>
 </html>
+
