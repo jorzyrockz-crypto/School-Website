@@ -64,9 +64,6 @@
         <li class="menu-item" data-view="transparency">
           <a href="#/transparency"><ion-icon name="document-text-outline"></ion-icon> Transparency Board</a>
         </li>
-        <li class="menu-item" data-view="contact">
-          <a href="#/contact"><ion-icon name="mail-outline"></ion-icon> Contact Directory</a>
-        </li>
 
         <!-- Authenticated Portal Links (Hidden until login) -->
         <li class="menu-item auth-only" data-view="dashboard" style="display:none; border-top: 1px solid rgba(255,255,255,0.1); padding-top:0.5rem;">
@@ -296,7 +293,7 @@
           </div>
           
           <h2 class="widget-title" style="text-align:center; margin-bottom:2rem;">Our Faculty & Administration</h2>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:2rem; text-align:center;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:2rem; text-align:center; margin-bottom:4rem;">
             <div class="news-card">
               <img style="width:100px; height:100px; border-radius:50%; margin-bottom:1rem; object-fit:cover;" src="https://api.dicebear.com/7.x/micah/svg?seed=principal" alt="Principal">
               <h3>Dr. Maria Santos</h3>
@@ -308,35 +305,10 @@
               <p style="font-size:0.85rem; color:var(--text-secondary)">Head, Mathematics Department</p>
             </div>
           </div>
-        </div>
-
-        <!-- ================= VIEW: TRANSPARENCY BOARD ================= -->
-        <div id="view-transparency" class="route-view" style="display:none;">
-          <h1 class="hero-title" style="text-align:center;">DepEd Transparency Board</h1>
-          <p style="text-align:center; color:var(--text-secondary); margin-bottom:3rem;">In compliance with national transparency laws and DepEd guidelines, we make our school credentials and reports available to the public.</p>
           
-          <div class="news-card">
-            <h2 class="widget-title">Citizen's Charter & Reports</h2>
-            <div style="overflow-x: auto;">
-              <table class="transparency-table">
-                <thead>
-                  <tr>
-                    <th>Document / Report Title</th>
-                    <th>Last Updated</th>
-                    <th>Access Link</th>
-                  </tr>
-                </thead>
-                <tbody id="transparency-docs-list">
-                  <!-- Dynamically populated -->
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- ================= VIEW: CONTACT US ================= -->
-        <div id="view-contact" class="route-view" style="display:none;">
-          <h1 class="hero-title" style="text-align:center; margin-bottom:3rem;">Connect With Us</h1>
+          <hr style="border-top:1px solid var(--border-color); margin-bottom:4rem;">
+          
+          <h2 class="widget-title" style="text-align:center; margin-bottom:2rem;">Connect With Us & Office Directory</h2>
           <div class="grid-2">
             <div class="news-card">
               <h2 class="widget-title">Inquiry Form</h2>
@@ -367,6 +339,30 @@
                   [Map Placeholder - Manila, PH]
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= VIEW: TRANSPARENCY BOARD ================= -->
+        <div id="view-transparency" class="route-view" style="display:none;">
+          <h1 class="hero-title" style="text-align:center;">DepEd Transparency Board</h1>
+          <p style="text-align:center; color:var(--text-secondary); margin-bottom:3rem;">In compliance with national transparency laws and DepEd guidelines, we make our school credentials and reports available to the public.</p>
+          
+          <div class="news-card">
+            <h2 class="widget-title">Citizen's Charter & Reports</h2>
+            <div style="overflow-x: auto;">
+              <table class="transparency-table">
+                <thead>
+                  <tr>
+                    <th>Document / Report Title</th>
+                    <th>Last Updated</th>
+                    <th>Access Link</th>
+                  </tr>
+                </thead>
+                <tbody id="transparency-docs-list">
+                  <!-- Dynamically populated -->
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

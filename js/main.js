@@ -416,7 +416,7 @@ window.dismissedChatHeads = window.dismissedChatHeads || [];
 window.dismissChatHead = function(uid, event) {
   event.stopPropagation();
   window.dismissedChatHeads.push(uid);
-  updateChatHeads();
+  initFloatingChatHeads();
 };
 
 let activeEmojiInputId = null;
