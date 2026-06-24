@@ -1027,24 +1027,24 @@ function initProfilePanel() {
         <div class="form-group" style="margin-bottom:0;"><label>PRC License Number</label><input type="text" id="rf-prc" class="form-control" value="${roleData.prc || ''}"></div>
         <div class="form-group" style="margin-bottom:0;"><label>Department / Subject</label><input type="text" id="rf-dept" class="form-control" value="${roleData.dept || ''}" placeholder="e.g. Mathematics"></div>
         <div class="form-group" style="margin-bottom:0;">
-          <label>ECCP Teaching Position</label>
+          <label>Teaching Position</label>
           <select id="rf-position" class="form-control">
             <option value="">Select Position...</option>
             <optgroup label="Classroom Teaching Career Line">
               <option value="Teacher I" ${roleData.position === 'Teacher I' ? 'selected' : ''}>Teacher I</option>
               <option value="Teacher II" ${roleData.position === 'Teacher II' ? 'selected' : ''}>Teacher II</option>
               <option value="Teacher III" ${roleData.position === 'Teacher III' ? 'selected' : ''}>Teacher III</option>
-              <option value="Teacher IV" ${roleData.position === 'Teacher IV' ? 'selected' : ''}>Teacher IV (ECCP)</option>
-              <option value="Teacher V" ${roleData.position === 'Teacher V' ? 'selected' : ''}>Teacher V (ECCP)</option>
-              <option value="Teacher VI" ${roleData.position === 'Teacher VI' ? 'selected' : ''}>Teacher VI (ECCP)</option>
-              <option value="Teacher VII" ${roleData.position === 'Teacher VII' ? 'selected' : ''}>Teacher VII (ECCP)</option>
+              <option value="Teacher IV" ${roleData.position === 'Teacher IV' ? 'selected' : ''}>Teacher IV</option>
+              <option value="Teacher V" ${roleData.position === 'Teacher V' ? 'selected' : ''}>Teacher V</option>
+              <option value="Teacher VI" ${roleData.position === 'Teacher VI' ? 'selected' : ''}>Teacher VI</option>
+              <option value="Teacher VII" ${roleData.position === 'Teacher VII' ? 'selected' : ''}>Teacher VII</option>
             </optgroup>
             <optgroup label="Master Teachers">
               <option value="Master Teacher I" ${roleData.position === 'Master Teacher I' ? 'selected' : ''}>Master Teacher I</option>
               <option value="Master Teacher II" ${roleData.position === 'Master Teacher II' ? 'selected' : ''}>Master Teacher II</option>
               <option value="Master Teacher III" ${roleData.position === 'Master Teacher III' ? 'selected' : ''}>Master Teacher III</option>
               <option value="Master Teacher IV" ${roleData.position === 'Master Teacher IV' ? 'selected' : ''}>Master Teacher IV</option>
-              <option value="Master Teacher V" ${roleData.position === 'Master Teacher V' ? 'selected' : ''}>Master Teacher V (ECCP)</option>
+              <option value="Master Teacher V" ${roleData.position === 'Master Teacher V' ? 'selected' : ''}>Master Teacher V</option>
             </optgroup>
             <optgroup label="Head Teachers">
               <option value="Head Teacher I" ${roleData.position === 'Head Teacher I' ? 'selected' : ''}>Head Teacher I</option>
@@ -1072,7 +1072,7 @@ function initProfilePanel() {
               <option value="School Principal II" ${roleData.position === 'School Principal II' ? 'selected' : ''}>School Principal II</option>
               <option value="School Principal III" ${roleData.position === 'School Principal III' ? 'selected' : ''}>School Principal III</option>
               <option value="School Principal IV" ${roleData.position === 'School Principal IV' ? 'selected' : ''}>School Principal IV</option>
-              <option value="School Principal V" ${roleData.position === 'School Principal V' ? 'selected' : ''}>School Principal V (ECCP)</option>
+              <option value="School Principal V" ${roleData.position === 'School Principal V' ? 'selected' : ''}>School Principal V</option>
             </optgroup>
             <optgroup label="Assistant Principals">
               <option value="Asst. School Principal I" ${roleData.position === 'Asst. School Principal I' ? 'selected' : ''}>Assistant School Principal I</option>
