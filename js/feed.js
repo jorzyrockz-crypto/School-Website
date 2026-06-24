@@ -938,12 +938,17 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
       const hasImage = !!post.imageData;
       const snippet = (post.content || '').slice(0, 100) + ((post.content || '').length > 100 ? '…' : '');
       const targetAttr = post.link && post.link !== '#/home' ? 'target="_blank"' : '';
+      const sourceInitial = (post.type || 'N').charAt(0).toUpperCase();
+      const fallbackThumb = `<div style="width:68px; height:68px; border-radius:8px; background:linear-gradient(135deg, ${post.color || 'var(--primary)'} 0%, color-mix(in srgb, ${post.color || 'var(--primary)'} 60%, #000) 100%); display:flex; flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; gap:2px;">
+              <ion-icon name="newspaper-outline" style="font-size:1.4rem; color:rgba(255,255,255,0.85);"></ion-icon>
+              <span style="font-size:0.55rem; color:rgba(255,255,255,0.7); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; max-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${(post.type || 'News').split(' ')[0]}</span>
+            </div>`;
 
       return `
         <a href="${post.link}" ${targetAttr} style="display:flex; gap:0.75rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border-color); cursor:pointer; transition:opacity 0.2s; text-decoration:none; color:inherit;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
           ${hasImage
-            ? `<img src="${post.imageData}" alt="News" style="width:68px; height:68px; border-radius:8px; object-fit:cover; flex-shrink:0;">`
-            : `<div style="width:68px; height:68px; border-radius:8px; background:var(--bg-primary); border:1px solid var(--border-color); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><ion-icon name="${post.icon}" style="font-size:1.75rem; color:${post.color};"></ion-icon></div>`
+            ? `<img src="${post.imageData}" alt="News" style="width:68px; height:68px; border-radius:8px; object-fit:cover; flex-shrink:0;" onerror="this.outerHTML='${fallbackThumb.replace(/`/g, '\\`').replace(/'/g, "\\'")}';">`
+            : fallbackThumb
           }
           <div style="flex:1; min-width:0;">
             <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem;">
