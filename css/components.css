@@ -814,7 +814,7 @@
   border-radius: var(--radius-md);
   margin-bottom: 1rem;
   border-left: none;
-
+}
 .poll-card .poll-option {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
