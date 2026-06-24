@@ -156,14 +156,17 @@ async function initFloatingChatHeads() {
     </div>
   `;
 
-  // Render top 4 threads to avoid clutter
-  const topThreads = threads.slice(0, 4);
+  // Filter out dismissed chat heads and render top 4
+  const topThreads = threads.filter(t => !window.dismissedChatHeads?.includes(t.uid)).slice(0, 4);
   const threadsHTML = topThreads.map(t => {
     // Escape JSON so it can be passed as a string
     const tJson = encodeURIComponent(JSON.stringify(t)).replace(/'/g, "%27");
     return `
-      <div class="chat-head-bubble" onclick="openFloatingChat('${tJson}')" title="${t.name}">
-        <img src="${t.avatar}" alt="${t.name}">
+      <div class="chat-head-bubble" style="position:relative;" title="${t.name}">
+        <img src="${t.avatar}" alt="${t.name}" onclick="openFloatingChat('${tJson}')">
+        <button onclick="dismissChatHead('${t.uid}', event)" style="position:absolute; top:-2px; right:-2px; background:var(--danger); color:white; border:none; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; font-size:0.7rem; box-shadow:0 1px 3px rgba(0,0,0,0.3);">
+          <ion-icon name="close"></ion-icon>
+        </button>
       </div>
     `;
   }).join('');
@@ -405,4 +408,55 @@ async function initPage() {
   }
 }
 
+// ==========================================
+// CHAT HEADS & EMOJI LOGIC
+// ==========================================
+window.dismissedChatHeads = window.dismissedChatHeads || [];
+
+window.dismissChatHead = function(uid, event) {
+  event.stopPropagation();
+  window.dismissedChatHeads.push(uid);
+  updateChatHeads();
+};
+
+let activeEmojiInputId = null;
+
+const EMOJI_LIST = ['😀','😃','😄','😁','😆','😅','😂','🤣','🥲','☺️','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾'];
+
+window.toggleEmojiPicker = function(inputId) {
+  activeEmojiInputId = inputId;
+  const picker = document.getElementById('emoji-picker');
+  if (!picker) return;
+  
+  if (picker.style.display === 'block') {
+    picker.style.display = 'none';
+    return;
+  }
+  
+  // Render emojis if empty
+  const list = document.getElementById('emoji-list');
+  if (list && list.innerHTML.trim() === '') {
+    list.innerHTML = EMOJI_LIST.map(e => `<span style="cursor:pointer; font-size:1.5rem; padding:0.2rem; transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.2)'" onmouseout="this.style.transform='scale(1)'" onclick="insertEmoji('${e}')">${e}</span>`).join('');
+  }
+  
+  picker.style.display = 'block';
+  
+  // Position it near the bottom right but above input
+  picker.style.bottom = '80px';
+  picker.style.right = '20px';
+};
+
+window.closeEmojiPicker = function() {
+  const picker = document.getElementById('emoji-picker');
+  if (picker) picker.style.display = 'none';
+};
+
+window.insertEmoji = function(emoji) {
+  if (!activeEmojiInputId) return;
+  const input = document.getElementById(activeEmojiInputId);
+  if (input) {
+    input.value += emoji;
+    input.focus();
+  }
+};
 initPage();
