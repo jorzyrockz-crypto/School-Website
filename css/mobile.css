@@ -273,6 +273,7 @@
   .composer-actions {
     /* Kill the wrapping desktop layout */
     display: flex !important;
+    flex-direction: row !important;
     flex-wrap: nowrap !important;
     justify-content: flex-start !important;
     gap: 0 !important;
@@ -818,11 +819,6 @@
     font-size: 0.88rem;
   }
 
-  /* Composer audience & submit button row */
-  #fb-create-post-box div[style*="justify-content:space-between"][style*="flex-wrap"] {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 
 
