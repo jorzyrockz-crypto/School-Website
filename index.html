@@ -26,11 +26,35 @@
   <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=48">
-  <link rel="stylesheet" href="css/layout.css?v=48">
-  <link rel="stylesheet" href="css/components.css?v=48">
-  <link rel="stylesheet" href="css/mobile.css?v=48">
+  <link rel="stylesheet" href="css/variables.css?v=49">
+  <link rel="stylesheet" href="css/layout.css?v=49">
+  <link rel="stylesheet" href="css/components.css?v=49">
+  <link rel="stylesheet" href="css/mobile.css?v=49">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <!-- Instant Inline Orientation and Tablet Detector -->
+  <script>
+    (function() {
+      function checkTabletOrientation() {
+        var isPortrait = window.matchMedia('(orientation: portrait)').matches || (window.innerHeight > window.innerWidth);
+        var target = document.documentElement;
+        if (isPortrait && window.innerWidth >= 500 && window.innerWidth <= 1366) {
+          target.classList.add('is-portrait');
+          if (document.body) document.body.classList.add('is-portrait');
+          console.log('[Inline Detection] Tablet Portrait detected. Applied is-portrait class.');
+        } else {
+          target.classList.remove('is-portrait');
+          if (document.body) document.body.classList.remove('is-portrait');
+          console.log('[Inline Detection] Landscape or non-tablet detected.');
+        }
+      }
+      window.addEventListener('resize', checkTabletOrientation);
+      window.addEventListener('DOMContentLoaded', checkTabletOrientation);
+      checkTabletOrientation();
+      setTimeout(checkTabletOrientation, 100);
+      setTimeout(checkTabletOrientation, 400);
+      setTimeout(checkTabletOrientation, 1000);
+    })();
+  </script>
 </head>
 <body>
 
@@ -922,12 +946,12 @@
   <div id="toast" class="toast">Action completed successfully!</div>
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=48"></script>
-  <script src="js/auth.js?v=48"></script>
-  <script src="js/feed.js?v=48"></script>
-  <script src="js/dashboard.js?v=48"></script>
-  <script src="js/router.js?v=48"></script>
-  <script src="js/main.js?v=48"></script>
+  <script src="js/db.js?v=49"></script>
+  <script src="js/auth.js?v=49"></script>
+  <script src="js/feed.js?v=49"></script>
+  <script src="js/dashboard.js?v=49"></script>
+  <script src="js/router.js?v=49"></script>
+  <script src="js/main.js?v=49"></script>
 
   <!-- PWA Service Worker Registration -->
   <script>
