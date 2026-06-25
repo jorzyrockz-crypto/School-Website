@@ -655,28 +655,6 @@ window.addEventListener('storage', (e) => {
   });
 })();
 
-// ── Desktop Sidebar Collapse Toggle ────────────────────────────────────────
-(function () {
-  const collapseBtn = document.getElementById('btn-sidebar-collapse');
-  const sidebar = document.querySelector('.portal-sidebar');
-  
-  if (!collapseBtn || !sidebar) return;
-
-  // Check if sidebar was previously collapsed in localStorage
-  if (localStorage.getItem('sidebar_collapsed') === 'true') {
-    sidebar.classList.add('collapsed');
-  }
-
-  collapseBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    sidebar.classList.toggle('collapsed');
-    
-    // Save state
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
-  });
-})();
-
 // ── Dynamic Version Injection ───────────────────────────────────────────────
 (function() {
   const versionLabel = document.getElementById('sidebar-version-text');
