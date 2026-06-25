@@ -978,6 +978,12 @@
   <script src="js/router.js?v=51"></script>
   <script src="js/main.js?v=51"></script>
 
+  <!-- PWA Update Notification -->
+  <div id="pwa-update-banner" style="display:none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); border:1px solid var(--primary); padding:12px 20px; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:99999; align-items:center; gap:12px; font-size:0.9rem; color:var(--text-primary); white-space:nowrap;">
+    <span><ion-icon name="cloud-download-outline" style="vertical-align:middle; margin-right:4px;"></ion-icon> Update available!</span>
+    <button id="pwa-update-btn" class="btn-primary" style="padding:6px 16px; font-size:0.8rem; border-radius:20px;">Install</button>
+  </div>
+
   <!-- PWA Service Worker Registration -->
   <script>
     if ('serviceWorker' in navigator) {
@@ -986,13 +992,23 @@
           .then((reg) => {
             console.log('[PWA] Service Worker registered:', reg.scope);
             
-            // Auto-update logic: bypass "waiting" state
+            // User-controlled update logic
             reg.addEventListener('updatefound', () => {
               const newWorker = reg.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[PWA] New update found! Auto-activating...');
-                  newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  console.log('[PWA] New update found! Showing banner to user.');
+                  const banner = document.getElementById('pwa-update-banner');
+                  const updateBtn = document.getElementById('pwa-update-btn');
+                  if (banner && updateBtn) {
+                    banner.style.display = 'flex';
+                    updateBtn.onclick = () => {
+                      updateBtn.innerText = 'Updating...';
+                      newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    };
+                  } else {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                  }
                 }
               });
             });
