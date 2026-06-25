@@ -98,12 +98,33 @@ async function updateNotificationsList() {
     listEl.innerHTML = `<p style="padding:1rem; text-align:center; color:var(--text-secondary); font-size:0.8rem;">No new notifications</p>`;
   } else {
     listEl.innerHTML = notifs.map(n => `
-      <div class="notif-item ${n.read ? '' : 'unread'}">
+      <div class="notif-item ${n.read ? '' : 'unread'}" onclick="window.handleNotificationClick('${n.referenceId}')" style="cursor:pointer;">
         <div class="notif-text"><strong>${n.senderName}</strong> ${n.messageText}</div>
       </div>
     `).join('');
   }
 }
+
+window.handleNotificationClick = function(referenceId) {
+  // 1. Close dropdown
+  const notifDropdown = document.getElementById('notif-dropdown');
+  if (notifDropdown) notifDropdown.classList.remove('active');
+
+  // 2. Navigate to Feed if not already there
+  if (window.location.hash !== '#feed' && window.location.hash !== '') {
+    window.location.hash = '#feed';
+  }
+
+  // 3. Wait slightly for feed to render (if just navigated), then scroll & highlight
+  setTimeout(() => {
+    const postEl = document.getElementById(`post-${referenceId}`);
+    if (postEl) {
+      postEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      postEl.classList.add('highlight-post');
+      setTimeout(() => postEl.classList.remove('highlight-post'), 2500);
+    }
+  }, 150);
+};
 
 async function updateMessengerDropdownList() {
   if (!activeUser) return;

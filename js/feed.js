@@ -231,7 +231,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     }
 
     return `
-      <article class="news-card ${a.type === 'achievement' ? 'achievement-card' : (a.type === 'event' ? 'event-card' : '')}" style="margin-bottom:1.5rem;">
+      <article id="post-${a.id}" class="news-card ${a.type === 'achievement' ? 'achievement-card' : (a.type === 'event' ? 'event-card' : '')}" style="margin-bottom:1.5rem;">
         <!-- Card Header -->
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
