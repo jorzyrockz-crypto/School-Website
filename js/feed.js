@@ -469,6 +469,8 @@ let composerDocData = null;
 if (composerInput) {
   composerInput.onfocus = () => {
     composerArea.style.display = 'flex';
+    document.body.classList.add('composer-modal-active');
+    fbPostBox.classList.add('composer-modal-active');
   };
   
   // Auto-resize textarea
@@ -490,6 +492,8 @@ if (btnCancel) {
     composerImageData = null;
     composerDocData = null;
     fbPostBox.style.border = 'none';
+    document.body.classList.remove('composer-modal-active');
+    fbPostBox.classList.remove('composer-modal-active');
   };
 }
 
@@ -537,6 +541,8 @@ function updateAudienceBtnText() {
 document.querySelectorAll('.post-action-btn').forEach(btn => {
   btn.onclick = () => {
     composerArea.style.display = 'flex';
+    document.body.classList.add('composer-modal-active');
+    fbPostBox.classList.add('composer-modal-active');
     const type = btn.dataset.type;
     
     // Photo Attachment Logic (Works across any post type)

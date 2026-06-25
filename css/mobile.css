@@ -332,6 +332,131 @@
   #btn-action-announcement {
     min-width: 76px !important;
   }
+
+  /* ── FULL SCREEN MODAL STATE (Facebook style) ── */
+  /* When the body has the modal class, lock scroll */
+  body.composer-modal-active {
+    overflow: hidden !important;
+  }
+
+  #fb-create-post-box.composer-modal-active {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    /* Use dynamic viewport height to respect virtual keyboard */
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    z-index: 99999 !important;
+    margin: 0 !important;
+    border-radius: 0 !important;
+    border: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--bg-primary) !important;
+    /* Pad safe areas if any */
+    padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0 !important;
+  }
+
+  /* Make the header row (avatar + textarea) flow down */
+  #fb-create-post-box.composer-modal-active .composer-top {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    border-bottom: none !important;
+    padding: 1rem !important;
+    margin-bottom: 0 !important;
+    gap: 1rem !important;
+    /* Move it down slightly to clear the absolute-positioned top bar */
+    margin-top: 50px !important;
+  }
+
+  /* Avatar size in modal */
+  #fb-create-post-box.composer-modal-active .composer-top > img {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  /* Textarea inside the modal grows */
+  #fb-create-post-box.composer-modal-active #composer-main-input {
+    border-radius: 0 !important;
+    padding: 0 !important;
+    font-size: 1.1rem !important;
+    flex: 1;
+    height: 150px !important; /* Min height */
+    background: transparent !important;
+  }
+
+  /* Expansion area takes remaining space */
+  #fb-create-post-box.composer-modal-active #composer-expansion-area {
+    flex: 1;
+    padding: 0 1rem 1rem 1rem;
+    overflow-y: auto;
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  /* The Footer transforms into a Top App Bar */
+  #fb-create-post-box.composer-modal-active .composer-footer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    border-top: none !important;
+    border-bottom: 1px solid var(--border-color);
+    margin: 0 !important;
+    padding: 0 0.5rem !important;
+    background: var(--bg-secondary);
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    z-index: 10;
+  }
+
+  /* Audience button under avatar */
+  #fb-create-post-box.composer-modal-active .composer-audience-wrapper {
+    position: absolute;
+    top: 60px; /* Aligned next to avatar */
+    left: 70px;
+    z-index: 5;
+  }
+
+  /* The Cancel/Post button group */
+  #fb-create-post-box.composer-modal-active .composer-submit-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  /* Style cancel as an X */
+  #fb-create-post-box.composer-modal-active #btn-composer-cancel {
+    background: transparent;
+    color: var(--text-primary);
+    font-size: 0; /* Hide text */
+    padding: 0.5rem;
+    border: none;
+    box-shadow: none;
+  }
+  #fb-create-post-box.composer-modal-active #btn-composer-cancel::before {
+    content: '\2715'; /* X symbol */
+    font-size: 1.5rem;
+    line-height: 1;
+  }
+
+  /* Style Post button */
+  #fb-create-post-box.composer-modal-active #btn-composer-submit {
+    padding: 0.35rem 1rem;
+    font-weight: 600;
+  }
+
+  /* Stick the action icons at the bottom */
+  #fb-create-post-box.composer-modal-active .composer-actions {
+    position: sticky;
+    bottom: 0;
+    margin-top: auto;
+    background: var(--bg-secondary);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  }
 }
 
 
