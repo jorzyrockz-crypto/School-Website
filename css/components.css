@@ -219,6 +219,13 @@
   transform: translateY(-2px);
 }
 
+@media (max-width: 768px) {
+  .news-card {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+  }
+}
+
 @keyframes highlightFade {
   0% { background-color: rgba(59, 130, 246, 0.15); transform: scale(1.02); }
   50% { background-color: rgba(59, 130, 246, 0.05); transform: scale(1.01); }
@@ -744,10 +751,20 @@
   -webkit-backdrop-filter: blur(8px);
   padding: 0.5rem 0 0.5rem 0;
   border-bottom: none;
-  margin-left: -1rem;
-  margin-right: -1rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  margin-left: -1.5rem;
+  margin-right: -1.5rem;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .feed-filter-bar {
+    margin-top: -1.25rem; /* Tuck flush under top nav */
+    margin-left: -1rem; /* Spread edge-to-edge */
+    margin-right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 }
 .feed-filter-bar::-webkit-scrollbar {
   display: none;
@@ -846,6 +863,7 @@
   margin-bottom: 1rem;
   border-left: none;
 }
+
 .poll-card .poll-option {
   background: var(--bg-primary);
   border: 1px solid var(--border-color);
@@ -1091,10 +1109,10 @@
 /* ================= FLOATING CHAT SYSTEM ================= */
 
 .chat-heads-dock {
+  display: none !important; /* Hidden unless .has-new-messages */
   position: fixed;
   bottom: 100px;
   right: 20px;
-  display: flex;
   flex-direction: column;
   gap: 12px;
   z-index: 9000;
@@ -1107,6 +1125,27 @@
   border: 1px solid rgba(255, 255, 255, 0.4);
   width: auto;
   height: auto;
+}
+
+.chat-heads-dock.has-new-messages {
+  display: flex !important;
+}
+
+@media (max-width: 768px) {
+  .chat-heads-dock {
+    right: 8px;
+    bottom: 120px;
+    padding: 8px;
+    gap: 8px;
+  }
+  .chat-heads-dock .chat-head-bubble {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+  .chat-heads-dock .chat-head-bubble img {
+    border-radius: 14px;
+  }
 }
 
 .chat-head-bubble {
@@ -1883,10 +1922,10 @@
   display: none; /* Hidden by default, shown via .is-portrait or .sidebar-hidden */
   position: fixed;
   bottom: 24px;
-  left: 24px;
-  transform: translateY(150%);
+  left: 50%;
+  transform: translateX(-50%) translateY(150%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 45px;
+  height: 52px;
   background: linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0.6) 0%,
@@ -1895,7 +1934,7 @@
   ), var(--nav-bg);
   backdrop-filter: blur(25px) saturate(200%);
   -webkit-backdrop-filter: blur(25px) saturate(200%);
-  border-radius: 23px;
+  border-radius: 26px;
   align-items: center;
   padding: 0 clamp(8px, 2vw, 16px);
   box-shadow: 
@@ -1910,6 +1949,23 @@
   max-width: 95vw;
 }
 
+@media (prefers-color-scheme: dark) {
+  #tablet-bottom-nav {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.15) 0%,
+      rgba(255, 255, 255, 0.05) 20%,
+      rgba(0, 0, 0, 0.2) 100%
+    ), var(--nav-bg);
+    box-shadow: 
+      0 12px 32px rgba(0, 0, 0, 0.4),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2),
+      inset 0 -1px 1px rgba(0, 0, 0, 0.3),
+      inset 0 0 10px rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+}
+
 #tablet-bottom-nav .nav-brand {
   display: flex;
   align-items: center;
@@ -1918,8 +1974,8 @@
 }
 
 #tablet-bottom-nav .nav-brand img {
-  width: 25px;
-  height: 25px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -1933,7 +1989,7 @@
 #tablet-bottom-nav .nav-content {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 18px;
 }
 
 #tablet-bottom-nav .nav-item {
@@ -1944,16 +2000,16 @@
   color: var(--nav-text);
   cursor: pointer;
   transition: color 0.2s ease;
-  min-width: 34px;
+  min-width: 40px;
 }
 
 #tablet-bottom-nav .nav-item i {
-  font-size: 18px;
+  font-size: 20px;
   margin-bottom: 2px;
 }
 
 #tablet-bottom-nav .nav-item span {
-  font-size: 8px;
+  font-size: 9px;
   font-weight: 500;
   letter-spacing: 0.2px;
 }
@@ -1965,7 +2021,7 @@
 
   .is-portrait #tablet-bottom-nav {
     display: flex !important;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }
 
   body.sidebar-hidden #tablet-bottom-nav {
@@ -1973,5 +2029,5 @@
   }
 
   body.sidebar-hidden.dock-visible #tablet-bottom-nav {
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
   }

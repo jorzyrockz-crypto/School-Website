@@ -241,7 +241,7 @@ async function initFloatingChatHeads() {
 
   // Clear existing dynamic heads, leave the "Add" button
   const addBtnHTML = `
-    <div class="chat-head-bubble" title="New Message" onclick="window.location.hash='#/messages'">
+    <div class="chat-head-bubble" title="New Message" onclick="openContactDrawer()">
       <div style="background:var(--bg-secondary); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:1.5rem;">
         <ion-icon name="add"></ion-icon>
       </div>
@@ -264,6 +264,25 @@ async function initFloatingChatHeads() {
   }).join('');
 
   dock.innerHTML = threadsHTML + addBtnHTML;
+
+  // Mock new message trigger: If we have threads, simulate that there's a new message
+  // so the dock becomes visible, otherwise hide it.
+  if (topThreads.length > 0) {
+    dock.classList.add('has-new-messages');
+  } else {
+    dock.classList.remove('has-new-messages');
+  }
+}
+
+// App Drawer Functions
+function openContactDrawer() {
+  const drawer = document.getElementById('contact-drawer-overlay');
+  if (drawer) drawer.style.display = 'flex';
+}
+
+function closeContactDrawer() {
+  const drawer = document.getElementById('contact-drawer-overlay');
+  if (drawer) drawer.style.display = 'none';
 }
 
 async function openFloatingChat(encodedUser) {
