@@ -546,4 +546,40 @@ window.addEventListener('storage', (e) => {
   }
 });
 
+// ── Mobile Sidebar Toggle ──────────────────────────────────────────────────
+(function () {
+  const toggleBtn  = document.getElementById('btn-sidebar-toggle');
+  const sidebar    = document.querySelector('.portal-sidebar');
+  const overlay    = document.getElementById('sidebar-overlay');
+
+  if (!toggleBtn || !sidebar || !overlay) return;
+
+  function openSidebar() {
+    sidebar.classList.add('mobile-open');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden'; // prevent background scroll
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('mobile-open');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+  });
+
+  // Close when tapping the overlay
+  overlay.addEventListener('click', closeSidebar);
+
+  // Close when a nav menu item is clicked (auto-navigate on mobile)
+  document.querySelectorAll('.menu-item a').forEach(link => {
+    link.addEventListener('click', () => {
+      if (window.innerWidth <= 767) closeSidebar();
+    });
+  });
+})();
+
 initPage();

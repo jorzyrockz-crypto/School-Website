@@ -2,7 +2,7 @@
 <html lang="en" data-theme="blue-gold">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
   <title>Apex Integrated School Portal</title>
 
   <!-- PWA Meta Tags -->
@@ -26,9 +26,10 @@
   <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=6">
-  <link rel="stylesheet" href="css/layout.css?v=6">
-  <link rel="stylesheet" href="css/components.css?v=6">
+  <link rel="stylesheet" href="css/variables.css?v=9">
+  <link rel="stylesheet" href="css/layout.css?v=9">
+  <link rel="stylesheet" href="css/components.css?v=9">
+  <link rel="stylesheet" href="css/mobile.css?v=9">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </head>
 <body>
@@ -55,6 +56,9 @@
       </div>
     </div>
   </div>
+  <!-- Mobile Sidebar Overlay Backdrop -->
+  <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
   <!-- ================= UNIFIED FB-STYLE CONTAINER ================= -->
   <div class="portal-container">
     
@@ -296,7 +300,7 @@
             <button class="btn-primary" onclick="window.location.hash='#/home'; setTimeout(() => document.getElementById('btn-add-agenda-event').click(), 100);" style="display:none;" id="btn-calendar-add-event"><ion-icon name="add"></ion-icon> Create Event</button>
           </div>
 
-          <div style="display:grid; grid-template-columns:minmax(0, 650px) 380px; gap:2rem; align-items:start; justify-content:center;">
+          <div style="display:grid; grid-template-columns:minmax(0, 650px) 380px; gap:2rem; align-items:start; justify-content:center;" class="calendar-layout-grid">
 
             <!-- LEFT: News Feed (Swapped) -->
             <div style="display:flex; flex-direction:column; gap:1.5rem;">
@@ -894,12 +898,12 @@
   <div id="toast" class="toast">Action completed successfully!</div>
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=6"></script>
-  <script src="js/auth.js?v=6"></script>
-  <script src="js/feed.js?v=6"></script>
-  <script src="js/dashboard.js?v=6"></script>
-  <script src="js/router.js?v=6"></script>
-  <script src="js/main.js?v=6"></script>
+  <script src="js/db.js?v=9"></script>
+  <script src="js/auth.js?v=9"></script>
+  <script src="js/feed.js?v=9"></script>
+  <script src="js/dashboard.js?v=9"></script>
+  <script src="js/router.js?v=9"></script>
+  <script src="js/main.js?v=9"></script>
 
   <!-- PWA Service Worker Registration -->
   <script>

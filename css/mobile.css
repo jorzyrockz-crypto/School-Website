@@ -1,0 +1,635 @@
+/*
+ * ============================================================
+ *  TECNO CAMON 20 PRO — MOBILE OPTIMISATION SHEET
+ *  Target: 360 × 800 CSS pixels  |  DPR 3  |  AMOLED 120Hz
+ *  Breakpoint: ≤ 480px (safe net), locked tighter at ≤ 360px
+ * ============================================================
+ */
+
+/* ── 1. GLOBAL OVERFLOW GUARD ─────────────────────────────── */
+@media (max-width: 480px) {
+  html, body {
+    overflow-x: hidden;
+    /* Prevent any rogue element from blowing the viewport */
+    max-width: 100vw;
+  }
+
+  /* Every element respects the box model */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    max-width: 100%;
+  }
+
+  /* Calendar view fixed grid → single column */
+  .calendar-layout-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+}
+
+
+/* ── 2. VIEWPORT META ENFORCEMENT ────────────────────────── */
+/* (handled in HTML, reinforced here for PWA standalone mode) */
+@media (max-width: 360px) {
+  html {
+    font-size: 15px; /* slightly tighter base so rem units fit */
+  }
+}
+
+
+/* ── 3. HEADER ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .portal-header {
+    padding: 0 0.6rem;
+    height: 54px;
+    gap: 0.4rem;
+  }
+
+  /* School name in header — truncate if too long */
+  #school-portal-name {
+    font-size: 0.88rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+  }
+
+  /* Hamburger button */
+  #btn-sidebar-toggle {
+    display: flex !important;
+    font-size: 1.4rem;
+    padding: 0;
+    flex-shrink: 0;
+  }
+
+  /* Action buttons row in header */
+  .header-actions {
+    gap: 0.3rem;
+    flex-shrink: 0;
+  }
+
+  .header-action-btn {
+    width: 36px;
+    height: 36px;
+    font-size: 1.15rem;
+  }
+
+  /* Dropdown menus — must never exceed viewport */
+  .header-dropdown {
+    position: fixed !important;
+    /* Centre-align dropdowns on mobile */
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    top: 58px !important;
+    width: calc(100vw - 1.5rem) !important;
+    max-width: 340px;
+    max-height: calc(100vh - 80px);
+    overflow-y: auto;
+    border-radius: var(--radius-md);
+    z-index: 999;
+  }
+
+  /* Profile dropdown stays right-aligned on small screens */
+  #profile-dropdown-menu {
+    left: auto !important;
+    right: 0.75rem !important;
+    transform: none !important;
+    width: calc(100vw - 1.5rem) !important;
+    max-width: 300px;
+  }
+}
+
+
+/* ── 4. SIDEBAR ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .portal-sidebar {
+    /* Limit sidebar to 80% of screen width so content is hinted */
+    width: min(280px, 82vw);
+    transform: translateX(-100%);
+  }
+
+  .portal-sidebar.mobile-open {
+    transform: translateX(0);
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.45);
+  }
+
+  .portal-main {
+    margin-left: 0 !important;
+  }
+
+  /* Sidebar brand — prevent overflow */
+  .sidebar-brand-name {
+    font-size: 0.88rem;
+  }
+
+  /* Menu items — tighter */
+  .menu-item a {
+    padding: 0.65rem 1rem;
+    margin: 0 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+
+/* ── 5. WORKSPACE / FEED CONTAINER ───────────────────────── */
+@media (max-width: 480px) {
+  .portal-workspace {
+    padding: 0.6rem 0.6rem 5rem; /* bottom padding for floating elements */
+  }
+
+  /* Sections grid → single column */
+  .sections-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  /* Calendar view two-column grid → single column */
+  #view-calendar > div[style*="grid-template-columns"] {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+  }
+}
+
+
+/* ── 6. FEED FILTER BAR ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .feed-filter-bar {
+    /* Negative margins match the 0.6rem workspace padding */
+    margin-left: -0.6rem;
+    margin-right: -0.6rem;
+    padding-left: 0.6rem;
+    padding-right: 0.6rem;
+    /* Sticky just under the 54px header */
+    top: 54px;
+    gap: 0.35rem;
+  }
+
+  .filter-pill {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.78rem;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .filter-pill ion-icon {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* ── 7. POST CARDS ────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .news-card {
+    padding: 0.85rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  /* All text must wrap, never clip */
+  .news-card,
+  .news-card p,
+  .news-card h1, .news-card h2, .news-card h3,
+  .news-title,
+  .post-body-text {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Post title */
+  .news-title {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  /* Post author row */
+  .post-author-meta {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  /* Post images — full width, max height */
+  .news-card img:not(.profile-avatar):not(.thread-avatar):not(.story-avatar) {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--radius-sm);
+  }
+}
+
+
+/* ── 8. COMPOSE / CREATE POST BOX ────────────────────────── */
+@media (max-width: 480px) {
+  #fb-create-post-box {
+    padding: 0.85rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Composer textarea */
+  #composer-main-input {
+    font-size: 0.9rem !important;
+    padding: 0.7rem 1rem !important;
+  }
+
+  /* Post action trigger buttons row */
+  #fb-create-post-box > div:last-child {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  /* Each action trigger button */
+  .post-action-btn {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.5rem;
+    gap: 0.25rem;
+  }
+
+  .post-action-btn ion-icon {
+    font-size: 1rem;
+  }
+}
+
+
+/* ── 9. REACTION / ACTION BARS ────────────────────────────── */
+@media (max-width: 480px) {
+  /* Reaction pills — wrap freely */
+  .reactions-bar {
+    flex-wrap: wrap;
+    gap: 0.3rem;
+    padding-top: 0.75rem;
+  }
+
+  .reaction-btn {
+    font-size: 0.72rem;
+    padding: 0.25rem 0.55rem;
+    border-radius: 50px;
+  }
+
+  /* Like/Comment/Share actions row */
+  .post-actions-row {
+    flex-wrap: wrap;
+    gap: 0.2rem;
+  }
+
+  .btn-reaction {
+    font-size: 0.78rem;
+    padding: 0.35rem 0.5rem;
+  }
+
+  .btn-reaction ion-icon {
+    font-size: 1rem;
+  }
+}
+
+
+/* ── 10. SIDEBAR WIDGETS (right column on home) ───────────── */
+@media (max-width: 480px) {
+  .sidebar-widget {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  /* Agenda list */
+  #agenda-widget-list {
+    max-height: 200px;
+  }
+
+  #btn-view-calendar {
+    margin-top: 1rem;
+  }
+}
+
+
+/* ── 11. CALENDAR VIEW ────────────────────────────────────── */
+@media (max-width: 480px) {
+  #view-calendar > div:first-child {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  #btn-calendar-add-event {
+    font-size: 0.8rem;
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+
+/* ── 12. DASHBOARD GRIDS ──────────────────────────────────── */
+@media (max-width: 480px) {
+  .dash-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem;
+  }
+
+  /* Admin "span 2" card reset */
+  .dash-card[style*="span 2"] {
+    grid-column: span 1 !important;
+  }
+
+  .dash-card {
+    padding: 1rem;
+  }
+}
+
+
+/* ── 13. ABOUT / GRID-2 ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .grid-profile {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Hero image in About section */
+  .hero-image {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: var(--radius-md);
+  }
+
+  /* Faculty grid — 2 columns on 360px */
+  #view-about > div[style*="auto-fit"] {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 1rem !important;
+  }
+}
+
+
+/* ── 14. TRANSPARENCY TABLE ───────────────────────────────── */
+@media (max-width: 480px) {
+  .transparency-table th,
+  .transparency-table td {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.78rem;
+    word-break: break-word;
+  }
+}
+
+
+/* ── 15. MESSAGES / CHAT VIEW ─────────────────────────────── */
+@media (max-width: 480px) {
+  #view-messages {
+    height: calc(100vh - 54px) !important;
+  }
+
+  .chat-container {
+    grid-template-columns: 1fr !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+
+  /* Thread list full-width by default */
+  .chat-container:not(.chat-active-window) .chat-threads {
+    display: flex !important;
+    width: 100% !important;
+  }
+  .chat-container:not(.chat-active-window) .chat-window {
+    display: none !important;
+  }
+  .chat-container.chat-active-window .chat-threads {
+    display: none !important;
+  }
+  .chat-container.chat-active-window .chat-window {
+    display: flex !important;
+    width: 100% !important;
+  }
+
+  #btn-chat-back {
+    display: flex !important;
+  }
+
+  /* Chat bubble width */
+  .message-bubble {
+    max-width: 80%;
+  }
+
+  /* Chat input bar */
+  .chat-input-bar {
+    padding: 0.5rem 0.4rem;
+    gap: 0.3rem;
+  }
+
+  .chat-window-header {
+    padding: 0.6rem 0.75rem;
+  }
+
+  /* Thread snippet width */
+  .thread-snippet {
+    max-width: 160px;
+  }
+}
+
+
+/* ── 16. MODALS ───────────────────────────────────────────── */
+@media (max-width: 480px) {
+  /* Announcement modal */
+  #announcement-modal {
+    width: calc(100vw - 1.5rem) !important;
+    max-width: none !important;
+    padding: 1.25rem !important;
+    border-radius: var(--radius-md) !important;
+    /* Stick near top on tall screens so keyboard doesn't cover it */
+    top: 5vh !important;
+    transform: translate(-50%, 0) !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* Create group chat modal */
+  #create-group-modal > form {
+    width: calc(100vw - 1.5rem) !important;
+    padding: 1.25rem !important;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  /* Manage sources modal */
+  #modal-manage-sources > div {
+    width: calc(100vw - 1.5rem) !important;
+    padding: 1.25rem !important;
+    max-height: 85vh;
+    overflow-y: auto;
+  }
+
+  /* Modal action rows — stack on very narrow */
+  #announcement-modal > form > div:last-child,
+  #create-group-modal > form > div:last-child,
+  #modal-manage-sources > div > div:last-child {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  /* Form controls in modals */
+  .modal-footer-btns button,
+  #announcement-modal button,
+  #create-group-modal button {
+    min-width: 0;
+    flex: 1;
+  }
+
+  /* Emoji picker — constrained to viewport */
+  #emoji-picker {
+    width: calc(100vw - 2rem) !important;
+    max-width: 300px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    bottom: 80px !important;
+  }
+}
+
+
+/* ── 17. LOGIN SCREEN ─────────────────────────────────────── */
+@media (max-width: 480px) {
+  #login-screen-overlay {
+    padding: 1rem;
+    align-items: flex-start;
+    padding-top: 10vh;
+  }
+
+  #login-screen-overlay > div {
+    padding: 1.75rem 1.25rem;
+    border-radius: var(--radius-md);
+    max-width: 100%;
+  }
+
+  #login-screen-overlay button {
+    font-size: 0.9rem;
+    padding: 0.65rem 1rem;
+  }
+}
+
+
+/* ── 18. FORMS ────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  .form-control {
+    font-size: 16px; /* Prevents iOS/Android zoom-on-focus */
+    padding: 0.55rem 0.7rem;
+  }
+
+  .btn-action {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+  }
+
+  .btn-secondary {
+    padding: 0.65rem 1rem;
+    font-size: 0.88rem;
+  }
+
+  /* Composer audience & submit button row */
+  #fb-create-post-box div[style*="justify-content:space-between"][style*="flex-wrap"] {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+
+/* ── 19. PROFILE SETTINGS VIEW ───────────────────────────── */
+@media (max-width: 480px) {
+  #view-profile {
+    /* Ensure consistent padding */
+  }
+
+  #view-profile h2 {
+    font-size: 1.15rem;
+    word-break: break-word;
+  }
+
+  /* Theme picker — 3 per row on 360px */
+  .theme-picker-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .theme-card {
+    padding: 0.5rem;
+  }
+
+  .theme-card span {
+    font-size: 0.68rem;
+  }
+}
+
+
+/* ── 20. TOAST & UPDATE BANNER ────────────────────────────── */
+@media (max-width: 480px) {
+  .toast {
+    bottom: 1rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    text-align: center;
+    font-size: 0.82rem;
+  }
+
+  /* Update/What's new banner */
+  #update-banner {
+    width: calc(100vw - 1.5rem) !important;
+    padding: 1rem !important;
+    bottom: 1rem !important;
+  }
+}
+
+
+/* ── 21. FLOATING CHAT (hidden on mobile, just in case) ───── */
+@media (max-width: 480px) {
+  .chat-heads-dock,
+  .floating-chat-window {
+    display: none !important;
+  }
+}
+
+
+/* ── 22. SCHEDULE ITEMS ───────────────────────────────────── */
+@media (max-width: 480px) {
+  .schedule-item {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    padding: 0.6rem 0.75rem;
+  }
+
+  .schedule-time {
+    font-size: 0.82rem;
+  }
+}
+
+
+/* ── 23. HERO TITLES ──────────────────────────────────────── */
+@media (max-width: 480px) {
+  .hero-title {
+    font-size: 1.4rem;
+    line-height: 1.3;
+    word-break: break-word;
+  }
+
+  h1 { font-size: 1.35rem; }
+  h2 { font-size: 1.1rem; }
+  h3 { font-size: 0.95rem; }
+}
+
+
+/* ── 24. SCROLLBAR HIDE ON MOBILE ─────────────────────────── */
+@media (max-width: 480px) {
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+}
+
+
+/* ── 25. SAFE AREA (notch / gesture bar) ─────────────────── */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  @media (max-width: 480px) {
+    .portal-workspace {
+      padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+    }
+  }
+}

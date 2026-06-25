@@ -922,28 +922,81 @@
 
 /* Responsive constraints */
 @media (max-width: 767px) {
-  #btn-sidebar-toggle {
-    display: flex !important;
+  /* ── Global overflow guard ── */
+  body {
+    overflow-x: hidden;
   }
+
+  /* ── Header ── */
+  .portal-header {
+    padding: 0 0.75rem;
+  }
+  .header-title {
+    font-size: 1rem;
+  }
+  /* Prevent header dropdowns from blowing past screen edges */
+  .header-dropdown {
+    width: min(320px, calc(100vw - 1.5rem));
+    right: 0;
+  }
+
+  /* ── Workspace / feed ── */
   .portal-workspace {
-    padding: 1rem;
+    padding: 0.75rem;
   }
+  /* Undo the negative margins that bleed past the viewport */
+  .feed-filter-bar {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  /* ── Grid layouts ── */
   .sections-grid {
     grid-template-columns: 1fr;
   }
-  .portal-sidebar {
-    transform: translateX(-100%);
-    box-shadow: none;
+  .dash-grid {
+    grid-template-columns: 1fr;
   }
-  .portal-sidebar.active {
-    transform: translateX(0);
-    box-shadow: 4px 0 24px rgba(0,0,0,0.25);
+
+  /* ── Post cards ── */
+  .news-card {
+    padding: 1rem;
+    overflow: hidden;         /* clip any overflow inside card */
   }
-  .portal-main {
-    margin-left: 0;
+  .news-title,
+  .news-card p,
+  .news-card h1,
+  .news-card h2,
+  .news-card h3 {
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
-  
-  /* Mobile Chat Toggling logic styles */
+
+  /* ── Reaction / action buttons row ── */
+  .reactions-bar {
+    flex-wrap: wrap;
+    gap: 0.35rem;
+  }
+  .reaction-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+  /* Post action row (Like / Comment / Share) */
+  .post-actions-row {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .post-action-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.5rem;
+  }
+
+  /* ── Chat ── */
+  #btn-sidebar-toggle {
+    display: flex !important;
+  }
   #btn-chat-back {
     display: flex !important;
   }
@@ -964,11 +1017,8 @@
     display: flex !important;
     width: 100% !important;
   }
-
-  .dash-grid {
-    grid-template-columns: 1fr;
-  }
 }
+
 
 /* Reactions and Interactions styling */
 .btn-reaction {
