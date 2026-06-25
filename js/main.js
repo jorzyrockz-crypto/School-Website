@@ -225,9 +225,20 @@ dropdownTriggers.forEach(({triggerId, menuId}) => {
   }
 });
 
-// Click outside to close all dropdowns
-document.addEventListener('click', () => {
+// Click outside to close all dropdowns and floating chat
+document.addEventListener('click', (e) => {
   document.querySelectorAll('.header-dropdown').forEach(d => d.classList.remove('show'));
+  
+  // Close floating chat if clicked outside
+  const chatWindow = document.getElementById('floating-chat-window');
+  if (chatWindow && chatWindow.style.display === 'flex') {
+    // If click is not inside the chat window AND not inside the dock
+    if (!chatWindow.contains(e.target) && !e.target.closest('#chat-heads-dock')) {
+      if (typeof closeFloatingChat === 'function') {
+        closeFloatingChat();
+      }
+    }
+  }
 });
 
 // Floating Chat Window Logic
@@ -288,6 +299,11 @@ function closeContactDrawer() {
 async function openFloatingChat(encodedUser) {
   const targetUser = JSON.parse(decodeURIComponent(encodedUser));
   activeFloatingChatThread = targetUser;
+  
+  // Auto-close bubble from dock when clicked
+  if (window.dismissChatHead) {
+    window.dismissChatHead(targetUser.uid, null);
+  }
   
   const chatWindow = document.getElementById('floating-chat-window');
   if (!chatWindow) return;
