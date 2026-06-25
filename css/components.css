@@ -1817,7 +1817,6 @@
 }
 
 /* --- FAILSAFE CLASS TRACKER FOR PORTRAIT MODE --- */
-@media screen and (max-width: 1366px) {
   .is-portrait .portal-container {
     display: flex !important;
     flex-direction: row !important;
@@ -1851,7 +1850,6 @@
   .is-portrait .collapsible-widget-row .sidebar-widget { flex: 1; height: 320px; overflow-y: auto; }
   .is-portrait .collapsible-widget-row.collapsed { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; overflow: hidden !important; pointer-events: none !important; }
   .is-portrait .grid-profile { grid-template-columns: 1fr !important; max-width: 100% !important; }
-}
 
 /* --- TABLET PORTRAIT BOTTOM NAV --- */
 :root {
@@ -1941,8 +1939,6 @@
   color: var(--nav-active);
 }
 
-@media screen and (max-width: 1366px) {
   .is-portrait #tablet-bottom-nav {
-    display: flex;
+    display: flex !important;
   }
-}
