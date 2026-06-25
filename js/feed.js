@@ -58,6 +58,18 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
 
   const announcements = await dbService.getAnnouncements();
   
+  // --- Dynamic What's New & Version Sync ---
+  const systemUpdate = announcements.find(a => a.author === "System Auto-Update");
+  if (systemUpdate) {
+    if (window.showSystemUpdateBanner) {
+      window.showSystemUpdateBanner(systemUpdate.id, systemUpdate.title, systemUpdate.content);
+    }
+    if (window.updateSidebarVersion) {
+      window.updateSidebarVersion(systemUpdate.id.substring(0, 7));
+    }
+  }
+  // -----------------------------------------
+  
   const userRole = activeUser ? activeUser.role : 'guest';
   let filtered = announcements.filter(a => {
     // 1. Status Filter

@@ -6,8 +6,9 @@ const APP_VERSION = '1.6.0';
 // ==========================================
 // UPDATE BANNER
 // ==========================================
-function showUpdateBannerIfNew() {
-  const seenKey = 'seen_update_v' + APP_VERSION;
+function showSystemUpdateBanner(commitId, title, htmlContent) {
+  if (!commitId) return;
+  const seenKey = 'seen_update_' + commitId;
   if (localStorage.getItem(seenKey)) return;
 
   const banner = document.createElement('div');
@@ -29,12 +30,10 @@ function showUpdateBannerIfNew() {
           <div style="background:rgba(255,255,255,0.2); border-radius:8px; padding:0.35rem 0.6rem; font-size:0.7rem; font-weight:800; letter-spacing:1px; text-transform:uppercase;">v${APP_VERSION}</div>
           <span style="font-size:1rem; font-weight:700;">&#x1F389; What&rsquo;s New</span>
         </div>
-        <ul style="margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:0.4rem;">
-          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F50D;</span> Smart RSS auto-detection &mdash; paste any site URL!</li>
-          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F4F0;</span> Feed sources now show real names from the feed</li>
-          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F5BC;&#xFE0F;</span> Styled fallback thumbnails for image-less news</li>
-          <li style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; opacity:0.95;"><span style="font-size:1rem;">&#x1F504;</span> Live feed &mdash; auto-refreshes every 15 min + manual refresh button</li>
-        </ul>
+        <div style="font-weight:600; margin-bottom:0.4rem; font-size:0.95rem;">${title}</div>
+        <div style="font-size:0.85rem; opacity:0.95; line-height:1.4;">
+          ${htmlContent}
+        </div>
       </div>
       <button onclick="document.getElementById('update-banner').remove()" style="background:rgba(255,255,255,0.15); border:none; color:white; border-radius:50%; width:28px; height:28px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; line-height:1;">&times;</button>
     </div>
@@ -58,6 +57,7 @@ function showUpdateBannerIfNew() {
     }
   }, 20000);
 }
+window.showSystemUpdateBanner = showSystemUpdateBanner;
 
 function applyTheme(themeName, customLogo = null) {
   const html = document.documentElement;
@@ -654,12 +654,19 @@ window.addEventListener('storage', (e) => {
 })();
 
 // ── Dynamic Version Injection ───────────────────────────────────────────────
-(function() {
+// ── Dynamic Version Injection ───────────────────────────────────────────────
+window.updateSidebarVersion = function(hash) {
   const versionLabel = document.getElementById('sidebar-version-text');
   if (versionLabel) {
-    versionLabel.textContent = 'School Portal v' + APP_VERSION;
+    if (hash) {
+      versionLabel.textContent = 'School Portal v' + APP_VERSION + ' (' + hash + ')';
+    } else {
+      versionLabel.textContent = 'School Portal v' + APP_VERSION;
+    }
   }
-})();
+};
+// Initialize with default
+window.updateSidebarVersion();
 
 // ── Tablet Bottom Nav Bridge ───────────────────────────────────────────────
 (function() {
