@@ -296,14 +296,18 @@ const dbService = {
         
         if (validCommit) {
           const msgParts = validCommit.commit.message.split('\n');
-          const title = msgParts[0];
+          
+          // Strip out developer jargon like "feat(ui): " or "fix: "
+          let cleanTitle = msgParts[0].replace(/^(feat|fix|style|refactor|perf|chore|docs)(\([^)]+\))?:\s*/i, '');
+          cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1); // Capitalize first letter
+
           const content = msgParts.slice(1).join('\n').trim() || "Minor platform improvements deployed automatically.";
           
           const ghPost = {
             id: 'gh-update-' + validCommit.sha.substring(0,7),
             schoolId: 'default-school',
             type: 'announcement',
-            title: "✨ Live System Update: " + title,
+            title: "✨ Live System Update: " + cleanTitle,
             content: content.replace(/\n/g, '<br>'),
             author: "System Auto-Update",
             authorRole: "admin",
