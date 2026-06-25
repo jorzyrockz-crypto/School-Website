@@ -410,13 +410,17 @@
   /* Textarea inside the modal grows */
   #fb-create-post-box.composer-modal-active #composer-main-input {
     border-radius: 0 !important;
-    padding: 0 1rem !important;
-    font-size: 1.1rem !important;
+    padding: 0.5rem 0 !important;
+    font-size: 1.25rem !important;
+    line-height: 1.4 !important;
     flex: 1;
     height: 150px !important; /* Min height */
     background: transparent !important;
     white-space: pre-wrap !important;
     word-wrap: break-word !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: visible !important;
   }
 
   /* Expansion area takes remaining space */
