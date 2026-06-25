@@ -282,53 +282,66 @@ const dbService = {
   },
   getAnnouncements: async () => {
     const local = getLocalDB();
-    let feed = [...local.announcements];
     
-    // Auto-inject live GitHub update
+    // Auto-inject live GitHub updates into permanent local database
     try {
-      const ghData = sessionStorage.getItem('ghUpdate');
-      if (ghData) {
-        if (ghData !== 'none') feed.unshift(JSON.parse(ghData));
-      } else {
-        const res = await fetch('https://api.github.com/repos/jorzyrockz-crypto/School-Website/commits?per_page=5');
+      const ghFetched = sessionStorage.getItem('ghFetched');
+      if (!ghFetched) {
+        const res = await fetch('https://api.github.com/repos/jorzyrockz-crypto/School-Website/commits?per_page=10');
         const commits = await res.json();
-        const validCommit = commits.find(c => c.commit.message.match(/^(feat|fix|style|refactor|perf|chore)/i));
         
-        if (validCommit) {
-          const msgParts = validCommit.commit.message.split('\n');
+        // Find valid commits and reverse so the oldest gets added first, preserving correct order
+        const validCommits = commits.filter(c => c.commit.message.match(/^(feat|fix|style|refactor|perf|chore)/i)).reverse();
+        
+        let newPostsAdded = false;
+        
+        validCommits.forEach(validCommit => {
+          const ghPostId = 'gh-update-' + validCommit.sha.substring(0,7);
           
-          // Strip out developer jargon like "feat(ui): " or "fix: "
-          let cleanTitle = msgParts[0].replace(/^(feat|fix|style|refactor|perf|chore|docs)(\([^)]+\))?:\s*/i, '');
-          cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1); // Capitalize first letter
+          // Check if this specific update is already saved in our database
+          if (!local.announcements.some(a => a.id === ghPostId)) {
+            const msgParts = validCommit.commit.message.split('\n');
+            
+            // Strip out developer jargon
+            let cleanTitle = msgParts[0].replace(/^(feat|fix|style|refactor|perf|chore|docs)(\([^)]+\))?:\s*/i, '');
+            cleanTitle = cleanTitle.charAt(0).toUpperCase() + cleanTitle.slice(1);
 
-          const content = msgParts.slice(1).join('\n').trim() || "Minor platform improvements deployed automatically.";
-          
-          const ghPost = {
-            id: 'gh-update-' + validCommit.sha.substring(0,7),
-            schoolId: 'default-school',
-            type: 'announcement',
-            title: "✨ Live System Update: " + cleanTitle,
-            content: content.replace(/\n/g, '<br>'),
-            author: "System Auto-Update",
-            authorRole: "admin",
-            authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=SystemBot&backgroundColor=eff6ff",
-            date: new Date(validCommit.commit.author.date).toISOString().split('T')[0],
-            status: "approved",
-            likes: [],
-            imageData: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80"
-          };
-          
-          sessionStorage.setItem('ghUpdate', JSON.stringify(ghPost));
-          feed.unshift(ghPost);
-        } else {
-          sessionStorage.setItem('ghUpdate', 'none');
+            const content = msgParts.slice(1).join('\n').trim() || "Minor platform improvements deployed automatically.";
+            
+            const ghPost = {
+              id: ghPostId,
+              schoolId: 'default-school',
+              type: 'announcement',
+              title: "✨ Live System Update: " + cleanTitle,
+              content: content.replace(/\n/g, '<br>'),
+              author: "System Auto-Update",
+              authorRole: "admin",
+              authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=SystemBot&backgroundColor=eff6ff",
+              date: new Date(validCommit.commit.author.date).toISOString(), // Store exact timestamp
+              status: "approved",
+              likes: [],
+              imageData: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80"
+            };
+            
+            local.announcements.unshift(ghPost);
+            newPostsAdded = true;
+          }
+        });
+        
+        if (newPostsAdded) {
+          // Sort by date to ensure newest posts are always at the top
+          local.announcements.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          saveLocalDB(local);
         }
+        
+        // Mark as fetched so we don't ping GitHub again until the next session
+        sessionStorage.setItem('ghFetched', 'true');
       }
     } catch(e) {
       console.log('Could not fetch GitHub updates', e);
     }
 
-    return feed;
+    return local.announcements;
   },
   addAnnouncement: async (content, type, imageData, audiences, extraData, status) => {
     const local = getLocalDB();
