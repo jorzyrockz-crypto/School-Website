@@ -329,10 +329,7 @@
     display: block;
   }
 
-  /* Shorten button labels on mobile */
-  #btn-action-announcement {
-    min-width: 76px !important;
-  }
+  /* Make the action buttons fluid now that the label is shorter */
 
   /* ── FULL SCREEN MODAL STATE (Facebook style) ── */
   @keyframes slideUpModal {
