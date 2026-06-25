@@ -282,7 +282,49 @@ const dbService = {
   },
   getAnnouncements: async () => {
     const local = getLocalDB();
-    return local.announcements;
+    let feed = [...local.announcements];
+    
+    // Auto-inject live GitHub update
+    try {
+      const ghData = sessionStorage.getItem('ghUpdate');
+      if (ghData) {
+        if (ghData !== 'none') feed.unshift(JSON.parse(ghData));
+      } else {
+        const res = await fetch('https://api.github.com/repos/jorzyrockz-crypto/School-Website/commits?per_page=5');
+        const commits = await res.json();
+        const validCommit = commits.find(c => c.commit.message.match(/^(feat|fix|style|refactor|perf|chore)/i));
+        
+        if (validCommit) {
+          const msgParts = validCommit.commit.message.split('\n');
+          const title = msgParts[0];
+          const content = msgParts.slice(1).join('\n').trim() || "Minor platform improvements deployed automatically.";
+          
+          const ghPost = {
+            id: 'gh-update-' + validCommit.sha.substring(0,7),
+            schoolId: 'default-school',
+            type: 'announcement',
+            title: "✨ Live System Update: " + title,
+            content: content.replace(/\n/g, '<br>'),
+            author: "System Auto-Update",
+            authorRole: "admin",
+            authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=SystemBot&backgroundColor=eff6ff",
+            date: new Date(validCommit.commit.author.date).toISOString().split('T')[0],
+            status: "approved",
+            likes: [],
+            imageData: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80"
+          };
+          
+          sessionStorage.setItem('ghUpdate', JSON.stringify(ghPost));
+          feed.unshift(ghPost);
+        } else {
+          sessionStorage.setItem('ghUpdate', 'none');
+        }
+      }
+    } catch(e) {
+      console.log('Could not fetch GitHub updates', e);
+    }
+
+    return feed;
   },
   addAnnouncement: async (content, type, imageData, audiences, extraData, status) => {
     const local = getLocalDB();
