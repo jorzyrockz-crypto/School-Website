@@ -643,7 +643,7 @@
 
 
 /* ── 15. MESSAGES / CHAT VIEW ─────────────────────────────── */
-@media (max-width: 480px) {
+@media (max-width: 767px) {
 
   /* The view fills exactly the screen below the header */
   #view-messages.active {
@@ -702,6 +702,7 @@
     width: 100% !important;
     height: 100%;
     flex: 1;
+    min-height: 0; /* prevent infinite flex expansion */
     background: var(--bg-secondary);
   }
 
@@ -721,6 +722,7 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 0.75rem;
+    min-height: 0; /* ensure scrolling instead of infinite expansion */
   }
 
   /* Input bar always visible, never covered by keyboard */
