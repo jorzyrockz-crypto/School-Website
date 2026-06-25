@@ -44,10 +44,12 @@ function switchView(viewName) {
   // Toggle visibility of route blocks
   document.querySelectorAll('.route-view').forEach(view => {
     view.style.display = 'none';
+    view.classList.remove('active');
   });
 
   const activeView = document.getElementById(`view-${viewName}`);
   if (activeView) {
+    activeView.classList.add('active');
     if (viewName === 'messages') {
       activeView.style.display = 'flex';
       activeView.style.flexDirection = 'column';

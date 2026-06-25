@@ -285,7 +285,7 @@ async function initMessagesPanel() {
   }
 }
 
-async function openChatWindow(targetUser) {
+async function openChatWindow(targetUser, forceNoIndicator = false) {
   activeChatThread = targetUser;
   document.getElementById('chat-header-avatar').src = targetUser.avatar;
   document.getElementById('chat-header-name').innerText = targetUser.name;
@@ -379,7 +379,7 @@ async function openChatWindow(targetUser) {
   };
   
   // Render typing indicator if there's no messages or randomly (1 in 3 chance) just for effect
-  if (messages.length > 0 && Math.random() > 0.6) {
+  if (!forceNoIndicator && messages.length > 0 && Math.random() > 0.6) {
     body.innerHTML = `
       <div class="chat-msg-row received">
         <img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">
@@ -499,7 +499,7 @@ if (chatForm) {
     await dbService.sendMessage(chatId, activeUser.uid, text, null);
     input.value = '';
     
-    openChatWindow(activeChatThread);
+    openChatWindow(activeChatThread, true);
     if (typeof activeFloatingChatThread !== 'undefined' && activeFloatingChatThread && activeFloatingChatThread.uid === activeChatThread.uid) {
       if (typeof openFloatingChat === 'function') openFloatingChat(encodeURIComponent(JSON.stringify(activeFloatingChatThread)).replace(/'/g, "%27"));
     }

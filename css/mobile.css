@@ -657,6 +657,13 @@
     padding: 0 !important;
   }
 
+  /* Workspace height adjustment for no-padding layouts on mobile (e.g. Chat) */
+  .portal-workspace.no-padding {
+    height: calc(100dvh - 54px) !important;
+    height: calc(100vh - 54px) !important;
+    overflow: hidden !important;
+  }
+
   /* Chat container fills the view */
   #chat-container-element {
     flex: 1;

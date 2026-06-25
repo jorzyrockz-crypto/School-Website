@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Smooth theme-switch animation on the whole page */
 html {
@@ -180,5 +180,11 @@ a {
 button, input, select, textarea {
   font-family: inherit;
   font-size: inherit;
+  color: inherit;
+}
+
+::placeholder {
+  color: var(--text-secondary);
+  opacity: 0.75;
 }
 
