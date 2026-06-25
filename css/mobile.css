@@ -647,10 +647,7 @@
 
   /* The view fills exactly the screen below the header */
   #view-messages.active {
-    /* Use dynamic viewport height — shrinks when virtual keyboard opens */
-    height: calc(100dvh - 54px);
-    /* Fallback for browsers without dvh support */
-    height: calc(100vh - 54px);
+    height: 100% !important;
     display: flex !important;
     flex-direction: column;
     overflow: hidden;
@@ -659,7 +656,6 @@
 
   /* Workspace height adjustment for no-padding layouts on mobile (e.g. Chat) */
   .portal-workspace.no-padding {
-    height: calc(100dvh - 54px) !important;
     height: calc(100vh - 54px) !important;
     overflow: hidden !important;
   }

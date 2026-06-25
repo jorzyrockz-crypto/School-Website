@@ -325,8 +325,8 @@ async function openChatWindow(targetUser, forceNoIndicator = false) {
       } else if (m.imageData) {
         mediaItems.push(m.imageData);
         content += `
-          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${m.imageData}', 'chat_${m.timestamp}')">
-            <img src="${m.imageData}" alt="Image" style="max-width:220px; max-height:200px; border-radius:8px; display:block; border:1px solid rgba(255,255,255,0.2);">
+          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in; max-width:100%;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${m.imageData}', 'chat_${m.timestamp}')">
+            <img src="${m.imageData}" alt="Image" style="max-width:100%; width:220px; max-height:200px; object-fit:cover; border-radius:8px; display:block; border:1px solid rgba(255,255,255,0.2);">
             <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
               <ion-icon name="download-outline"></ion-icon>
             </a>
@@ -343,11 +343,12 @@ async function openChatWindow(targetUser, forceNoIndicator = false) {
         receipt = `<div style="font-size:0.65rem; color:var(--text-secondary); text-align:right; margin-top:0.2rem;"><ion-icon name="checkmark-done-outline"></ion-icon> Seen</div>`;
       }
       
+      const bubbleCls = m.imageData && !m.text ? 'chat-msg-bubble chat-msg-media-bubble' : 'chat-msg-bubble';
       return `
         <div class="chat-msg-row ${rowCls}">
           ${!isOut ? `<img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">` : ''}
-          <div style="max-width:75%; display:flex; flex-direction:column; align-items:${isOut ? 'flex-end' : 'flex-start'};">
-            <div class="chat-msg-bubble">${content}</div>
+          <div style="max-width:75%; display:flex; flex-direction:column; align-items:${isOut ? 'flex-end' : 'flex-start'}; flex-shrink:0;">
+            <div class="${bubbleCls}">${content}</div>
             <span class="chat-msg-timestamp">${timeStr}</span>
             ${receipt}
           </div>
