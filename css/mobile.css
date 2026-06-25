@@ -375,56 +375,140 @@
 
 /* ── 15. MESSAGES / CHAT VIEW ─────────────────────────────── */
 @media (max-width: 480px) {
+
+  /* The view fills exactly the screen below the header */
   #view-messages {
-    height: calc(100vh - 54px) !important;
+    /* Use dynamic viewport height — shrinks when virtual keyboard opens */
+    height: calc(100dvh - 54px);
+    /* Fallback for browsers without dvh support */
+    height: calc(100vh - 54px);
+    display: flex !important;
+    flex-direction: column;
+    overflow: hidden;
+    padding: 0 !important;
   }
 
-  .chat-container {
-    grid-template-columns: 1fr !important;
-    border-radius: 0 !important;
+  /* Chat container fills the view */
+  #chat-container-element {
+    flex: 1;
+    min-height: 0;
+    display: flex !important;
+    flex-direction: column;
     border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    /* Single column — thread list OR chat window, never side by side */
+    grid-template-columns: 1fr !important;
+    height: 100% !important;
   }
 
-  /* Thread list full-width by default */
-  .chat-container:not(.chat-active-window) .chat-threads {
-    display: flex !important;
+  /* ── Thread list panel ── */
+  .chat-threads {
+    display: flex;
+    flex-direction: column;
     width: 100% !important;
-  }
-  .chat-container:not(.chat-active-window) .chat-window {
-    display: none !important;
-  }
-  .chat-container.chat-active-window .chat-threads {
-    display: none !important;
-  }
-  .chat-container.chat-active-window .chat-window {
-    display: flex !important;
-    width: 100% !important;
+    height: 100%;
+    overflow: hidden;
   }
 
+  /* Thread list scrolls internally */
+  .thread-list {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* ── Chat window panel ── */
+  .chat-window {
+    display: none; /* hidden until a thread is tapped */
+    flex-direction: column;
+    width: 100% !important;
+    /* Fill remaining height; subtract header + input bar */
+    height: 100%;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg-secondary);
+    z-index: 5;
+  }
+
+  /* When a thread is selected, show the chat window */
+  .chat-window.mobile-active {
+    display: flex !important;
+  }
+
+  /* Show back button whenever chat window is visible on mobile */
   #btn-chat-back {
     display: flex !important;
   }
 
-  /* Chat bubble width */
-  .message-bubble {
-    max-width: 80%;
+  /* ── Messages area scrolls, input stays at bottom ── */
+  .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 0.75rem;
   }
 
-  /* Chat input bar */
+  /* Input bar always visible, never covered by keyboard */
   .chat-input-bar {
+    flex-shrink: 0;
     padding: 0.5rem 0.4rem;
     gap: 0.3rem;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-color);
+    /* Stick to bottom of the flex column */
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
   }
 
+  /* Input field fills available space */
+  .chat-input-bar > div[style*="flex:1"] {
+    min-width: 0;
+  }
+
+  /* Prevent the input from being tiny */
+  #chat-msg-input {
+    font-size: 16px !important; /* prevents Android zoom */
+    min-height: 36px;
+  }
+
+  /* Chat header on mobile */
   .chat-window-header {
+    flex-shrink: 0;
     padding: 0.6rem 0.75rem;
+  }
+
+  /* Message bubbles */
+  .message-bubble,
+  .chat-msg-bubble {
+    max-width: 82%;
+    font-size: 0.88rem;
+    word-break: break-word;
+    overflow-wrap: break-word;
   }
 
   /* Thread snippet width */
   .thread-snippet {
-    max-width: 160px;
+    max-width: calc(100vw - 120px);
+  }
+
+  /* Hide media panel on mobile (info button still works) */
+  #chat-media-panel {
+    position: fixed !important;
+    top: 0; right: 0; bottom: 0;
+    width: min(280px, 85vw) !important;
+    z-index: 20;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+  }
+  #chat-media-panel[style*="display: flex"],
+  #chat-media-panel[style*="display:flex"] {
+    transform: translateX(0);
   }
 }
+
 
 
 /* ── 16. MODALS ───────────────────────────────────────────── */
