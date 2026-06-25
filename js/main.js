@@ -685,4 +685,21 @@ window.addEventListener('storage', (e) => {
   }
 })();
 
+// ── Tablet Bottom Nav Bridge ───────────────────────────────────────────────
+(function() {
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const targetName = item.getAttribute('data-target');
+      const originalLink = Array.from(document.querySelectorAll('.sidebar-menu a'))
+        .find(a => a.innerText.trim().includes(targetName));
+
+      if (originalLink) {
+        originalLink.click();
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+      }
+    });
+  });
+})();
+
 initPage();
