@@ -928,11 +928,68 @@
 }
 
 
-/* ── 21. FLOATING CHAT (hidden on mobile, just in case) ───── */
+/* ── 21. FLOATING CHAT (mobile-specific adjustments) ───── */
 @media (max-width: 480px) {
-  .chat-heads-dock,
+  .chat-heads-dock {
+    bottom: 75px;
+    right: 12px;
+  }
+}
+
+/* ── 21b. FLOATING CHAT WINDOW — mobile message bubble fixes ── */
+@media (max-width: 767px) {
+  /* Full-screen window — no overflow clipping on sides */
   .floating-chat-window {
-    display: none !important;
+    overflow: hidden;
+  }
+
+  /* The messages scroll area — prevent horizontal overflow */
+  #floating-chat-messages-body.chat-window-body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0.75rem 0.6rem;
+    /* Stop the body from shrinking below its min size */
+    min-height: 0;
+    flex: 1;
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+  /* Every message row fills the container width cleanly */
+  #floating-chat-messages-body .chat-msg-row {
+    width: 100%;
+    box-sizing: border-box;
+    overflow: visible;
+  }
+
+  /* Sent bubble wrapper — constrain to viewport, never clip */
+  #floating-chat-messages-body .chat-msg-row.sent > div {
+    max-width: 80%;
+    text-align: right;
+    flex-shrink: 0;
+    min-width: 0;
+  }
+
+  /* Received bubble wrapper */
+  #floating-chat-messages-body .chat-msg-row.received > div {
+    max-width: 75%;
+    text-align: left;
+    flex-shrink: 0;
+    min-width: 0;
+  }
+
+  /* The bubble itself — inline-block so it sizes to text, not squished */
+  #floating-chat-messages-body .chat-msg-bubble {
+    display: inline-block !important;
+    text-align: left;
+    width: auto;
+    max-width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    font-size: 0.92rem;
+    line-height: 1.45;
+    padding: 0.55rem 0.75rem;
   }
 }
 

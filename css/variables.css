@@ -6,7 +6,7 @@ html {
 }
 
 :root {
-  /* â”€â”€ DepEd Blue Gold (default) â”€â”€ */
+  /* 🔵🟡 School Blue Gold (default) 🔵🟡 */
   --primary:           #1877f2;
   --primary-hover:     #166fe5;
   --accent:            #d4af37;
@@ -31,6 +31,7 @@ html {
   --shadow-md:         0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
   --shadow-lg:         0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
   --sidebar-width:     280px;
+  --sidebar-collapsed: 68px;
   --transition:        all 0.2s ease;
 }
 

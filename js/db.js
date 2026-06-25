@@ -52,7 +52,7 @@ const DEFAULT_LOCAL_DB = {
       id: "ann2",
       schoolId: "default-school",
       title: "Class Suspensions Due to Inclement Weather",
-      content: "In compliance with DepEd local directives, classes in all levels are suspended today due to heavy monsoon rains. Stay safe inside, learners!",
+      content: "In compliance with local school directives, classes in all levels are suspended today due to heavy rains. Please stay safe and monitor our channels for further updates.",
       author: "Teacher Jose",
       authorRole: "teacher",
       authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",

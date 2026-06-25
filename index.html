@@ -26,10 +26,10 @@
   <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=32">
-  <link rel="stylesheet" href="css/layout.css?v=32">
-  <link rel="stylesheet" href="css/components.css?v=32">
-  <link rel="stylesheet" href="css/mobile.css?v=32">
+  <link rel="stylesheet" href="css/variables.css?v=44">
+  <link rel="stylesheet" href="css/layout.css?v=44">
+  <link rel="stylesheet" href="css/components.css?v=44">
+  <link rel="stylesheet" href="css/mobile.css?v=44">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </head>
 <body>
@@ -52,7 +52,7 @@
       </div>
 
       <div style="margin-top:2rem; font-size:0.85rem; color:var(--text-secondary);">
-        <p>By signing in, you agree to the DepEd Privacy Policy and Terms of Service.</p>
+        <p>By signing in, you agree to the School Privacy Policy and Terms of Service.</p>
       </div>
     </div>
   </div>
@@ -71,7 +71,7 @@
         </div>
         <div class="sidebar-brand-text">
           <span id="school-sidebar-name" class="sidebar-brand-name">Apex School</span>
-          <span class="sidebar-brand-tag">DepEd Portal</span>
+          <span class="sidebar-brand-tag">School Portal</span>
         </div>
       </div>
 
@@ -79,27 +79,30 @@
       <ul class="sidebar-menu" id="sidebar-menu-list">
         <!-- Public Navigation Links -->
         <li class="menu-item active" data-view="home">
-          <a href="#/home"><ion-icon name="home-outline"></ion-icon> School Feed</a>
+          <a href="#/home" data-label="School Feed"><ion-icon name="home-outline"></ion-icon> <span class="nav-label">School Feed</span></a>
         </li>
         <li class="menu-item" data-view="calendar">
-          <a href="#/calendar"><ion-icon name="calendar-outline"></ion-icon> News & Calendar</a>
+          <a href="#/calendar" data-label="News & Calendar"><ion-icon name="calendar-outline"></ion-icon> <span class="nav-label">News & Calendar</span></a>
         </li>
         <li class="menu-item" data-view="about">
-          <a href="#/about"><ion-icon name="school-outline"></ion-icon> About Us</a>
+          <a href="#/about" data-label="About Us"><ion-icon name="school-outline"></ion-icon> <span class="nav-label">About Us</span></a>
         </li>
         <li class="menu-item" data-view="transparency">
-          <a href="#/transparency"><ion-icon name="document-text-outline"></ion-icon> Transparency Board</a>
+          <a href="#/transparency" data-label="Transparency Board"><ion-icon name="document-text-outline"></ion-icon> <span class="nav-label">Transparency Board</span></a>
         </li>
 
         <!-- Authenticated Portal Links (Hidden until login) -->
         <li class="menu-item auth-only" data-view="dashboard" style="display:none; border-top: 1px solid rgba(255,255,255,0.1); padding-top:0.5rem;">
-          <a href="#/dashboard"><ion-icon name="grid-outline"></ion-icon> Profile Dashboard</a>
+          <a href="#/dashboard" data-label="Profile Dashboard"><ion-icon name="grid-outline"></ion-icon> <span class="nav-label">Profile Dashboard</span></a>
         </li>
       </ul>
 
-      <!-- Sidebar Footer (Version / Branding strip) -->
+      <!-- Sidebar Footer (Version / Branding strip + Collapse Toggle) -->
       <div class="sidebar-footer">
-        <span style="font-size:0.65rem; color:rgba(255,255,255,0.3); font-weight:600;">DepEd School Portal v3.1</span>
+        <span class="sidebar-version-label" id="sidebar-version-text" style="font-size:0.65rem; color:rgba(255,255,255,0.3); font-weight:600; overflow:hidden; white-space:nowrap; transition:opacity 0.2s, width 0.3s;">School Portal</span>
+        <button id="btn-sidebar-collapse" title="Collapse sidebar" aria-label="Toggle sidebar" style="background:rgba(255,255,255,0.07); border:none; color:rgba(255,255,255,0.5); border-radius:8px; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; transition:background 0.2s, color 0.2s, transform 0.2s;">
+          <ion-icon name="chevron-back-outline" id="collapse-icon"></ion-icon>
+        </button>
       </div>
     </aside>
 
@@ -427,8 +430,8 @@
 
         <!-- ================= VIEW: TRANSPARENCY BOARD ================= -->
         <div id="view-transparency" class="route-view" style="display:none;">
-          <h1 class="hero-title" style="text-align:center;">DepEd Transparency Board</h1>
-          <p style="text-align:center; color:var(--text-secondary); margin-bottom:3rem;">In compliance with national transparency laws and DepEd guidelines, we make our school credentials and reports available to the public.</p>
+          <h1 class="hero-title" style="text-align:center;">School Transparency Board</h1>
+          <p style="text-align:center; color:var(--text-secondary); margin-bottom:3rem;">In compliance with the national mandate for transparency in educational institutions, we make our school credentials and reports available to the public.</p>
           
           <div class="news-card">
             <h2 class="widget-title">Citizen's Charter & Reports</h2>
@@ -525,7 +528,7 @@
 
           <!-- View: ADMIN PORTAL -->
           <div id="portal-view-admin" style="display:none;">
-            <h2>DepEd Administrator Dashboard</h2>
+            <h2>School Administrator Dashboard</h2>
             <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Manage school branding, content review, and attendance metrics.</p>
             
             <div class="dash-grid">
@@ -547,8 +550,8 @@
         </div>
 
         <!-- ================= VIEW: DIRECT MESSAGES ================= -->
-        <div id="view-messages" class="route-view" id="view-messages" style="display:none; padding:0;">
-          <div id="chat-container-element" class="chat-container" style="border:none; border-radius:0; height:100%; max-height:none; box-shadow:none; display:flex; margin:0;">
+        <div id="view-messages" class="route-view" style="display:none;">
+          <div id="chat-container-element" class="chat-container">
             <div class="chat-threads">
               <div style="padding:1rem 1rem 0 1rem;">
                 <h2 style="font-size:1.5rem;">Chats</h2>
@@ -706,7 +709,7 @@
                   <div class="theme-picker-grid">
                     <div class="theme-card" data-theme-val="blue-gold">
                       <div class="theme-preview-color" style="background:linear-gradient(135deg, #1877f2, #0d5bce); border: 2px solid #d4af37;"></div>
-                      <span style="font-size:0.75rem; font-weight:600;">DepEd Blue</span>
+                      <span style="font-size:0.75rem; font-weight:600;">School Blue</span>
                     </div>
                     <div class="theme-card" data-theme-val="forest-green">
                       <div class="theme-preview-color" style="background:linear-gradient(135deg, #2d9e6b, #1b7a50); border: 2px solid #95d5b2;"></div>
@@ -831,12 +834,29 @@
         <img id="floating-chat-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=MC&backgroundColor=0369a1" style="width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,0.2);">
         <div style="display:flex; flex-direction:column;">
           <span id="floating-chat-title" style="font-weight:700; font-size:0.95rem; line-height:1.2;">Main chat</span>
-          <span id="floating-chat-subtitle" style="font-size:0.75rem; opacity:0.8;">DepED Oquendo Elementary School</span>
+          <span id="floating-chat-subtitle" style="font-size:0.75rem; opacity:0.8;">Apex Elementary School</span>
         </div>
       </div>
-      <div class="chat-window-actions">
+      <div class="chat-window-actions" style="display:flex; gap:0.5rem; align-items:center;">
+        <!-- Media History Button -->
+        <button type="button" onclick="toggleFloatingMediaPanel()" title="Media History" style="background:none; border:none; color:rgba(255,255,255,0.8); font-size:1.2rem; cursor:pointer; display:flex; align-items:center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'"><ion-icon name="images-outline"></ion-icon></button>
         <button onclick="minimizeChatWindow()"><ion-icon name="remove"></ion-icon></button>
         <button onclick="closeChatWindow()"><ion-icon name="close"></ion-icon></button>
+      </div>
+    </div>
+    
+    <!-- Floating Media Panel overlay inside window -->
+    <div id="floating-chat-media-panel" class="chat-media-panel" style="display:none; position:absolute; top:48px; right:0; bottom:0; left:0; width:100%; background:var(--bg-secondary); overflow-y:auto; flex-direction:column; z-index:10;">
+      <div style="padding:1.5rem; border-bottom:1px solid var(--border-color); display:flex; flex-direction:column; align-items:center; text-align:center;">
+        <img id="floating-media-panel-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" style="width:80px; height:80px; border-radius:50%; margin-bottom:0.5rem; object-fit:cover;">
+        <h3 id="floating-media-panel-name" style="margin:0; font-size:1.1rem; color:var(--text-primary);">Shared Media</h3>
+        <button type="button" onclick="toggleFloatingMediaPanel()" style="margin-top:0.75rem; background:var(--bg-primary); border:1px solid var(--border-color); padding:0.4rem 1rem; border-radius:12px; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-primary);">Back to Chat</button>
+      </div>
+      <div style="padding:1rem; flex:1;">
+        <h4 style="font-size:0.9rem; margin-bottom:0.75rem; color:var(--text-primary);">Shared Photos & Files</h4>
+        <div id="floating-chat-media-grid" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:0.5rem;">
+          <!-- Populated dynamically -->
+        </div>
       </div>
     </div>
     
@@ -902,12 +922,12 @@
   <div id="toast" class="toast">Action completed successfully!</div>
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=34"></script>
-  <script src="js/auth.js?v=34"></script>
-  <script src="js/feed.js?v=34"></script>
-  <script src="js/dashboard.js?v=34"></script>
-  <script src="js/router.js?v=34"></script>
-  <script src="js/main.js?v=34"></script>
+  <script src="js/db.js?v=44"></script>
+  <script src="js/auth.js?v=44"></script>
+  <script src="js/feed.js?v=44"></script>
+  <script src="js/dashboard.js?v=44"></script>
+  <script src="js/router.js?v=44"></script>
+  <script src="js/main.js?v=44"></script>
 
   <!-- PWA Service Worker Registration -->
   <script>

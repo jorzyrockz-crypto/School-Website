@@ -273,6 +273,10 @@ async function openFloatingChat(encodedUser) {
   const chatWindow = document.getElementById('floating-chat-window');
   if (!chatWindow) return;
 
+  // Reset media panel visibility
+  const floatMediaPanel = document.getElementById('floating-chat-media-panel');
+  if (floatMediaPanel) floatMediaPanel.style.display = 'none';
+
   // Set Header Info
   document.getElementById('floating-chat-title').innerText = targetUser.name;
   document.getElementById('floating-chat-subtitle').innerText = targetUser.role.toUpperCase();
@@ -321,8 +325,8 @@ async function openFloatingChat(encodedUser) {
     if (isOut) {
       return `
         <div class="chat-msg-row sent">
-          <div style="display:flex; flex-direction:column; align-items:flex-end; max-width:85%;">
-            <div class="chat-msg-bubble bg-green">${content}</div>
+          <div style="max-width:85%; text-align:right; flex-shrink:0;">
+            <div class="chat-msg-bubble bg-green" style="display:inline-block; text-align:left;">${content}</div>
           </div>
         </div>
       `;
@@ -330,8 +334,8 @@ async function openFloatingChat(encodedUser) {
       return `
         <div class="chat-msg-row received">
           <img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">
-          <div style="display:flex; flex-direction:column; max-width:75%;">
-            <div class="chat-msg-bubble bg-dark">${content}</div>
+          <div style="max-width:75%; text-align:left; flex-shrink:0;">
+            <div class="chat-msg-bubble bg-dark" style="display:inline-block; text-align:left;">${content}</div>
           </div>
         </div>
       `;
@@ -444,6 +448,54 @@ function closeChatWindow() {
     setTimeout(() => {
       chatWindow.style.display = 'none';
     }, 300);
+  }
+}
+
+window.toggleFloatingMediaPanel = function() {
+  const panel = document.getElementById('floating-chat-media-panel');
+  if (panel) {
+    const isHidden = panel.style.display === 'none';
+    panel.style.display = isHidden ? 'flex' : 'none';
+    if (isHidden) {
+      populateFloatingMediaPanel();
+    }
+  }
+};
+
+async function populateFloatingMediaPanel() {
+  if (!activeFloatingChatThread || !activeUser) return;
+  
+  const avatarEl = document.getElementById('floating-media-panel-avatar');
+  const nameEl = document.getElementById('floating-media-panel-name');
+  const gridEl = document.getElementById('floating-chat-media-grid');
+  
+  if (avatarEl) avatarEl.src = activeFloatingChatThread.avatar;
+  if (nameEl) nameEl.innerText = activeFloatingChatThread.name;
+  
+  if (gridEl) {
+    const chatId = activeFloatingChatThread.isGroup ? activeFloatingChatThread.uid : [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
+    const messages = await dbService.getMessages(chatId);
+    
+    // Find all images in this chat
+    const mediaItems = [];
+    messages.forEach(m => {
+      if (m.imageData) {
+        mediaItems.push(m.imageData);
+      }
+    });
+    
+    if (mediaItems.length > 0) {
+      gridEl.innerHTML = mediaItems.map((src, i) => `
+        <div style="position:relative; width:100%; aspect-ratio:1; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${src}', 'float_media_${i}')">
+          <img class="media-item" src="${src}" style="width:100%; height:100%; display:block; border-radius:8px; object-fit:cover;">
+          <a href="${src}" download="media_${i}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
+            <ion-icon name="download-outline" style="font-size:0.8rem;"></ion-icon>
+          </a>
+        </div>
+      `).join('');
+    } else {
+      gridEl.innerHTML = `<p style="grid-column:1/-1; text-align:center; color:var(--text-secondary); font-size:0.85rem; padding:2rem 0;">No media shared yet</p>`;
+    }
   }
 }
 
@@ -601,6 +653,36 @@ window.addEventListener('storage', (e) => {
       if (window.innerWidth <= 767) closeSidebar();
     });
   });
+})();
+
+// ── Desktop Sidebar Collapse Toggle ────────────────────────────────────────
+(function () {
+  const collapseBtn = document.getElementById('btn-sidebar-collapse');
+  const sidebar = document.querySelector('.portal-sidebar');
+  
+  if (!collapseBtn || !sidebar) return;
+
+  // Check if sidebar was previously collapsed in localStorage
+  if (localStorage.getItem('sidebar_collapsed') === 'true') {
+    sidebar.classList.add('collapsed');
+  }
+
+  collapseBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.toggle('collapsed');
+    
+    // Save state
+    const isCollapsed = sidebar.classList.contains('collapsed');
+    localStorage.setItem('sidebar_collapsed', isCollapsed ? 'true' : 'false');
+  });
+})();
+
+// ── Dynamic Version Injection ───────────────────────────────────────────────
+(function() {
+  const versionLabel = document.getElementById('sidebar-version-text');
+  if (versionLabel) {
+    versionLabel.textContent = 'School Portal v' + APP_VERSION;
+  }
 })();
 
 initPage();

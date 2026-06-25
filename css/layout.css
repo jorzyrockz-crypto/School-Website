@@ -162,13 +162,15 @@
 }
 
 .sidebar-footer {
-  padding: 0.5rem 1.5rem 0.75rem;
+  padding: 0.5rem 0.75rem 0.75rem;
   border-top: 1px solid rgba(255,255,255,0.07);
   display: flex;
   align-items: center;
-  justify-content: center;
-  min-height: 36px;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 48px;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 /* Guest login box wrapper inside sidebar */
@@ -240,7 +242,145 @@
 
 /* ── Sidebar slide transition ── */
 .portal-sidebar {
-  transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background-color 0.4s ease, box-shadow 0.4s ease, transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Desktop collapsed sidebar (icon rail) ── */
+.portal-sidebar.collapsed {
+  width: var(--sidebar-collapsed);
+}
+
+.portal-sidebar.collapsed .sidebar-brand-text,
+.portal-sidebar.collapsed .sidebar-brand-name,
+.portal-sidebar.collapsed .sidebar-brand-tag,
+.portal-sidebar.collapsed .sidebar-profile,
+.portal-sidebar.collapsed .profile-name,
+.portal-sidebar.collapsed .profile-role,
+.portal-sidebar.collapsed .sidebar-version-label {
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  width: 0;
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+}
+
+/* Icon only — center icons in collapsed rail */
+.portal-sidebar.collapsed .menu-item a {
+  justify-content: center;
+  padding: 0;
+  margin: 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  position: relative;
+}
+
+/* Prevent translation shift when collapsed so circle stays centered */
+.portal-sidebar.collapsed .menu-item:hover a,
+.portal-sidebar.collapsed .menu-item.active a {
+  transform: none;
+}
+
+/* When collapsed, we need tooltips to bleed out of the sidebar, 
+   so we must disable overflow clipping on the menu container */
+.portal-sidebar.collapsed .sidebar-menu {
+  overflow: visible;
+}
+
+/* Tooltip on hover when collapsed */
+.portal-sidebar.collapsed .menu-item a::after {
+  content: attr(data-label);
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.85);
+  color: white;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0.15s;
+  z-index: 9999;
+}
+
+.portal-sidebar.collapsed .menu-item a:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Hide the text label spans inside menu links when collapsed */
+.portal-sidebar.collapsed .menu-item a span.nav-label {
+  display: none;
+}
+
+/* Collapse button rotates when collapsed */
+.portal-sidebar.collapsed #btn-sidebar-collapse {
+  transform: scaleX(-1);
+}
+
+/* Brand logo stays visible and centered */
+.portal-sidebar.collapsed .sidebar-brand {
+  justify-content: center;
+  padding: 1rem 0.5rem;
+}
+
+/* Profile area collapses to just avatar */
+.portal-sidebar.collapsed .sidebar-profile {
+  display: none;
+}
+
+/* Main content shifts when sidebar collapses */
+.portal-main {
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.portal-sidebar.collapsed ~ .portal-main,
+body:has(.portal-sidebar.collapsed) .portal-main {
+  margin-left: var(--sidebar-collapsed);
+}
+
+/* ── Tablet breakpoint (768–1199px): auto-narrow sidebar ── */
+@media (min-width: 768px) and (max-width: 1199px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+
+  .sidebar-brand-name {
+    font-size: 0.85rem;
+  }
+
+  .menu-item a {
+    font-size: 0.88rem;
+    padding: 0.65rem 1rem;
+    margin: 0 0.75rem;
+    gap: 0.6rem;
+  }
+
+  .sidebar-profile {
+    padding: 1rem;
+    margin: 0.75rem;
+  }
+
+  .profile-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .profile-name {
+    font-size: 0.88rem;
+  }
+
+  /* Content area gets more room */
+  .portal-workspace {
+    padding: 1.25rem 1rem;
+  }
 }
 
 /* ── Mobile overlay backdrop ── */
