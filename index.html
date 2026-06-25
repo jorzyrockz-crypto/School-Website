@@ -26,10 +26,10 @@
   <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=52">
-  <link rel="stylesheet" href="css/layout.css?v=52">
-  <link rel="stylesheet" href="css/components.css?v=52">
-  <link rel="stylesheet" href="css/mobile.css?v=52">
+  <link rel="stylesheet" href="css/variables.css?v=53">
+  <link rel="stylesheet" href="css/layout.css?v=53">
+  <link rel="stylesheet" href="css/components.css?v=53">
+  <link rel="stylesheet" href="css/mobile.css?v=53">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <!-- Instant Inline Orientation and Tablet Detector -->
   <script>
@@ -37,7 +37,7 @@
       function checkTabletOrientation() {
         var isPortrait = window.matchMedia('(orientation: portrait)').matches || (window.innerHeight > window.innerWidth);
         var target = document.documentElement;
-        if (isPortrait && window.innerWidth >= 500 && window.innerWidth <= 1366) {
+        if (isPortrait && window.innerWidth <= 1366) {
           target.classList.add('is-portrait');
           if (document.body) document.body.classList.add('is-portrait');
           console.log('[Inline Detection] Tablet Portrait detected. Applied is-portrait class.');
@@ -973,7 +973,7 @@
   <!-- Javascript Modules -->
   <script src="js/db.js?v=51"></script>
   <script src="js/auth.js?v=51"></script>
-  <script src="js/feed.js?v=51"></script>
+  <script src="js/feed.js?v=53"></script>
   <script src="js/dashboard.js?v=51"></script>
   <script src="js/router.js?v=51"></script>
   <script src="js/main.js?v=51"></script>

@@ -1278,7 +1278,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const body = document.body;
     const isPortrait = window.matchMedia('(orientation: portrait)').matches || (window.innerHeight > window.innerWidth);
     console.log('[Tablet Detection] Checked. isPortrait:', isPortrait, 'innerWidth:', window.innerWidth, 'innerHeight:', window.innerHeight);
-    if (isPortrait && window.innerWidth >= 500 && window.innerWidth <= 1366) {
+    if (isPortrait && window.innerWidth <= 1366) {
       body.classList.add('is-portrait');
       console.log('[Tablet Detection] Applied .is-portrait to body');
     } else {
