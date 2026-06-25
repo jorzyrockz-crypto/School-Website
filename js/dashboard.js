@@ -405,12 +405,24 @@ async function openChatWindow(targetUser) {
 }
 
 // Media Panel Toggle
-window.toggleMediaPanel = function() {
+window.toggleMediaPanel = function(e) {
+  if (e) e.stopPropagation();
   const panel = document.getElementById('chat-media-panel');
   if (panel) {
     panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
   }
 };
+
+// Close media panel on mobile if clicking outside of it
+document.addEventListener('click', (e) => {
+  const panel = document.getElementById('chat-media-panel');
+  // Only apply this logic if we are on a narrow screen where panel is fixed/floating
+  if (panel && panel.style.display === 'flex' && window.innerWidth <= 767) {
+    if (!panel.contains(e.target) && !e.target.closest('ion-icon[name="information-circle"]')) {
+      panel.style.display = 'none';
+    }
+  }
+});
 
 // Bind mobile back button
 const chatBackBtn = document.getElementById('btn-chat-back');
