@@ -232,6 +232,17 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Sidebar Hidden State ── */
+body.sidebar-hidden .portal-sidebar {
+  transform: translateX(-100%) !important;
+}
+
+body.sidebar-hidden .portal-main {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
 }
 
 .main-content {

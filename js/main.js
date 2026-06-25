@@ -530,32 +530,7 @@ async function initPage() {
     setTimeout(showUpdateBannerIfNew, 1200);
   }
 
-  // Mobile Navigation Toggler
-  const sidebarToggle = document.getElementById('btn-sidebar-toggle');
-  const sidebar = document.querySelector('.portal-sidebar');
-  if (sidebarToggle && sidebar) {
-    sidebarToggle.onclick = (e) => {
-      e.stopPropagation();
-      sidebar.classList.toggle('active');
-    };
-    
-    // Close sidebar when clicking outside on mobile
-    document.addEventListener('click', (e) => {
-      if (window.innerWidth <= 900 && sidebar.classList.contains('active') && !sidebar.contains(e.target)) {
-        sidebar.classList.remove('active');
-      }
-    });
-
-    // Close sidebar on navigation on mobile
-    const menuLinks = document.querySelectorAll('.menu-item a');
-    menuLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth <= 900) {
-          sidebar.classList.remove('active');
-        }
-      });
-    });
-  }
+  // Removed redundant sidebar logic (handled below in IIFE)
 }
 
 // ==========================================
@@ -641,7 +616,11 @@ window.addEventListener('storage', (e) => {
 
   toggleBtn.addEventListener('click', (e) => {
     e.stopPropagation();
-    sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+    if (window.innerWidth > 767) {
+      document.body.classList.toggle('sidebar-hidden');
+    } else {
+      sidebar.classList.contains('mobile-open') ? closeSidebar() : openSidebar();
+    }
   });
 
   // Close when tapping the overlay
@@ -678,6 +657,26 @@ window.addEventListener('storage', (e) => {
       }
     });
   });
+})();
+// ── Scroll Dock Toggle ──────────────────────────────────────────────────────
+(function() {
+  let lastScrollY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    if (!document.body.classList.contains('sidebar-hidden')) {
+      document.body.classList.remove('dock-visible');
+      lastScrollY = window.scrollY;
+      return;
+    }
+
+    const currentScrollY = window.scrollY;
+    // Show dock if scrolling up and past a threshold
+    if (currentScrollY < lastScrollY && currentScrollY > 50) {
+      document.body.classList.add('dock-visible');
+    } else if (currentScrollY > lastScrollY) {
+      document.body.classList.remove('dock-visible');
+    }
+    lastScrollY = currentScrollY;
+  }, { passive: true });
 })();
 
 initPage();
