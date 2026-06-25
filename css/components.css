@@ -751,6 +751,7 @@
   -webkit-backdrop-filter: blur(8px);
   padding: 0.5rem 0 0.5rem 0;
   border-bottom: none;
+  margin-top: -1.5rem; /* Tuck flush under top nav */
   margin-left: -1.5rem;
   margin-right: -1.5rem;
   padding-left: 1.5rem;
