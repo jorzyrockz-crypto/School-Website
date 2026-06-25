@@ -693,12 +693,8 @@
     display: none; /* hidden until a thread is tapped */
     flex-direction: column;
     width: 100% !important;
-    /* Fill remaining height; subtract header + input bar */
     height: 100%;
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
     background: var(--bg-secondary);
-    z-index: 5;
   }
 
   /* When a thread is selected, show the chat window */
