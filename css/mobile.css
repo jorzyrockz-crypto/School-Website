@@ -299,33 +299,56 @@
     display: none !important;
   }
 
-  /* Each action button — compact icon + short label pill */
+  /* Each action button — premium tall square with gradient border */
   .composer-actions .post-action-btn {
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
     flex-shrink: 0;
-    gap: 0.2rem !important;
-    padding: 0.35rem 0.65rem !important;
-    font-size: 0.68rem !important;
+    gap: 0.4rem !important;
+    padding: 0.75rem 0.5rem !important;
+    font-size: 0.75rem !important;
     font-weight: 600;
-    border-radius: var(--radius-sm);
+    border-radius: 12px;
     white-space: nowrap;
-    min-width: 60px;
+    min-width: 85px;
+    min-height: 85px;
     line-height: 1.2;
-    background: var(--bg-primary);
-    border: 1px solid transparent;
-    transition: background 0.15s ease, border-color 0.15s ease;
+    /* Gradient Border Magic */
+    border: 1.5px solid transparent;
+    background: linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
+                var(--btn-gradient, linear-gradient(to right, #ea4335, #fbbc04)) border-box;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .composer-actions .post-action-btn:active {
-    background: var(--bg-tint);
-    border-color: var(--border-color);
-    transform: scale(0.96);
+    transform: scale(0.95);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   }
 
-  /* Larger icon inside each pill */
+  /* Custom Gradient Colors per button */
+  .composer-actions .post-action-btn[data-type="announcement"] {
+    --btn-gradient: linear-gradient(135deg, #3b82f6, #6366f1);
+  }
+  .composer-actions .post-action-btn[data-type="photo"] {
+    --btn-gradient: linear-gradient(135deg, #ef4444, #f97316);
+  }
+  .composer-actions .post-action-btn[data-type="document"] {
+    --btn-gradient: linear-gradient(135deg, #0ea5e9, #2563eb);
+  }
+  .composer-actions .post-action-btn[data-type="event"] {
+    --btn-gradient: linear-gradient(135deg, #f59e0b, #ea580c);
+  }
+  .composer-actions .post-action-btn[data-type="poll"] {
+    --btn-gradient: linear-gradient(135deg, #10b981, #059669);
+  }
+  .composer-actions .post-action-btn[data-type="achievement"] {
+    --btn-gradient: linear-gradient(135deg, #d946ef, #8b5cf6);
+  }
+
+  /* Larger icon inside each card */
   .composer-actions .post-action-btn ion-icon {
-    font-size: 1.3rem !important;
+    font-size: 1.75rem !important;
     display: block;
   }
 
@@ -472,10 +495,6 @@
     padding-bottom: 0.5rem;
   }
   
-  /* Make buttons inside bottom action strip transparent to blend in */
-  #fb-create-post-box.composer-modal-active .composer-actions .post-action-btn {
-    background: transparent !important;
-  }
 }
 
 
