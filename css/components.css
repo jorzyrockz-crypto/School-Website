@@ -1790,6 +1790,12 @@
   }
   .portal-main {
     margin-left: 68px !important;
+    width: calc(100% - 68px) !important;
+    max-width: calc(100% - 68px) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-x: hidden !important; /* Prevents hidden widgets from causing a horizontal page scroll */
   }
   /* Hide text elements to simulate collapsed state */
   .sidebar-brand-text, .sidebar-brand-name, .sidebar-brand-tag,
@@ -1811,8 +1817,10 @@
   /* Adjust grid for narrow portrait tablet */
   .grid-2, .sections-grid {
     grid-template-columns: 1fr !important;
+    max-width: 100% !important;
   }
   .grid-profile {
     grid-template-columns: 1fr !important;
+    max-width: 100% !important;
   }
 }
