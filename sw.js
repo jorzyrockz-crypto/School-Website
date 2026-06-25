@@ -2,7 +2,7 @@
 // APEX SCHOOL PORTAL - SERVICE WORKER v1.6.0
 // ==========================================
 
-const CACHE_NAME = 'apex-school-v2.0.1';
+const CACHE_NAME = 'apex-school-v2.0.2';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -45,7 +45,7 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// ── Fetch: Network-first for RSS/API, Cache-first for assets ──────────────────
+// ── Fetch: Network-first for everything to ensure fresh UI ──────────────
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
@@ -60,20 +60,21 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache-first strategy for local static assets
+  // Network-first strategy for local static assets (HTML, CSS, JS)
+  // This ensures the app always loads the freshest code if online.
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-
-      return fetch(event.request).then((response) => {
-        // Cache valid responses
-        if (response && response.status === 200 && response.type === 'basic') {
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        }
-        return response;
-      }).catch(() => {
-        // Offline fallback for navigation requests
+    fetch(event.request).then((response) => {
+      // Cache valid responses immediately in background
+      if (response && response.status === 200 && response.type === 'basic') {
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+      }
+      return response;
+    }).catch(() => {
+      // If network fails (offline), fallback to cache instantly
+      return caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        // Ultimate offline fallback for navigation requests
         if (event.request.mode === 'navigate') {
           return caches.match('./index.html');
         }

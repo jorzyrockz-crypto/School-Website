@@ -912,17 +912,28 @@
         navigator.serviceWorker.register('./sw.js')
           .then((reg) => {
             console.log('[PWA] Service Worker registered:', reg.scope);
-            // Check for updates and notify user
+            
+            // Auto-update logic: bypass "waiting" state
             reg.addEventListener('updatefound', () => {
               const newWorker = reg.installing;
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[PWA] New version available — will activate on next visit.');
+                  console.log('[PWA] New update found! Auto-activating...');
+                  newWorker.postMessage({ type: 'SKIP_WAITING' });
                 }
               });
             });
           })
           .catch((err) => console.warn('[PWA] SW registration failed:', err));
+
+        // When the new worker takes control, gracefully reload the page
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+          if (!refreshing) {
+            refreshing = true;
+            window.location.reload();
+          }
+        });
       });
     }
   </script>
