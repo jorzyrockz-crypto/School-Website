@@ -646,7 +646,7 @@
 @media (max-width: 480px) {
 
   /* The view fills exactly the screen below the header */
-  #view-messages {
+  #view-messages.active {
     /* Use dynamic viewport height — shrinks when virtual keyboard opens */
     height: calc(100dvh - 54px);
     /* Fallback for browsers without dvh support */
