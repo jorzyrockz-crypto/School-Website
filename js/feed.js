@@ -1277,12 +1277,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function checkTabletOrientation() {
     const body = document.body;
     const isPortrait = window.matchMedia('(orientation: portrait)').matches || (window.innerHeight > window.innerWidth);
+    console.log('[Tablet Detection] Checked. isPortrait:', isPortrait, 'innerWidth:', window.innerWidth, 'innerHeight:', window.innerHeight);
     if (isPortrait && window.innerWidth >= 500 && window.innerWidth <= 1366) {
       body.classList.add('is-portrait');
+      console.log('[Tablet Detection] Applied .is-portrait to body');
     } else {
       body.classList.remove('is-portrait');
+      console.log('[Tablet Detection] Removed .is-portrait from body');
     }
   }
   window.addEventListener('resize', checkTabletOrientation);
   checkTabletOrientation(); // Run once immediately on load
+  
+  // Run again after short delays to ensure emulators/resizers that report desktop dimensions on initial tick are handled
+  setTimeout(checkTabletOrientation, 200);
+  setTimeout(checkTabletOrientation, 1000);
 });
