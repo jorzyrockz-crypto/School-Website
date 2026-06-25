@@ -976,9 +976,9 @@
   <script src="js/main.js?v=51"></script>
 
   <!-- PWA Update Notification -->
-  <div id="pwa-update-banner" style="display:none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--bg-secondary); border:1px solid var(--primary); padding:12px 20px; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.2); z-index:99999; align-items:center; gap:12px; font-size:0.9rem; color:var(--text-primary); white-space:nowrap;">
-    <span><ion-icon name="cloud-download-outline" style="vertical-align:middle; margin-right:4px;"></ion-icon> Update available!</span>
-    <button id="pwa-update-btn" class="btn-primary" style="padding:6px 16px; font-size:0.8rem; border-radius:20px;">Install</button>
+  <div id="pwa-update-banner" style="display:none; position:fixed; bottom:80px; left:50%; transform:translateX(-50%); background:var(--nav-bg, var(--bg-secondary)); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%); border:1px solid rgba(255,255,255,0.15); padding:10px 16px; border-radius:30px; box-shadow:0 10px 30px rgba(0,0,0,0.25); z-index:99999; align-items:center; gap:12px; font-size:0.9rem; color:var(--text-primary); white-space:nowrap;">
+    <span style="display:flex; align-items:center; font-weight:600;"><ion-icon name="cloud-download-outline" style="font-size:1.2rem; margin-right:8px; color:var(--primary);"></ion-icon> Update available!</span>
+    <button id="pwa-update-btn" class="btn-primary" style="padding:6px 16px; font-size:0.8rem; border-radius:20px; font-weight:600;">Install</button>
   </div>
 
   <!-- PWA Service Worker Registration -->
