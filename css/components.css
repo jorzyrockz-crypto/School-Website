@@ -1785,11 +1785,29 @@
 
 /* --- Improved Portrait Mode Auto-Collapse for Tablet --- */
 @media screen and (min-width: 500px) and (max-width: 1366px) and (orientation: portrait) {
-  .portal-sidebar { width: 68px !important; }
-  .portal-main { margin-left: 68px !important; width: calc(100% - 68px) !important; max-width: calc(100% - 68px) !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow-x: hidden !important; }
-  .sidebar-brand-text, .sidebar-brand-name, .sidebar-brand-tag, .sidebar-profile, .profile-name, .profile-role, .sidebar-version-label { display: none !important; }
-  .menu-item a { justify-content: center !important; padding: 0 !important; margin: 0 auto !important; width: 44px !important; height: 44px !important; border-radius: 50% !important; }
-  .menu-item a span.nav-label { display: none !important; }
+  .portal-container {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+  }
+  .portal-sidebar {
+    position: static !important;
+    flex: 0 0 220px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+  }
+  .portal-main {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-x: hidden !important;
+  }
   .grid-2 { grid-template-columns: 1fr !important; max-width: 100% !important; }
   .sections-grid { display: flex !important; flex-direction: column-reverse !important; width: 100% !important; max-width: 100% !important; }
   .collapsible-widget-row { display: flex !important; gap: 1rem !important; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease; max-height: 500px; overflow: hidden; flex-shrink: 0 !important; }
@@ -1800,11 +1818,29 @@
 
 /* --- FAILSAFE CLASS TRACKER FOR PORTRAIT MODE --- */
 @media screen and (max-width: 1366px) {
-  .is-portrait .portal-sidebar { width: 68px !important; }
-  .is-portrait .portal-main { margin-left: 68px !important; width: calc(100% - 68px) !important; max-width: calc(100% - 68px) !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow-x: hidden !important; }
-  .is-portrait .sidebar-brand-text, .is-portrait .sidebar-brand-name, .is-portrait .sidebar-brand-tag, .is-portrait .sidebar-profile, .is-portrait .profile-name, .is-portrait .profile-role, .is-portrait .sidebar-version-label { display: none !important; }
-  .is-portrait .menu-item a { justify-content: center !important; padding: 0 !important; margin: 0 auto !important; width: 44px !important; height: 44px !important; border-radius: 50% !important; }
-  .is-portrait .menu-item a span.nav-label { display: none !important; }
+  .is-portrait .portal-container {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    width: 100% !important;
+  }
+  .is-portrait .portal-sidebar {
+    position: static !important;
+    flex: 0 0 220px !important;
+    width: 220px !important;
+    min-width: 220px !important;
+  }
+  .is-portrait .portal-main {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    margin-left: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-x: hidden !important;
+  }
   .is-portrait .grid-2 { grid-template-columns: 1fr !important; max-width: 100% !important; }
   .is-portrait .sections-grid { display: flex !important; flex-direction: column-reverse !important; width: 100% !important; max-width: 100% !important; }
   .is-portrait .collapsible-widget-row { display: flex !important; gap: 1rem !important; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease; max-height: 500px; overflow: hidden; flex-shrink: 0 !important; }
