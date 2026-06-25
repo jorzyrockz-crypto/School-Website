@@ -347,8 +347,8 @@ async function openChatWindow(targetUser, forceNoIndicator = false) {
       return `
         <div class="chat-msg-row ${rowCls}">
           ${!isOut ? `<img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">` : ''}
-          <div style="width:max-content; max-width:75%; display:flex; flex-direction:column; align-items:${isOut ? 'flex-end' : 'flex-start'}; flex-shrink:1;">
-            <div class="${bubbleCls}">${content}</div>
+          <div style="max-width:75%; text-align:${isOut ? 'right' : 'left'}; flex-shrink:0;">
+            <div class="${bubbleCls}" style="display:inline-block; text-align:left;">${content}</div>
             <span class="chat-msg-timestamp">${timeStr}</span>
             ${receipt}
           </div>
