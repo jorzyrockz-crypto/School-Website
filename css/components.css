@@ -744,7 +744,7 @@
   margin-bottom: 1rem;
   scrollbar-width: none;
   position: sticky;
-  top: 59px; /* Just below the 60px header */
+  top: 0px; /* Sticks to top of scroll container (portal-workspace) */
   z-index: 30; /* Keep it below header (40) but above feed cards */
   background: var(--bg-primary);
   backdrop-filter: blur(8px);
