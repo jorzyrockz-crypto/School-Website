@@ -221,34 +221,119 @@
 
 /* ── 8. COMPOSE / CREATE POST BOX ────────────────────────── */
 @media (max-width: 480px) {
-  #fb-create-post-box {
-    padding: 0.85rem !important;
-    margin-bottom: 1rem !important;
+
+  /* Card itself — tighter all-round */
+  .composer-card {
+    padding: 0.75rem !important;
+    margin-bottom: 0.75rem !important;
+    border-radius: var(--radius-md) !important;
   }
 
-  /* Composer textarea */
+  /* Top row: avatar + textarea side by side */
+  .composer-top {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 0.6rem !important;
+    margin-bottom: 0.6rem !important;
+    padding-bottom: 0.6rem !important;
+  }
+
+  /* Avatar — smaller on mobile */
+  .composer-top > img {
+    width: 36px !important;
+    height: 36px !important;
+    margin-top: 0 !important;
+    flex-shrink: 0;
+  }
+
+  /* Textarea — single-line pill style */
   #composer-main-input {
-    font-size: 0.9rem !important;
-    padding: 0.7rem 1rem !important;
+    font-size: 0.88rem !important;
+    padding: 0.6rem 1rem !important;
+    border-radius: 50px !important;
+    min-height: unset !important;
+    width: 100% !important;
+    line-height: 1.4;
   }
 
-  /* Post action trigger buttons row */
-  #fb-create-post-box > div:last-child {
-    flex-wrap: wrap;
-    gap: 0.25rem;
+  /* Expansion area (shown when composer is open) */
+  #composer-expansion-area {
+    gap: 0.75rem !important;
   }
 
-  /* Each action trigger button */
-  .post-action-btn {
-    font-size: 0.78rem;
-    padding: 0.35rem 0.5rem;
-    gap: 0.25rem;
+  /* Audience + submit row inside expansion */
+  #composer-expansion-area > div:last-child {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
   }
 
-  .post-action-btn ion-icon {
-    font-size: 1rem;
+  /* ── Action strip — horizontal scroll, icon + label ── */
+  .composer-actions {
+    /* Kill the wrapping desktop layout */
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    /* Scrollable row */
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 0.25rem 0 0.1rem;
+    /* Bleed slightly so pills reach the card edges */
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 0.5rem;
+  }
+  .composer-actions::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* The flex-1 spacer div between announcement and others — remove on mobile */
+  .composer-actions > div[style*="flex:1"] {
+    display: none !important;
+  }
+
+  /* Each action button — compact icon + short label pill */
+  .composer-actions .post-action-btn {
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0;
+    gap: 0.2rem !important;
+    padding: 0.35rem 0.65rem !important;
+    font-size: 0.68rem !important;
+    font-weight: 600;
+    border-radius: var(--radius-sm);
+    white-space: nowrap;
+    min-width: 60px;
+    line-height: 1.2;
+    background: var(--bg-primary);
+    border: 1px solid transparent;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .composer-actions .post-action-btn:active {
+    background: var(--bg-tint);
+    border-color: var(--border-color);
+    transform: scale(0.96);
+  }
+
+  /* Larger icon inside each pill */
+  .composer-actions .post-action-btn ion-icon {
+    font-size: 1.3rem !important;
+    display: block;
+  }
+
+  /* Shorten button labels on mobile */
+  #btn-action-announcement {
+    min-width: 76px !important;
   }
 }
+
 
 
 /* ── 9. REACTION / ACTION BARS ────────────────────────────── */

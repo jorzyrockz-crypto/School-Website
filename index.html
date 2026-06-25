@@ -26,10 +26,10 @@
   <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=10">
-  <link rel="stylesheet" href="css/layout.css?v=10">
-  <link rel="stylesheet" href="css/components.css?v=10">
-  <link rel="stylesheet" href="css/mobile.css?v=10">
+  <link rel="stylesheet" href="css/variables.css?v=11">
+  <link rel="stylesheet" href="css/layout.css?v=11">
+  <link rel="stylesheet" href="css/components.css?v=11">
+  <link rel="stylesheet" href="css/mobile.css?v=11">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </head>
 <body>
@@ -210,8 +210,8 @@
           </div>
           
           <!-- FB Create Post box -->
-          <div id="fb-create-post-box" class="news-card" style="display:none; margin-bottom:2rem; padding:1.25rem;">
-            <div style="display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);">
+          <div id="fb-create-post-box" class="news-card composer-card" style="display:none; margin-bottom:1rem; padding:1.25rem;">
+            <div class="composer-top" style="display:flex; gap:1rem; align-items:flex-start; margin-bottom:1rem; padding-bottom:1rem; border-bottom:1px solid var(--border-color);">
               <img id="post-box-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" alt="avatar" style="width:48px; height:48px; margin-top:0.25rem;">
               <div style="flex:1; display:flex; flex-direction:column; gap:0.5rem;">
                 <!-- Main Input Area -->
@@ -246,7 +246,7 @@
             </div>
             
             <!-- Action Triggers -->
-            <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+            <div class="composer-actions" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; align-items:center;">
               <button id="btn-action-announcement" class="post-action-btn" data-type="announcement" style="color:var(--primary); font-weight:700;"><ion-icon name="megaphone"></ion-icon> Official Announcement</button>
               <div style="flex:1;"></div>
               <button class="post-action-btn" data-type="photo" style="color:#ef4444;"><ion-icon name="image"></ion-icon> Photo/Video</button>
@@ -898,12 +898,12 @@
   <div id="toast" class="toast">Action completed successfully!</div>
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=10"></script>
-  <script src="js/auth.js?v=10"></script>
-  <script src="js/feed.js?v=10"></script>
-  <script src="js/dashboard.js?v=10"></script>
-  <script src="js/router.js?v=10"></script>
-  <script src="js/main.js?v=10"></script>
+  <script src="js/db.js?v=11"></script>
+  <script src="js/auth.js?v=11"></script>
+  <script src="js/feed.js?v=11"></script>
+  <script src="js/dashboard.js?v=11"></script>
+  <script src="js/router.js?v=11"></script>
+  <script src="js/main.js?v=11"></script>
 
   <!-- PWA Service Worker Registration -->
   <script>
