@@ -398,9 +398,9 @@ async function openChatWindow(targetUser) {
   }
 
   // Toggle active view state on mobile
-  const chatWindow = document.querySelector('.chat-window');
-  if (chatWindow) {
-    chatWindow.classList.add('mobile-active');
+  const chatContainer = document.querySelector('.chat-container');
+  if (chatContainer) {
+    chatContainer.classList.add('chat-active-window');
   }
 }
 
@@ -417,9 +417,9 @@ const chatBackBtn = document.getElementById('btn-chat-back');
 if (chatBackBtn) {
   chatBackBtn.onclick = () => {
     activeChatThread = null;
-    const chatWindow = document.querySelector('.chat-window');
-    if (chatWindow) {
-      chatWindow.classList.remove('mobile-active');
+    const chatContainer = document.querySelector('.chat-container');
+    if (chatContainer) {
+      chatContainer.classList.remove('chat-active-window');
     }
   };
 }
