@@ -399,6 +399,12 @@
     gap: 1rem !important;
     /* Move it down slightly to clear the absolute-positioned top bar */
     margin-top: 50px !important;
+    width: 100% !important;
+  }
+
+  /* Ensure the textarea wrapper takes full width */
+  #fb-create-post-box.composer-modal-active .composer-top > div {
+    width: 100% !important;
   }
 
   /* Avatar size in modal */
