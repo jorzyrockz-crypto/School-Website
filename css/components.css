@@ -1809,7 +1809,7 @@
     overflow-x: hidden !important;
   }
   .grid-2 { grid-template-columns: 1fr !important; max-width: 100% !important; }
-  .sections-grid { display: flex !important; flex-direction: column-reverse !important; width: 100% !important; max-width: 100% !important; }
+  .sections-grid, .calendar-layout-grid { display: flex !important; flex-direction: column-reverse !important; width: 100% !important; max-width: 100% !important; }
   .collapsible-widget-row { display: flex !important; gap: 1rem !important; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease; max-height: 500px; overflow: hidden; flex-shrink: 0 !important; }
   .collapsible-widget-row .sidebar-widget { flex: 1; height: 320px; overflow-y: auto; }
   .collapsible-widget-row.collapsed { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; overflow: hidden !important; pointer-events: none !important; }
@@ -1839,7 +1839,13 @@
     overflow-x: hidden !important;
   }
   .is-portrait .grid-2 { grid-template-columns: 1fr !important; max-width: 100% !important; }
-  .is-portrait .sections-grid { display: flex !important; flex-direction: column-reverse !important; width: 100% !important; max-width: 100% !important; }
+  .is-portrait .sections-grid,
+  .is-portrait .calendar-layout-grid { 
+    display: flex !important; 
+    flex-direction: column-reverse !important; 
+    width: 100% !important; 
+    max-width: 100% !important; 
+  }
   .is-portrait .collapsible-widget-row { display: flex !important; gap: 1rem !important; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease; max-height: 500px; overflow: hidden; flex-shrink: 0 !important; }
   .is-portrait .collapsible-widget-row .sidebar-widget { flex: 1; height: 320px; overflow-y: auto; }
   .is-portrait .collapsible-widget-row.collapsed { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; overflow: hidden !important; pointer-events: none !important; }
