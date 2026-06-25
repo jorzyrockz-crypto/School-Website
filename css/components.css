@@ -1781,38 +1781,38 @@
   .chat-container {
     height: calc(100vh - 150px) !important;
   }
+}
 
-  /* --- Improved Portrait Mode Auto-Collapse --- */
-  @media (orientation: portrait) {
-    .portal-sidebar {
-      width: 68px !important;
-    }
-    .portal-main {
-      margin-left: 68px !important;
-    }
-    /* Hide text elements to simulate collapsed state */
-    .sidebar-brand-text, .sidebar-brand-name, .sidebar-brand-tag,
-    .sidebar-profile, .profile-name, .profile-role, .sidebar-version-label {
-      display: none !important;
-    }
-    .menu-item a {
-      justify-content: center !important;
-      padding: 0 !important;
-      margin: 0 auto !important;
-      width: 44px !important;
-      height: 44px !important;
-      border-radius: 50% !important;
-    }
-    .menu-item a span.nav-label {
-      display: none !important;
-    }
-    
-    /* Adjust grid for narrow portrait tablet */
-    .grid-2, .sections-grid {
-      grid-template-columns: 1fr !important;
-    }
-    .grid-profile {
-      grid-template-columns: 1fr !important;
-    }
+/* --- Improved Portrait Mode Auto-Collapse for Tablet --- */
+@media screen and (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
+  .portal-sidebar {
+    width: 68px !important;
+  }
+  .portal-main {
+    margin-left: 68px !important;
+  }
+  /* Hide text elements to simulate collapsed state */
+  .sidebar-brand-text, .sidebar-brand-name, .sidebar-brand-tag,
+  .sidebar-profile, .profile-name, .profile-role, .sidebar-version-label {
+    display: none !important;
+  }
+  .menu-item a {
+    justify-content: center !important;
+    padding: 0 !important;
+    margin: 0 auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 50% !important;
+  }
+  .menu-item a span.nav-label {
+    display: none !important;
+  }
+  
+  /* Adjust grid for narrow portrait tablet */
+  .grid-2, .sections-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .grid-profile {
+    grid-template-columns: 1fr !important;
   }
 }
