@@ -1254,8 +1254,9 @@ document.addEventListener('DOMContentLoaded', () => {
   
   if (workspace && widgetRow) {
     workspace.addEventListener('scroll', () => {
-      // Check if we are in tablet portrait layout based on media query match
-      const isTabletPortrait = window.matchMedia('(min-width: 600px) and (max-width: 1024px) and (orientation: portrait)').matches;
+      // Check if we are in tablet portrait layout based on failsafe class or media query match
+      const isTabletPortrait = document.body.classList.contains('is-portrait') || 
+                               window.matchMedia('(min-width: 600px) and (max-width: 1366px) and (orientation: portrait)').matches;
       
       if (isTabletPortrait) {
         if (workspace.scrollTop > 150) {
@@ -1275,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // This explicitly tracks portrait orientation and applies .is-portrait to the body.
   function checkTabletOrientation() {
     const body = document.body;
-    if (window.innerHeight > window.innerWidth && window.innerWidth <= 1200) {
+    if (window.innerHeight > window.innerWidth && window.innerWidth <= 1366) {
       body.classList.add('is-portrait');
     } else {
       body.classList.remove('is-portrait');

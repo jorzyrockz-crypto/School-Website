@@ -1784,7 +1784,7 @@
 }
 
 /* --- Improved Portrait Mode Auto-Collapse for Tablet --- */
-@media screen and (min-width: 600px) and (max-width: 1200px) and (orientation: portrait) {
+@media screen and (min-width: 600px) and (max-width: 1366px) and (orientation: portrait) {
   .portal-sidebar { width: 68px !important; }
   .portal-main { margin-left: 68px !important; width: calc(100% - 68px) !important; max-width: calc(100% - 68px) !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow-x: hidden !important; }
   .sidebar-brand-text, .sidebar-brand-name, .sidebar-brand-tag, .sidebar-profile, .profile-name, .profile-role, .sidebar-version-label { display: none !important; }
@@ -1799,7 +1799,7 @@
 }
 
 /* --- FAILSAFE CLASS TRACKER FOR PORTRAIT MODE --- */
-@media screen and (max-width: 1200px) {
+@media screen and (max-width: 1366px) {
   .is-portrait .portal-sidebar { width: 68px !important; }
   .is-portrait .portal-main { margin-left: 68px !important; width: calc(100% - 68px) !important; max-width: calc(100% - 68px) !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow-x: hidden !important; }
   .is-portrait .sidebar-brand-text, .is-portrait .sidebar-brand-name, .is-portrait .sidebar-brand-tag, .is-portrait .sidebar-profile, .is-portrait .profile-name, .is-portrait .profile-role, .is-portrait .sidebar-version-label { display: none !important; }

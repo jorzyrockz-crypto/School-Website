@@ -1,8 +1,8 @@
 // ==========================================
-// APEX SCHOOL PORTAL - SERVICE WORKER v1.6.0
+// APEX SCHOOL PORTAL - SERVICE WORKER v1.6.1
 // ==========================================
 
-const CACHE_NAME = 'apex-school-v2.1.5';
+const CACHE_NAME = 'apex-school-v2.1.6';
 const STATIC_ASSETS = [
   './',
   './index.html',
