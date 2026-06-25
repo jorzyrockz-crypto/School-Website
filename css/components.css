@@ -751,17 +751,17 @@
   -webkit-backdrop-filter: blur(8px);
   padding: 0.5rem 0 0.5rem 0;
   border-bottom: none;
-  margin-top: -1.5rem; /* Tuck flush under top nav */
-  margin-left: -1.5rem;
-  margin-right: -1.5rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
+  margin-top: -1.25rem; /* Tuck flush under top nav (offsets workspace top padding 1.25rem) */
+  margin-left: -2rem; /* Spread edge-to-edge (offsets workspace l/r padding 2rem) */
+  margin-right: -2rem;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 @media (max-width: 768px) {
   .feed-filter-bar {
-    margin-top: -1.25rem; /* Tuck flush under top nav */
-    margin-left: -1rem; /* Spread edge-to-edge */
+    margin-top: -1.25rem; 
+    margin-left: -1rem; 
     margin-right: -1rem;
     padding-left: 1rem;
     padding-right: 1rem;
