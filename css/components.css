@@ -1815,9 +1815,41 @@
   }
   
   /* Adjust grid for narrow portrait tablet */
-  .grid-2, .sections-grid {
+  .grid-2 {
     grid-template-columns: 1fr !important;
     max-width: 100% !important;
+  }
+  
+  /* Vertical stack: 1) Composer, 2) Widgets, 3) Feed */
+  .sections-grid {
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Row 2 layout and Collapse logic */
+  .collapsible-widget-row {
+    display: flex !important;
+    gap: 1rem !important;
+    transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease;
+    max-height: 500px;
+    overflow: hidden;
+    flex-shrink: 0 !important;
+  }
+  .collapsible-widget-row .sidebar-widget {
+    flex: 1;
+    height: 320px;
+    overflow-y: auto;
+  }
+  .collapsible-widget-row.collapsed {
+    max-height: 0 !important;
+    opacity: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
   }
   .grid-profile {
     grid-template-columns: 1fr !important;

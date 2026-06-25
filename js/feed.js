@@ -734,7 +734,7 @@ async function renderPinnedPosts() {
   if (!container) return;
 
   const announcements = await dbService.getAnnouncements();
-  const pinned = announcements.filter(a => a.isPinned);
+  const pinned = announcements.filter(a => a.isPinned).slice(0, 5);
 
   if (pinned.length === 0) {
     container.innerHTML = `<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:1rem;">No pinned posts yet.</div>`;
@@ -1244,6 +1244,28 @@ document.addEventListener('DOMContentLoaded', () => {
         eventActionBtn.click();
         // Scroll to the top where the composer is
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  }
+
+  // Bind Scroll-Driven Auto-Collapse for Tablet Portrait Layout
+  const workspace = document.querySelector('.portal-workspace');
+  const widgetRow = document.querySelector('.collapsible-widget-row');
+  
+  if (workspace && widgetRow) {
+    workspace.addEventListener('scroll', () => {
+      // Check if we are in tablet portrait layout based on media query match
+      const isTabletPortrait = window.matchMedia('(min-width: 600px) and (max-width: 1024px) and (orientation: portrait)').matches;
+      
+      if (isTabletPortrait) {
+        if (workspace.scrollTop > 150) {
+          widgetRow.classList.add('collapsed');
+        } else if (workspace.scrollTop < 50) {
+          widgetRow.classList.remove('collapsed');
+        }
+      } else {
+        // If device rotated or resized out of portrait tablet mode, ensure it is uncollapsed
+        widgetRow.classList.remove('collapsed');
       }
     });
   }
