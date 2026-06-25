@@ -1,8 +1,8 @@
 // ==========================================
-// APEX SCHOOL PORTAL - SERVICE WORKER v1.6.7
+// APEX SCHOOL PORTAL - SERVICE WORKER v1.6.8
 // ==========================================
 
-const CACHE_NAME = 'apex-school-v2.2.3';
+const CACHE_NAME = 'apex-school-v2.2.4';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -25,7 +25,7 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching static assets');
       return cache.addAll(STATIC_ASSETS);
-    }).then(() => self.skipWaiting())
+    })
   );
 });
 
