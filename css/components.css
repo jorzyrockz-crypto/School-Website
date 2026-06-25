@@ -1784,75 +1784,31 @@
 }
 
 /* --- Improved Portrait Mode Auto-Collapse for Tablet --- */
-@media screen and (min-width: 600px) and (max-width: 1024px) and (orientation: portrait) {
-  .portal-sidebar {
-    width: 68px !important;
-  }
-  .portal-main {
-    margin-left: 68px !important;
-    width: calc(100% - 68px) !important;
-    max-width: calc(100% - 68px) !important;
-    box-sizing: border-box !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow-x: hidden !important; /* Prevents hidden widgets from causing a horizontal page scroll */
-  }
-  /* Hide text elements to simulate collapsed state */
-  .sidebar-brand-text, .sidebar-brand-name, .sidebar-brand-tag,
-  .sidebar-profile, .profile-name, .profile-role, .sidebar-version-label {
-    display: none !important;
-  }
-  .menu-item a {
-    justify-content: center !important;
-    padding: 0 !important;
-    margin: 0 auto !important;
-    width: 44px !important;
-    height: 44px !important;
-    border-radius: 50% !important;
-  }
-  .menu-item a span.nav-label {
-    display: none !important;
-  }
-  
-  /* Adjust grid for narrow portrait tablet */
-  .grid-2 {
-    grid-template-columns: 1fr !important;
-    max-width: 100% !important;
-  }
-  
-  /* Vertical stack: 1) Composer, 2) Widgets, 3) Feed */
-  .sections-grid {
-    display: flex !important;
-    flex-direction: column-reverse !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
+@media screen and (min-width: 600px) and (max-width: 1200px) and (orientation: portrait) {
+  .portal-sidebar { width: 68px !important; }
+  .portal-main { margin-left: 68px !important; width: calc(100% - 68px) !important; max-width: calc(100% - 68px) !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow-x: hidden !important; }
+  .sidebar-brand-text, .sidebar-brand-name, .sidebar-brand-tag, .sidebar-profile, .profile-name, .profile-role, .sidebar-version-label { display: none !important; }
+  .menu-item a { justify-content: center !important; padding: 0 !important; margin: 0 auto !important; width: 44px !important; height: 44px !important; border-radius: 50% !important; }
+  .menu-item a span.nav-label { display: none !important; }
+  .grid-2 { grid-template-columns: 1fr !important; max-width: 100% !important; }
+  .sections-grid { display: flex !important; flex-direction: column-reverse !important; width: 100% !important; max-width: 100% !important; }
+  .collapsible-widget-row { display: flex !important; gap: 1rem !important; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease; max-height: 500px; overflow: hidden; flex-shrink: 0 !important; }
+  .collapsible-widget-row .sidebar-widget { flex: 1; height: 320px; overflow-y: auto; }
+  .collapsible-widget-row.collapsed { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; overflow: hidden !important; pointer-events: none !important; }
+  .grid-profile { grid-template-columns: 1fr !important; max-width: 100% !important; }
+}
 
-  /* Row 2 layout and Collapse logic */
-  .collapsible-widget-row {
-    display: flex !important;
-    gap: 1rem !important;
-    transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease;
-    max-height: 500px;
-    overflow: hidden;
-    flex-shrink: 0 !important;
-  }
-  .collapsible-widget-row .sidebar-widget {
-    flex: 1;
-    height: 320px;
-    overflow-y: auto;
-  }
-  .collapsible-widget-row.collapsed {
-    max-height: 0 !important;
-    opacity: 0 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-    overflow: hidden !important;
-    pointer-events: none !important;
-  }
-  .grid-profile {
-    grid-template-columns: 1fr !important;
-    max-width: 100% !important;
-  }
+/* --- FAILSAFE CLASS TRACKER FOR PORTRAIT MODE --- */
+@media screen and (max-width: 1200px) {
+  .is-portrait .portal-sidebar { width: 68px !important; }
+  .is-portrait .portal-main { margin-left: 68px !important; width: calc(100% - 68px) !important; max-width: calc(100% - 68px) !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; overflow-x: hidden !important; }
+  .is-portrait .sidebar-brand-text, .is-portrait .sidebar-brand-name, .is-portrait .sidebar-brand-tag, .is-portrait .sidebar-profile, .is-portrait .profile-name, .is-portrait .profile-role, .is-portrait .sidebar-version-label { display: none !important; }
+  .is-portrait .menu-item a { justify-content: center !important; padding: 0 !important; margin: 0 auto !important; width: 44px !important; height: 44px !important; border-radius: 50% !important; }
+  .is-portrait .menu-item a span.nav-label { display: none !important; }
+  .is-portrait .grid-2 { grid-template-columns: 1fr !important; max-width: 100% !important; }
+  .is-portrait .sections-grid { display: flex !important; flex-direction: column-reverse !important; width: 100% !important; max-width: 100% !important; }
+  .is-portrait .collapsible-widget-row { display: flex !important; gap: 1rem !important; transition: max-height 0.4s ease, opacity 0.3s ease, margin-bottom 0.4s ease, padding 0.4s ease; max-height: 500px; overflow: hidden; flex-shrink: 0 !important; }
+  .is-portrait .collapsible-widget-row .sidebar-widget { flex: 1; height: 320px; overflow-y: auto; }
+  .is-portrait .collapsible-widget-row.collapsed { max-height: 0 !important; opacity: 0 !important; padding-top: 0 !important; padding-bottom: 0 !important; margin-bottom: 0 !important; overflow: hidden !important; pointer-events: none !important; }
+  .is-portrait .grid-profile { grid-template-columns: 1fr !important; max-width: 100% !important; }
 }

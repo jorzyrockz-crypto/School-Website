@@ -1269,4 +1269,18 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // --- WIDENED PORTRAIT MEDIA QUERY FAILSAFE ---
+  // Many tablets report incorrect orientation flags or inflated widths due to system zoom.
+  // This explicitly tracks portrait orientation and applies .is-portrait to the body.
+  function checkTabletOrientation() {
+    const body = document.body;
+    if (window.innerHeight > window.innerWidth && window.innerWidth <= 1200) {
+      body.classList.add('is-portrait');
+    } else {
+      body.classList.remove('is-portrait');
+    }
+  }
+  window.addEventListener('resize', checkTabletOrientation);
+  checkTabletOrientation(); // Run once immediately on load
 });
