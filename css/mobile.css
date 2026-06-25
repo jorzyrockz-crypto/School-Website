@@ -694,6 +694,7 @@
     flex-direction: column;
     width: 100% !important;
     height: 100%;
+    flex: 1;
     background: var(--bg-secondary);
   }
 

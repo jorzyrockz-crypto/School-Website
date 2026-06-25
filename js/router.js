@@ -48,7 +48,13 @@ function switchView(viewName) {
 
   const activeView = document.getElementById(`view-${viewName}`);
   if (activeView) {
-    activeView.style.display = 'block';
+    if (viewName === 'messages') {
+      activeView.style.display = 'flex';
+      activeView.style.flexDirection = 'column';
+      activeView.style.flex = '1';
+    } else {
+      activeView.style.display = 'block';
+    }
   }
 
   // Remove workspace padding when in messaging view for full-height layout
