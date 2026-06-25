@@ -26,10 +26,10 @@
   <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png">
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=16">
-  <link rel="stylesheet" href="css/layout.css?v=16">
-  <link rel="stylesheet" href="css/components.css?v=16">
-  <link rel="stylesheet" href="css/mobile.css?v=16">
+  <link rel="stylesheet" href="css/variables.css?v=17">
+  <link rel="stylesheet" href="css/layout.css?v=17">
+  <link rel="stylesheet" href="css/components.css?v=17">
+  <link rel="stylesheet" href="css/mobile.css?v=17">
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </head>
 <body>
@@ -247,13 +247,17 @@
             
             <!-- Action Triggers -->
             <div class="composer-actions" style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:0.5rem; align-items:center;">
-              <button id="btn-action-announcement" class="post-action-btn" data-type="announcement" style="color:var(--primary); font-weight:700;"><ion-icon name="megaphone"></ion-icon> Announce</button>
+              <button id="btn-action-announcement" class="post-action-btn" data-type="announcement"><ion-icon name="megaphone"></ion-icon> Announce</button>
               <div style="flex:1;"></div>
-              <button class="post-action-btn" data-type="photo" style="color:#ef4444;"><ion-icon name="image"></ion-icon> Photo/Video</button>
-              <button class="post-action-btn" data-type="document" style="color:#3b82f6;"><ion-icon name="document-text"></ion-icon> Document</button>
-              <button class="post-action-btn" data-type="event" style="color:#f59e0b;"><ion-icon name="calendar"></ion-icon> Event</button>
-              <button class="post-action-btn" data-type="poll" style="color:#10b981;"><ion-icon name="bar-chart"></ion-icon> Poll</button>
-              <button class="post-action-btn" data-type="achievement" style="color:#8b5cf6;"><ion-icon name="trophy"></ion-icon> Achievement</button>
+              <button class="post-action-btn" data-type="photo"><ion-icon name="image"></ion-icon> Photo/Video</button>
+              <button class="post-action-btn" data-type="document"><ion-icon name="document-text"></ion-icon> Document</button>
+              <button class="post-action-btn" data-type="event"><ion-icon name="calendar"></ion-icon> Event</button>
+              <button class="post-action-btn" data-type="poll"><ion-icon name="bar-chart"></ion-icon> Poll</button>
+              <button class="post-action-btn" data-type="achievement"><ion-icon name="trophy"></ion-icon> Achievement</button>
+            </div>
+            
+            <div class="composer-tip" style="background:#eff6ff; color:#2563eb; padding:0.75rem 1rem; border-radius:12px; margin-top:1rem; font-size:0.85rem; font-weight:600; display:flex; align-items:center; gap:0.5rem;">
+              <ion-icon name="sparkles" style="font-size:1.2rem;"></ion-icon> Keep everyone informed. Choose an action above to get started!
             </div>
           </div>
 
@@ -898,12 +902,12 @@
   <div id="toast" class="toast">Action completed successfully!</div>
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=16"></script>
-  <script src="js/auth.js?v=16"></script>
-  <script src="js/feed.js?v=16"></script>
-  <script src="js/dashboard.js?v=16"></script>
-  <script src="js/router.js?v=16"></script>
-  <script src="js/main.js?v=16"></script>
+  <script src="js/db.js?v=17"></script>
+  <script src="js/auth.js?v=17"></script>
+  <script src="js/feed.js?v=17"></script>
+  <script src="js/dashboard.js?v=17"></script>
+  <script src="js/router.js?v=17"></script>
+  <script src="js/main.js?v=17"></script>
 
   <!-- PWA Service Worker Registration -->
   <script>

@@ -195,14 +195,14 @@
 /* FB style Newsfeed cards / Material Cards */
 .news-card {
   background: var(--bg-secondary);
-  border: none;
-  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 16px;
   padding: 1.5rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.03);
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 .news-card:hover {
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 6px 24px rgba(0,0,0,0.06);
   transform: translateY(-2px);
 }
 
@@ -873,26 +873,41 @@
   display: flex;
   align-items: center;
   gap: 0.35rem;
-  background: var(--bg-primary);
-  border: 1px solid var(--border-color);
+  background: var(--reaction-bg, var(--bg-secondary));
+  border: 1px solid var(--reaction-border, var(--border-color));
   padding: 0.4rem 0.75rem;
   border-radius: 50px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--reaction-color, var(--text-secondary));
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .reaction-btn:hover {
-  background: var(--sidebar-active-bg);
-  color: var(--primary);
-  border-color: var(--primary);
   transform: translateY(-2px);
+  filter: brightness(0.95);
 }
-.reaction-btn.reacted {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+
+/* Data-type custom tints for Reactions */
+.reaction-btn[data-react="love"] {
+  --reaction-color: #ef4444;
+  --reaction-bg: #fef2f2;
+  --reaction-border: #fecaca;
+}
+.reaction-btn[data-react="celebrate"] {
+  --reaction-color: #8b5cf6;
+  --reaction-bg: #f5f3ff;
+  --reaction-border: #ddd6fe;
+}
+.reaction-btn[data-react="inspired"] {
+  --reaction-color: #f59e0b;
+  --reaction-bg: #fffbeb;
+  --reaction-border: #fde68a;
+}
+.reaction-btn[data-react="helpful"] {
+  --reaction-color: #3b82f6;
+  --reaction-bg: #eff6ff;
+  --reaction-border: #bfdbfe;
 }
 
 /* Responsive Grid Utilities */

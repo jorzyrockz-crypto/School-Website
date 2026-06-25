@@ -299,7 +299,7 @@
     display: none !important;
   }
 
-  /* Each action button — premium tall square with gradient border */
+  /* Each action button — premium tall square with soft colored border */
   .composer-actions .post-action-btn {
     flex-direction: column !important;
     align-items: center !important;
@@ -314,36 +314,40 @@
     min-width: 85px;
     min-height: 85px;
     line-height: 1.2;
-    /* Gradient Border Magic */
-    border: 1.5px solid transparent;
-    background: linear-gradient(var(--bg-primary), var(--bg-primary)) padding-box,
-                var(--btn-gradient, linear-gradient(to right, #ea4335, #fbbc04)) border-box;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    background: var(--bg-secondary) !important;
+    border: 1px solid var(--btn-border, rgba(0,0,0,0.05)) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.03);
     transition: transform 0.15s ease, box-shadow 0.15s ease;
   }
   .composer-actions .post-action-btn:active {
     transform: scale(0.95);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
   }
 
-  /* Custom Gradient Colors per button */
+  /* Custom Soft Colors per button */
   .composer-actions .post-action-btn[data-type="announcement"] {
-    --btn-gradient: linear-gradient(135deg, #3b82f6, #6366f1);
+    --btn-border: rgba(59, 130, 246, 0.4);
+    color: #3b82f6 !important;
   }
   .composer-actions .post-action-btn[data-type="photo"] {
-    --btn-gradient: linear-gradient(135deg, #ef4444, #f97316);
+    --btn-border: rgba(239, 68, 68, 0.4);
+    color: #ef4444 !important;
   }
   .composer-actions .post-action-btn[data-type="document"] {
-    --btn-gradient: linear-gradient(135deg, #0ea5e9, #2563eb);
+    --btn-border: rgba(59, 130, 246, 0.4);
+    color: #3b82f6 !important;
   }
   .composer-actions .post-action-btn[data-type="event"] {
-    --btn-gradient: linear-gradient(135deg, #f59e0b, #ea580c);
+    --btn-border: rgba(245, 158, 11, 0.4);
+    color: #f59e0b !important;
   }
   .composer-actions .post-action-btn[data-type="poll"] {
-    --btn-gradient: linear-gradient(135deg, #10b981, #059669);
+    --btn-border: rgba(16, 185, 129, 0.4);
+    color: #10b981 !important;
   }
   .composer-actions .post-action-btn[data-type="achievement"] {
-    --btn-gradient: linear-gradient(135deg, #d946ef, #8b5cf6);
+    --btn-border: rgba(139, 92, 246, 0.4);
+    color: #8b5cf6 !important;
   }
 
   /* Larger icon inside each card */
