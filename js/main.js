@@ -232,6 +232,9 @@ document.addEventListener('click', (e) => {
   // Close floating chat if clicked outside
   const chatWindow = document.getElementById('floating-chat-window');
   if (chatWindow && chatWindow.style.display === 'flex') {
+    // If the click target was removed from the DOM (e.g. chat head dismissed), ignore it
+    if (!document.body.contains(e.target)) return;
+    
     // If click is not inside the chat window AND not inside the dock
     if (!chatWindow.contains(e.target) && !e.target.closest('#chat-heads-dock')) {
       if (typeof closeFloatingChat === 'function') {
