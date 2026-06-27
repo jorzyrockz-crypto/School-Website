@@ -743,6 +743,7 @@
   padding-bottom: 0.5rem;
   margin-bottom: 1rem;
   scrollbar-width: none;
+  position: -webkit-sticky;
   position: sticky;
   top: 60px; /* Sticks directly below the 60px header */
   z-index: 30; /* Keep it below header (40) but above feed cards */
@@ -755,6 +756,13 @@
   margin-right: -2rem;
   padding-left: 2rem;
   padding-right: 2rem;
+}
+
+/* Hide filter bar if sticky positioning is not supported */
+@supports not ((position: sticky) or (position: -webkit-sticky)) {
+  .feed-filter-bar {
+    display: none !important;
+  }
 }
 
 @media (max-width: 768px) {
