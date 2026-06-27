@@ -242,6 +242,18 @@ document.addEventListener('click', (e) => {
       }
     }
   }
+  
+  // Chat Dock Expansion Logic for touch devices
+  const dock = document.getElementById('chat-heads-dock');
+  if (dock) {
+    if (e.target.closest('#chat-heads-dock')) {
+      // Toggle expand state on dock click
+      dock.classList.toggle('is-expanded');
+    } else {
+      // Click outside collapses the dock
+      dock.classList.remove('is-expanded');
+    }
+  }
 });
 
 // Floating Chat Window Logic
