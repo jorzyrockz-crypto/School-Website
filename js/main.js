@@ -268,8 +268,8 @@ async function initFloatingChatHeads() {
   // Clear existing dynamic heads, leave the "Add" button
   const addBtnHTML = `
     <div class="chat-head-bubble" title="New Message" onclick="openContactDrawer()">
-      <div style="background:var(--bg-secondary); width:100%; height:100%; border-radius:12px; display:flex; align-items:center; justify-content:center; color:var(--text-primary);">
-        <i class="material-symbols-rounded" style="font-size: 20px;">add</i>
+      <div style="background:var(--bg-secondary); width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; color:var(--text-primary); font-size:1.5rem;">
+        <ion-icon name="add"></ion-icon>
       </div>
     </div>
   `;
