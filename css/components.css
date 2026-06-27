@@ -1957,10 +1957,10 @@
   display: none; /* Hidden by default, shown via .is-portrait or .sidebar-hidden */
   position: fixed;
   bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%) translateY(150%);
+  left: 24px;
+  transform: translateY(150%);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  height: 52px;
+  height: 36px;
   background: linear-gradient(
     to bottom,
     rgba(255, 255, 255, 0.6) 0%,
@@ -1969,7 +1969,7 @@
   ), var(--nav-bg);
   backdrop-filter: blur(25px) saturate(200%);
   -webkit-backdrop-filter: blur(25px) saturate(200%);
-  border-radius: 26px;
+  border-radius: 18px;
   align-items: center;
   padding: 0 clamp(8px, 2vw, 16px);
   box-shadow: 
@@ -2009,8 +2009,8 @@
 }
 
 #tablet-bottom-nav .nav-brand img {
-  width: 28px;
-  height: 28px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   object-fit: cover;
 }
@@ -2039,12 +2039,12 @@
 }
 
 #tablet-bottom-nav .nav-item i {
-  font-size: 20px;
-  margin-bottom: 2px;
+  font-size: 14px;
+  margin-bottom: 0;
 }
 
 #tablet-bottom-nav .nav-item span {
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 500;
   letter-spacing: 0.2px;
 }
@@ -2056,7 +2056,7 @@
 
   .is-portrait #tablet-bottom-nav {
     display: flex !important;
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
 
   body.sidebar-hidden #tablet-bottom-nav {
@@ -2064,5 +2064,5 @@
   }
 
   body.sidebar-hidden.dock-visible #tablet-bottom-nav {
-    transform: translateX(-50%) translateY(0);
+    transform: translateY(0);
   }
