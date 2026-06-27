@@ -830,6 +830,20 @@
   font-size: 1.2rem;
 }
 
+/* Bare Outline Icon Buttons for Redesigned Composer */
+.icon-btn-bare {
+  padding: 0.4rem;
+  color: #94a3b8; /* Subtle gray */
+  border-radius: 50%;
+}
+.icon-btn-bare:hover {
+  background: transparent;
+  color: var(--text-primary);
+}
+.icon-btn-bare ion-icon {
+  font-size: 1.4rem;
+}
+
 /* Specialized Cards */
 .achievement-card {
   border: 2px solid #fbbf24; /* gold border */
