@@ -589,7 +589,9 @@ async function initPage() {
 window.dismissedChatHeads = window.dismissedChatHeads || [];
 
 window.dismissChatHead = function(uid, event) {
-  event.stopPropagation();
+  if (event) {
+    event.stopPropagation();
+  }
   window.dismissedChatHeads.push(uid);
   initFloatingChatHeads();
 };
