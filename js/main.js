@@ -446,7 +446,7 @@ function setupFloatingChatAttachment() {
       reader.onload = (ev) => {
         const dataUrl = ev.target.result;
         if (file.type.startsWith('image/')) {
-          dbService.compressImage(dataUrl, 800, async (compressedData) => {
+          compressImage(dataUrl, 800, async (compressedData) => {
             const chatId = activeFloatingChatThread.isGroup ? activeFloatingChatThread.uid : [activeUser.uid, activeFloatingChatThread.uid].sort().join('_');
             await dbService.sendMessage(chatId, activeUser.uid, '', { name: file.name, type: file.type, data: compressedData });
             fileInput.value = '';
