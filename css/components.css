@@ -744,14 +744,13 @@
   margin-bottom: 1rem;
   scrollbar-width: none;
   position: sticky;
-  top: 0px; /* Sticks to top of scroll container (portal-workspace) */
+  top: 60px; /* Sticks directly below the 60px header */
   z-index: 30; /* Keep it below header (40) but above feed cards */
   background: var(--bg-primary);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   padding: 0.5rem 0 0.5rem 0;
   border-bottom: none;
-  margin-top: -1.25rem; /* Tuck flush under top nav (offsets workspace top padding 1.25rem) */
   margin-left: -2rem; /* Spread edge-to-edge (offsets workspace l/r padding 2rem) */
   margin-right: -2rem;
   padding-left: 2rem;
@@ -760,7 +759,6 @@
 
 @media (max-width: 768px) {
   .feed-filter-bar {
-    margin-top: -1.25rem; 
     margin-left: -1rem; 
     margin-right: -1rem;
     padding-left: 1rem;
@@ -1003,6 +1001,7 @@
   }
   /* Undo the negative margins that bleed past the viewport */
   .feed-filter-bar {
+    top: 54px; /* Align below 54px mobile header */
     margin-left: -0.75rem;
     margin-right: -0.75rem;
     padding-left: 0.75rem;
