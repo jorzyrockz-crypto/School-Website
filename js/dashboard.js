@@ -583,6 +583,23 @@ function initProfilePanel() {
     };
   }
 
+  // --- Profile Cover Photo Upload ---
+  const profileCoverFile = document.getElementById('profile-cover-file');
+  if (profileCoverFile) {
+    profileCoverFile.onchange = (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        compressImage(ev.target.result, 1200, (compressedData) => {
+          document.getElementById('profile-cover-input').value = compressedData;
+          showToast('Cover photo processed! Click Save Profile to apply.');
+        });
+      };
+      reader.readAsDataURL(file);
+    };
+  }
+
   // --- Cartoon avatar seed (fallback) ---
   const seedInput = document.getElementById('profile-avatar-seed');
   if (seedInput) {
