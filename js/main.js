@@ -837,6 +837,9 @@ window.renderPublicProfile = async function(uid) {
     btnMessage.style.display = 'inline-block';
     btnConnect.style.display = 'inline-block';
     
+    const btnEditCover = document.getElementById('btn-edit-cover');
+    if (btnEditCover) btnEditCover.style.display = 'none';
+    
     // Check connection status
     const isConnected = (activeUser.connections || []).includes(uid);
     btnConnect.innerHTML = isConnected 
@@ -870,11 +873,32 @@ window.renderPublicProfile = async function(uid) {
         window.location.hash = '#/messages';
       }
     };
+  } else if (activeUser && activeUser.uid === uid) {
+    btnMessage.style.display = 'none';
+    btnConnect.style.display = 'none';
+    const btnEditCover = document.getElementById('btn-edit-cover');
+    if (btnEditCover) {
+      btnEditCover.style.display = 'flex';
+      btnEditCover.onclick = async () => {
+        const url = prompt("Enter the URL of your new cover photo:");
+        if (!url) return;
+        if (!url.startsWith('http')) {
+          showToast("Please enter a valid image URL.");
+          return;
+        }
+        activeUser.coverPhoto = url;
+        await window.dbService.saveUser(activeUser.uid, { coverPhoto: url });
+        try { sessionStorage.setItem('activeUser', JSON.stringify(activeUser)); } catch(e){}
+        showToast("Cover photo updated!");
+        renderPublicProfile(uid);
+      };
+    }
   } else {
     btnMessage.style.display = 'none';
     btnConnect.style.display = 'none';
+    const btnEditCover = document.getElementById('btn-edit-cover');
+    if (btnEditCover) btnEditCover.style.display = 'none';
   }
-  
   // Load User's Posts
   const allPosts = await window.dbService.getAnnouncements();
   const userPosts = allPosts.filter(p => p.authorUid === uid || p.author === targetUser.name);
