@@ -27,7 +27,8 @@ const DEFAULT_LOCAL_DB = {
   },
   feedSources: [
     { id: "fs1", url: "https://www.deped.gov.ph/feed/", type: "National News", tag: "globe-outline", color: "var(--primary)" },
-    { id: "fs2", url: "https://home.depedaklan.online/feed/", type: "Division Advisory", tag: "business-outline", color: "var(--success)" }
+    { id: "fs2", url: "https://home.depedaklan.online/feed/", type: "Division Advisory", tag: "business-outline", color: "var(--success)" },
+    { id: "fs5", url: "https://www.teacherph.com/feed/", type: "Teacher Resources", tag: "library", color: "#8b5cf6" }
   ],
   users: {
     "admin1":   { uid: "admin1",   email: "admin@school.edu",   name: "Maria Santos (Admin)",    role: "admin",   schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos" },
@@ -247,7 +248,21 @@ let currentSchoolId = "default-school";
 const dbService = {
   getFeedSources: async () => {
     const local = getLocalDB();
-    return local.feedSources || [];
+    if (!local.feedSources) local.feedSources = [];
+    
+    // Cleanup script to remove broken DepEd category feeds from local storage
+    const originalLength = local.feedSources.length;
+    local.feedSources = local.feedSources.filter(s => s.id !== "fs3" && s.id !== "fs4");
+    
+    // Auto-inject TeacherPH if missing
+    if (!local.feedSources.find(s => s.id === "fs5")) {
+      local.feedSources.push({ id: "fs5", url: "https://www.teacherph.com/feed/", type: "Teacher Resources", tag: "library", color: "#8b5cf6" });
+    }
+    
+    if (local.feedSources.length !== originalLength || !local.feedSources.find(s => s.id === "fs5" && originalLength > 0)) {
+      saveLocalDB(local);
+    }
+    return local.feedSources;
   },
   saveFeedSources: async (sources) => {
     const local = getLocalDB();

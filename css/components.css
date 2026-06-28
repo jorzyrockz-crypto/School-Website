@@ -250,6 +250,12 @@
   gap: 2rem;
 }
 
+.collapsible-widget-row {
+  position: sticky;
+  top: 80px;
+  align-self: start;
+}
+
 .sidebar-widget {
   background: var(--bg-secondary);
   border: none;
@@ -2033,7 +2039,7 @@
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-#tablet-bottom-nav .nav-item i {
+#tablet-bottom-nav .nav-item ion-icon {
   font-size: 18px;
 }
 
@@ -2100,7 +2106,7 @@
     height: 48px;
   }
 
-  #tablet-bottom-nav .nav-item i {
+  #tablet-bottom-nav .nav-item ion-icon {
     font-size: 20px;
   }
 

@@ -170,6 +170,29 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
           <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.5rem; text-align:right;">${totalVotes} total votes</div>
         </div>
       `;
+    } else if (a.type === 'location') {
+      const locName = (a.extraData && a.extraData.locationName) ? a.extraData.locationName : 'Unknown Location';
+      innerCardHTML = `
+        <div style="font-size:0.85rem; color:var(--danger); font-weight:600; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.25rem;">
+          <ion-icon name="location"></ion-icon> Checked in at ${locName}
+        </div>
+        ${titleText}
+        ${contentText}
+      `;
+    } else if (a.type === 'link') {
+      const linkUrl = (a.extraData && a.extraData.linkUrl) ? a.extraData.linkUrl : '#';
+      innerCardHTML = `
+        ${titleText}
+        ${contentText}
+        <a href="${linkUrl}" target="_blank" style="display:flex; align-items:center; gap:0.75rem; background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.75rem; text-decoration:none; color:inherit; transition: border-color 0.2s;">
+          <ion-icon name="link" style="font-size:1.5rem; color:var(--primary);"></ion-icon>
+          <div style="flex:1; overflow:hidden;">
+            <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${linkUrl}</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">Click to visit link</div>
+          </div>
+          <ion-icon name="open-outline" style="color:var(--text-secondary);"></ion-icon>
+        </a>
+      `;
     } else {
       // Default standard post
       innerCardHTML = `
@@ -503,6 +526,8 @@ if (btnCancel) {
     currentPostType = 'standard';
     composerImageData = null;
     composerDocData = null;
+    composerLinkData = null;
+    composerLocationData = null;
     fbPostBox.style.border = 'none';
     document.body.classList.remove('composer-modal-active');
     fbPostBox.classList.remove('composer-modal-active');
@@ -671,6 +696,22 @@ document.querySelectorAll('.post-action-btn').forEach(btn => {
         input.placeholder = `Option ${document.querySelectorAll('.poll-opt').length + 1}`;
         document.getElementById('poll-options-container').insertBefore(input, e.target);
       };
+    } else if (type === 'location') {
+      composerInput.placeholder = "Where are you?";
+      dynamicFields.innerHTML = `
+        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm);">
+          <ion-icon name="location" style="font-size:1.5rem; color:var(--danger);"></ion-icon>
+          <input type="text" id="ev-loc" placeholder="Search for a location..." class="form-control" style="flex:1;">
+        </div>
+      `;
+    } else if (type === 'link') {
+      composerInput.placeholder = "Share a link...";
+      dynamicFields.innerHTML = `
+        <div style="display:flex; gap:0.5rem; margin-top:0.5rem; background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm);">
+          <ion-icon name="link" style="font-size:1.5rem; color:var(--primary);"></ion-icon>
+          <input type="url" id="ev-link" placeholder="Paste a URL here (e.g., https://example.com)" class="form-control" style="flex:1;">
+        </div>
+      `;
     }
   };
 });
@@ -709,6 +750,14 @@ if (btnSubmit) {
         votes: opts.map(() => 0),
         votedUsers: {}
       };
+    } else if (currentPostType === 'location') {
+      const loc = document.getElementById('ev-loc').value.trim();
+      if (!loc) return showToast('Please enter a location');
+      extraData = { locationName: loc };
+    } else if (currentPostType === 'link') {
+      const link = document.getElementById('ev-link').value.trim();
+      if (!link) return showToast('Please enter a link');
+      extraData = { linkUrl: link };
     }
     
     if (composerDocData) {
@@ -915,7 +964,8 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
 
     const fetchPromises = feedSources.map(async (source) => {
       try {
-        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source.url));
+        const cacheBuster = Math.floor(Date.now() / (1000 * 60 * 5)); // 5-minute cache bucket
+        const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source.url + "?cb=" + cacheBuster));
         const data = await res.json();
         if (data.status === 'ok') {
           return data.items.map(item => {

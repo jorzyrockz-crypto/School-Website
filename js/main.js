@@ -739,3 +739,52 @@ window.updateSidebarVersion();
 })();
 
 initPage();
+// ==========================================
+// WEB SHARE TARGET API HANDLER
+// ==========================================
+(function handleWebShareTarget() {
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('shared') === 'true') {
+    const sharedTitle = urlParams.get('title') || '';
+    const sharedText = urlParams.get('text') || '';
+    const sharedUrl = urlParams.get('url') || '';
+    
+    let extractedUrl = sharedUrl;
+    if (!extractedUrl && sharedText.includes('http')) {
+      const match = sharedText.match(/(https?:\/\/[^\s]+)/);
+      if (match) extractedUrl = match[1];
+    }
+    
+    if (extractedUrl || sharedText || sharedTitle) {
+      setTimeout(() => {
+        window.location.hash = '#/home';
+        setTimeout(() => {
+          const btnLink = document.querySelector('.post-action-btn[data-type="link"]');
+          if (btnLink && extractedUrl) {
+            btnLink.click();
+            setTimeout(() => {
+              const linkInput = document.getElementById('ev-link');
+              if (linkInput) linkInput.value = extractedUrl;
+            }, 100);
+          } else {
+            const composerArea = document.getElementById('composer-expansion-area');
+            const fbPostBox = document.getElementById('fb-create-post-box');
+            if (composerArea) composerArea.style.display = 'flex';
+            if (fbPostBox) fbPostBox.classList.add('composer-modal-active');
+            document.body.classList.add('composer-modal-active');
+          }
+          const composerInput = document.getElementById('composer-main-input');
+          if (composerInput) {
+            let combined = [sharedTitle, sharedText].filter(Boolean).join('\n');
+            if (extractedUrl && combined.includes(extractedUrl)) {
+              combined = combined.replace(extractedUrl, '').trim();
+            }
+            composerInput.value = combined;
+            composerInput.focus();
+          }
+          window.history.replaceState({}, document.title, window.location.pathname + window.location.hash);
+        }, 500);
+      }, 300);
+    }
+  }
+})();
