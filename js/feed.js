@@ -213,17 +213,10 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
       const linkUrl = (a.extraData && a.extraData.linkUrl) ? a.extraData.linkUrl : '#';
       const safeLinkUrl = sanitizeUrlSafe(linkUrl, { allowHash: false });
       const safeLinkLabel = escapeHTMLSafe(linkUrl);
+      extractedUrl = linkUrl;
       innerCardHTML = `
         ${titleText}
         ${contentText}
-        <a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer" style="display:flex; align-items:center; gap:0.75rem; background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.75rem; text-decoration:none; color:inherit; transition: border-color 0.2s;">
-          <ion-icon name="link" style="font-size:1.5rem; color:var(--primary);"></ion-icon>
-          <div style="flex:1; overflow:hidden;">
-            <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${safeLinkLabel}</div>
-            <div style="font-size:0.75rem; color:var(--text-secondary);">Click to visit link</div>
-          </div>
-          <ion-icon name="open-outline" style="color:var(--text-secondary);"></ion-icon>
-        </a>
       `;
     } else {
       // Default standard post
