@@ -99,415 +99,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     return true;
   });
 
-  if (filtered.length === 0) {
-    container.innerHTML = `<p style="padding: 2rem; text-align: center; color:var(--text-secondary)">No news or announcements found for this filter.</p>`;
-    return;
-  }
-
-  container.innerHTML = filtered.map(a => {
-    const likes = a.likes || [];
-    const userHasLiked = activeUser ? likes.includes(activeUser.uid) : false;
-    const safePostId = escapeAttrSafe(a.id || '');
-    const safeAuthorUid = escapeAttrSafe(a.authorUid || '');
-    const safeAuthor = escapeHTMLSafe(a.author || 'Unknown Author');
-    const safeAuthorRole = escapeHTMLSafe(a.authorRole || 'member');
-    const safeDate = escapeHTMLSafe(a.date || '');
-    const safeTitleValue = escapeHTMLSafe(a.title || '');
-    const safeContentValue = escapeHTMLSafe(a.content || '');
-    const safeAvatarUrl = sanitizeUrlSafe(a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder', { allowDataImage: true, allowHash: false });
-    const safeImageUrl = a.imageData ? sanitizeUrlSafe(a.imageData, { allowDataImage: true, allowHash: false }) : '';
-    const encodedImageData = a.imageData ? encodeURIComponent(a.imageData) : '';
-    
-    let extractedUrl = null;
-    let textWithLinks = safeContentValue;
-    const urlRegex = /(https?:\/\/[^\s]+)/g;
-    
-    if (!a.type || a.type === 'standard' || a.type === 'announcement') {
-      const urls = safeContentValue.match(urlRegex);
-      if (urls && urls.length > 0) {
-        extractedUrl = urls[0];
-        textWithLinks = safeContentValue.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:underline; word-break:break-all;">$1</a>');
-      }
-    }
-    
-    let innerCardHTML = '';
-    const titleText = a.title ? `<h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${safeTitleValue}</h3>` : '';
-    const contentText = `<p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${textWithLinks}</p>`;
-
-    if (a.type === 'announcement') {
-      innerCardHTML = `
-        <div style="background:rgba(239, 68, 68, 0.1); color:var(--danger); font-size:0.75rem; font-weight:800; padding:0.3rem 0.6rem; border-radius:var(--radius-sm); display:inline-block; margin-bottom:0.75rem; border:1px solid rgba(239, 68, 68, 0.3);">
-          <ion-icon name="megaphone"></ion-icon> OFFICIAL ANNOUNCEMENT
-        </div>
-        ${titleText}
-        <p style="color:var(--text-primary); margin-bottom:1rem; font-size:1.05rem; font-weight:600;">${textWithLinks}</p>
-      `;
-    } else if (a.type === 'achievement') {
-      innerCardHTML = `
-        <div class="achievement-badge"><ion-icon name="trophy"></ion-icon> Achievement</div>
-        ${titleText}
-        <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:1rem; font-weight:500;">${textWithLinks}</p>
-      `;
-    } else if (a.type === 'event') {
-      const eData = a.extraData || {};
-      const rsvps = eData.rsvps || [];
-      const userGoing = activeUser ? rsvps.includes(activeUser.uid) : false;
-      const goingBtnStyle = userGoing ? "background:var(--primary); color:white;" : "background:var(--bg-secondary); color:var(--primary);";
-      const safeEventTitle = escapeHTMLSafe(eData.eventTitle || a.title || 'School Event');
-      const safeEventDate = escapeHTMLSafe(eData.date || a.eventDate || '');
-      const safeEventTime = escapeHTMLSafe(eData.time || a.eventTime || '');
-      const safeEventLocation = escapeHTMLSafe(eData.location || a.eventLocation || '');
-      
-      innerCardHTML = `
-        <h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${safeEventTitle}</h3>
-        ${contentText}
-        <div class="event-details" style="background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:1rem;">
-          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;"><ion-icon name="calendar" style="color:var(--primary);"></ion-icon> <strong>${safeEventDate}</strong> at ${safeEventTime}</div>
-          <div style="display:flex; align-items:center; gap:0.5rem;"><ion-icon name="location" style="color:var(--primary);"></ion-icon> ${safeEventLocation}</div>
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.75rem; border-top:1px dashed var(--border-color); padding-top:0.75rem;">
-            <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">${rsvps.length || a.eventGoing || 0} people going</span>
-            <button class="btn-action btn-rsvp" data-id="${safePostId}" style="padding:0.4rem 1rem; font-size:0.8rem; border-radius:50px; ${goingBtnStyle}; border:1px solid var(--primary); font-weight:600;">${userGoing ? "I'm Going!" : "RSVP"}</button>
-          </div>
-        </div>
-      `;
-    } else if (a.type === 'poll') {
-      const pData = a.extraData || {};
-      const opts = pData.options || (a.pollOptions ? a.pollOptions.map(o => o.text) : []);
-      const votes = pData.votes || (a.pollOptions ? a.pollOptions.map(o => o.votes) : []);
-      const totalVotes = votes.reduce((sum, v) => sum + v, 0);
-      const votedUsers = pData.votedUsers || {};
-      const userVoteIndex = activeUser ? votedUsers[activeUser.uid] : undefined;
-
-      const pollHTML = opts.map((optText, idx) => {
-        const percent = totalVotes === 0 ? 0 : Math.round((votes[idx] / totalVotes) * 100);
-        const isVoted = userVoteIndex === idx;
-        const barColor = isVoted ? 'rgba(99,102,241,0.2)' : 'var(--bg-secondary)';
-        return `
-          <div class="poll-option btn-poll-vote" data-id="${safePostId}" data-idx="${idx}" style="position:relative; margin-bottom:0.5rem; border:1px solid ${isVoted ? 'var(--primary)' : 'var(--border-color)'}; border-radius:var(--radius-sm); overflow:hidden; cursor:pointer;">
-            <div class="poll-progress" style="width:${percent}%; background:${barColor}; height:100%; position:absolute; top:0; left:0; z-index:1;"></div>
-            <div style="position:relative; z-index:2; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
-              <span class="poll-text" style="font-size:0.9rem; font-weight:500;">${escapeHTMLSafe(optText)}</span>
-              <span class="poll-percent" style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">${percent}%</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-      innerCardHTML = `
-        ${titleText}
-        ${contentText}
-        <div class="poll-card" style="margin-bottom:1rem;">
-          ${pollHTML}
-          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.5rem; text-align:right;">${totalVotes} total votes</div>
-        </div>
-      `;
-    } else if (a.type === 'location') {
-      const locName = escapeHTMLSafe((a.extraData && a.extraData.locationName) ? a.extraData.locationName : 'Unknown Location');
-      innerCardHTML = `
-        <div style="font-size:0.85rem; color:var(--danger); font-weight:600; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.25rem;">
-          <ion-icon name="location"></ion-icon> Checked in at ${locName}
-        </div>
-        ${titleText}
-        ${contentText}
-      `;
-    } else if (a.type === 'link') {
-      const linkUrl = (a.extraData && a.extraData.linkUrl) ? a.extraData.linkUrl : '#';
-      const safeLinkUrl = sanitizeUrlSafe(linkUrl, { allowHash: false });
-      const safeLinkLabel = escapeHTMLSafe(linkUrl);
-      extractedUrl = linkUrl;
-      innerCardHTML = `
-        ${titleText}
-        ${contentText}
-      `;
-    } else {
-      // Default standard post
-      innerCardHTML = `
-        ${titleText}
-        ${contentText}
-      `;
-    }
-    
-    if (extractedUrl) {
-      innerCardHTML += `<div class="link-preview-container" data-url="${escapeAttrSafe(extractedUrl)}"></div>`;
-    }
-
-    // Global Photo Appending
-    if (a.imageData) {
-      innerCardHTML += `
-        <div style="position:relative; margin-bottom:1rem; width:100%;">
-          <a href="javascript:void(0)" onclick="openPhotoTheater(decodeURIComponent('${encodedImageData}'), '${safePostId}')" style="display:block; cursor:zoom-in;" title="Click to view full image">
-            <img src="${safeImageUrl}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--border-color); display:block; transition: filter 0.2s;" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='brightness(1)'">
-          </a>
-          <a href="${safeImageUrl}" download="post_image_${safePostId}.png" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.65); color:white; padding:0.4rem 0.8rem; border-radius:50px; font-size:0.8rem; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:0.3rem; backdrop-filter:blur(4px); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.65)'" title="Download Image">
-            <ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Save
-          </a>
-        </div>
-      `;
-    }
-
-    // Global Document Appending
-    if (a.extraData && a.extraData.document) {
-      const doc = a.extraData.document;
-      const safeDocName = escapeHTMLSafe(doc.name || 'Document');
-      const safeDocSize = escapeHTMLSafe(doc.size || '');
-      const safeDocHref = sanitizeUrlSafe(doc.fileData || '#', { allowDataFile: true });
-      innerCardHTML += `
-        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:1rem;">
-          <ion-icon name="document-text" style="color:var(--primary); font-size:1.75rem;"></ion-icon>
-          <div style="flex:1;">
-            <div style="font-size:0.9rem; font-weight:600;">${safeDocName}</div>
-            <div style="font-size:0.75rem; color:var(--text-secondary);">${safeDocSize}</div>
-          </div>
-          <a href="${safeDocHref}" ${doc.fileData ? `download="${escapeAttrSafe(doc.name || 'document')}"` : `onclick="showToast('Downloading document...')"`} style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.2rem;"><ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Download</a>
-        </div>
-      `;
-    }
-
-    // Reaction calculations
-    const reactions = a.reactions || {};
-    const totalReactions = Object.keys(reactions).length;
-    let userReaction = activeUser ? reactions[activeUser.uid] : null;
-    
-    // Moderation Menu
-    let contextMenuHTML = '';
-    if (activeUser) {
-      let menuItems = [];
-      if (activeUser.name === a.author) {
-        menuItems.push(`<button class="btn-edit-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="create"></ion-icon> Edit</button>`);
-      }
-      if (activeUser.role === 'admin' || activeUser.name === a.author) {
-        menuItems.push(`<button class="btn-delete-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:var(--danger);"><ion-icon name="trash"></ion-icon> Delete</button>`);
-      }
-      if (activeUser.role === 'teacher' && activeUser.name !== a.author) {
-        menuItems.push(`<button class="btn-flag-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:#f59e0b;"><ion-icon name="flag"></ion-icon> Flag for Review</button>`);
-      }
-      if (activeUser.role === 'admin' || activeUser.role === 'teacher') {
-        const pinText = a.isPinned ? "Unpin Post" : "Pin Post";
-        const pinIcon = a.isPinned ? "close-circle" : "pin";
-        menuItems.push(`<button class="btn-pin-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="${pinIcon}"></ion-icon> ${pinText}</button>`);
-      }
-      if (menuItems.length > 0) {
-        contextMenuHTML = `
-          <div style="position:relative;" class="post-context-menu">
-            <button class="btn-context-trigger" style="background:none; border:none; color:var(--text-secondary); font-size:1.2rem; cursor:pointer; padding:0.25rem;"><ion-icon name="ellipsis-horizontal"></ion-icon></button>
-            <div class="context-dropdown" style="display:none; position:absolute; right:0; top:100%; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm); z-index:10; min-width:120px; overflow:hidden;">
-              ${menuItems.join('')}
-            </div>
-          </div>
-        `;
-      }
-    }
-
-    return `
-      <article id="post-${safePostId}" class="news-card ${a.type === 'achievement' ? 'achievement-card' : (a.type === 'event' ? 'event-card' : '')}" style="margin-bottom:1.5rem;">
-        <!-- Card Header -->
-        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
-          <div style="display:flex; align-items:center; gap:0.75rem;">
-            <a href="#/user/${safeAuthorUid}" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; color:inherit;">
-              <img class="thread-avatar" src="${safeAvatarUrl}" alt="avatar">
-              <div>
-                <strong style="font-size:0.95rem; display:block;">${safeAuthor}</strong>
-              <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${safeAuthorRole} &bull; ${safeDate}</span>
-            </div>
-            </a>
-          </div>
-          ${contextMenuHTML}
-        </div>
-
-        <div id="post-body-${safePostId}">
-          ${innerCardHTML}
-        </div>
-        
-        <!-- Edit container -->
-        <div id="post-edit-container-${safePostId}" style="display:none; margin-bottom:1rem;">
-          <textarea id="edit-input-${safePostId}" class="form-control" style="width:100%; resize:vertical; min-height:80px; margin-bottom:0.5rem;">${safeContentValue}</textarea>
-          <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
-            <button class="btn-secondary btn-cancel-edit" data-id="${safePostId}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Cancel</button>
-            <button class="btn-primary btn-save-edit" data-id="${safePostId}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Save</button>
-          </div>
-        </div>
-        
-        <!-- Interactive Status bar -->
-        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.5rem;">
-          <span id="likes-count-${a.id}">👍 ${totalReactions} Reactions</span>
-          <span style="cursor:pointer;" class="btn-expand-comments" data-id="${a.id}">💬 Comments</span>
-        </div>
-
-        <!-- Custom School Reactions Bar -->
-        <div class="reactions-bar" style="display:flex; gap:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
-          <button class="reaction-btn ${userReaction === 'love' ? 'reacted' : ''}" data-id="${a.id}" data-react="love"><ion-icon name="heart"></ion-icon> Love</button>
-          <button class="reaction-btn ${userReaction === 'celebrate' ? 'reacted' : ''}" data-id="${a.id}" data-react="celebrate"><ion-icon name="medal"></ion-icon> Celebrate</button>
-          <button class="reaction-btn ${userReaction === 'inspired' ? 'reacted' : ''}" data-id="${a.id}" data-react="inspired"><ion-icon name="bulb"></ion-icon> Inspired</button>
-          <button class="reaction-btn ${userReaction === 'helpful' ? 'reacted' : ''}" data-id="${a.id}" data-react="helpful"><ion-icon name="information-circle"></ion-icon> Helpful</button>
-        </div>
-
-        <!-- Comments Area (Hidden by default) -->
-        <div id="comments-box-${safePostId}" class="comments-section" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-color);">
-          <div id="comments-list-${safePostId}" style="max-height: 300px; overflow-y: auto; padding-right: 0.5rem;"></div>
-          ${activeUser ? `
-            <form class="comment-form" data-ann-id="${safePostId}" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-              <input type="text" class="form-control" placeholder="Write a comment..." style="flex:1; border-radius:50px; font-size:0.85rem; padding:0.5rem 1rem;">
-              <button type="submit" class="btn-primary" style="border-radius:50px; padding:0.5rem 1rem;"><ion-icon name="send"></ion-icon></button>
-            </form>
-          ` : `<p style="font-size:0.75rem; color:var(--text-secondary);">Log in to comment.</p>`}
-        </div>
-      </article>
-    `;
-  }).join('');
-
-  // Fetch Link Previews
-  container.querySelectorAll('.link-preview-container').forEach(async (previewDiv) => {
-    const url = previewDiv.dataset.url;
-    if (!url) return;
-    
-    const cacheKey = 'link_preview_v2_' + url;
-    const cached = sessionStorage.getItem(cacheKey);
-    if (cached) {
-      previewDiv.innerHTML = cached;
-      return;
-    }
-
-    try {
-      previewDiv.innerHTML = `
-        <div style="display:flex; align-items:center; justify-content:center; padding:1.5rem; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); margin-top:0.75rem;">
-          <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; align-items:center; gap:0.5rem;">
-            <ion-icon name="sync-outline" style="animation: spin 2s linear infinite;"></ion-icon> Loading preview...
-          </div>
-        </div>
-      `;
-      const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
-      const data = await res.json();
-      if (data.status === 'success' && data.data) {
-        const pd = data.data;
-        const html = `
-          <a href="${url}" target="_blank" rel="noopener noreferrer" class="link-preview-card" style="display:block; text-decoration:none; color:inherit; border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden; margin-top:0.75rem; transition:border-color 0.2s, box-shadow 0.2s;">
-            ${pd.image && pd.image.url ? `<img src="${pd.image.url}" alt="Preview" style="width:100%; height:auto; max-height:400px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;">` : ''}
-            <div style="padding:1rem; background:var(--bg-secondary);">
-              <div style="font-weight:700; font-size:1rem; margin-bottom:0.25rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.title || url)}</div>
-              ${pd.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.description)}</div>` : ''}
-              <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem; color:var(--text-secondary); font-weight:600;">
-                ${pd.logo && pd.logo.url ? `<img src="${pd.logo.url}" style="width:16px; height:16px; border-radius:50%; object-fit:cover;">` : '<ion-icon name="link"></ion-icon>'}
-                <span>${escapeHTMLSafe(pd.publisher || new URL(url).hostname)}</span>
-              </div>
-            </div>
-          </a>
-        `;
-        previewDiv.innerHTML = html;
-        sessionStorage.setItem(cacheKey, html);
-      } else {
-        previewDiv.innerHTML = '';
-      }
-    } catch(e) {
-      previewDiv.innerHTML = '';
-    }
-  });
-
-  // Interaction Bindings
-  container.querySelectorAll('.reaction-btn').forEach(btn => {
-    btn.onclick = async (e) => {
-      if (!activeUser) return showToast("Please log in to react!");
-      const annId = e.currentTarget.dataset.id;
-      const reactType = e.currentTarget.dataset.react;
-      await dbService.addReaction(annId, activeUser.uid, reactType);
-      renderNewsfeed();
-    };
-  });
-
-  container.querySelectorAll('.btn-rsvp').forEach(btn => {
-    btn.onclick = async (e) => {
-      if (!activeUser) return showToast("Please log in to RSVP!");
-      const annId = e.currentTarget.dataset.id;
-      await dbService.rsvpEvent(annId, activeUser.uid);
-      renderNewsfeed();
-    };
-  });
-
-  container.querySelectorAll('.btn-poll-vote').forEach(btn => {
-    btn.onclick = async (e) => {
-      if (!activeUser) return showToast("Please log in to vote!");
-      const annId = e.currentTarget.dataset.id;
-      const optIdx = parseInt(e.currentTarget.dataset.idx);
-      await dbService.votePoll(annId, optIdx, activeUser.uid);
-      renderNewsfeed();
-    };
-  });
-
-  // Context Menu Toggle
-  container.querySelectorAll('.btn-context-trigger').forEach(btn => {
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      const dropdown = e.currentTarget.nextElementSibling;
-      const isVisible = dropdown.style.display === 'block';
-      document.querySelectorAll('.context-dropdown').forEach(d => d.style.display = 'none');
-      dropdown.style.display = isVisible ? 'none' : 'block';
-    };
-  });
-  document.addEventListener('click', () => {
-    document.querySelectorAll('.context-dropdown').forEach(d => d.style.display = 'none');
-  });
-
-  // Moderation Actions
-  container.querySelectorAll('.btn-delete-post').forEach(btn => {
-    btn.onclick = async (e) => {
-      if (!confirm("Are you sure you want to delete this post?")) return;
-      await dbService.deleteAnnouncement(e.currentTarget.dataset.id);
-      renderNewsfeed();
-    };
-  });
-  
-  container.querySelectorAll('.btn-flag-post').forEach(btn => {
-    btn.onclick = async (e) => {
-      await dbService.flagAnnouncement(e.currentTarget.dataset.id);
-      showToast("Post flagged and hidden for review.");
-      renderNewsfeed();
-    };
-  });
-
-  container.querySelectorAll('.btn-pin-post').forEach(btn => {
-    btn.onclick = async (e) => {
-      await dbService.togglePinAnnouncement(e.currentTarget.dataset.id);
-      renderNewsfeed();
-      renderPinnedPosts();
-    };
-  });
-
-  // Edit Action
-  container.querySelectorAll('.btn-edit-post').forEach(btn => {
-    btn.onclick = (e) => {
-      const id = e.currentTarget.dataset.id;
-      document.getElementById(`post-body-${id}`).style.display = 'none';
-      document.getElementById(`post-edit-container-${id}`).style.display = 'block';
-    };
-  });
-  container.querySelectorAll('.btn-cancel-edit').forEach(btn => {
-    btn.onclick = (e) => {
-      const id = e.currentTarget.dataset.id;
-      document.getElementById(`post-body-${id}`).style.display = 'block';
-      document.getElementById(`post-edit-container-${id}`).style.display = 'none';
-    };
-  });
-  container.querySelectorAll('.btn-save-edit').forEach(btn => {
-    btn.onclick = async (e) => {
-      const id = e.currentTarget.dataset.id;
-      const newText = document.getElementById(`edit-input-${id}`).value.trim();
-      if (!newText) return showToast("Post cannot be empty.");
-      await dbService.updateAnnouncementText(id, newText);
-      renderNewsfeed();
-    };
-  });
-
-  // Comments drawer expand bindings
-  container.querySelectorAll('.btn-expand-comments').forEach(btn => {
-    btn.onclick = async (e) => {
-      const annId = e.currentTarget.dataset.id;
-      const box = document.getElementById(`comments-box-${annId}`);
-      const isHidden = box.style.display === 'none';
-      box.style.display = isHidden ? 'block' : 'none';
-      e.currentTarget.innerText = isHidden ? '💬 Hide Comments' : '💬 Comments';
-      if (isHidden) {
-        renderCommentsList(annId);
-      }
-    };
-  });
+  await window.renderPostList(filtered, container);
 }
 
 async function renderCommentsList(annId) {
@@ -1465,3 +1057,416 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(checkTabletOrientation, 200);
   setTimeout(checkTabletOrientation, 1000);
 });
+
+window.renderPostList = async function(filtered, container, customRenderCallback) {
+  if (filtered.length === 0) {
+    container.innerHTML = `<p style="padding: 2rem; text-align: center; color:var(--text-secondary)">No news or announcements found for this filter.</p>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(a => {
+    const likes = a.likes || [];
+    const userHasLiked = activeUser ? likes.includes(activeUser.uid) : false;
+    const safePostId = escapeAttrSafe(a.id || '');
+    const safeAuthorUid = escapeAttrSafe(a.authorUid || '');
+    const safeAuthor = escapeHTMLSafe(a.author || 'Unknown Author');
+    const safeAuthorRole = escapeHTMLSafe(a.authorRole || 'member');
+    const safeDate = escapeHTMLSafe(a.date || '');
+    const safeTitleValue = escapeHTMLSafe(a.title || '');
+    const safeContentValue = escapeHTMLSafe(a.content || '');
+    const safeAvatarUrl = sanitizeUrlSafe(a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder', { allowDataImage: true, allowHash: false });
+    const safeImageUrl = a.imageData ? sanitizeUrlSafe(a.imageData, { allowDataImage: true, allowHash: false }) : '';
+    const encodedImageData = a.imageData ? encodeURIComponent(a.imageData) : '';
+    
+    let extractedUrl = null;
+    let textWithLinks = safeContentValue;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    if (!a.type || a.type === 'standard' || a.type === 'announcement') {
+      const urls = safeContentValue.match(urlRegex);
+      if (urls && urls.length > 0) {
+        extractedUrl = urls[0];
+        textWithLinks = safeContentValue.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:underline; word-break:break-all;">$1</a>');
+      }
+    }
+    
+    let innerCardHTML = '';
+    const titleText = a.title ? `<h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${safeTitleValue}</h3>` : '';
+    const contentText = `<p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${textWithLinks}</p>`;
+
+    if (a.type === 'announcement') {
+      innerCardHTML = `
+        <div style="background:rgba(239, 68, 68, 0.1); color:var(--danger); font-size:0.75rem; font-weight:800; padding:0.3rem 0.6rem; border-radius:var(--radius-sm); display:inline-block; margin-bottom:0.75rem; border:1px solid rgba(239, 68, 68, 0.3);">
+          <ion-icon name="megaphone"></ion-icon> OFFICIAL ANNOUNCEMENT
+        </div>
+        ${titleText}
+        <p style="color:var(--text-primary); margin-bottom:1rem; font-size:1.05rem; font-weight:600;">${textWithLinks}</p>
+      `;
+    } else if (a.type === 'achievement') {
+      innerCardHTML = `
+        <div class="achievement-badge"><ion-icon name="trophy"></ion-icon> Achievement</div>
+        ${titleText}
+        <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:1rem; font-weight:500;">${textWithLinks}</p>
+      `;
+    } else if (a.type === 'event') {
+      const eData = a.extraData || {};
+      const rsvps = eData.rsvps || [];
+      const userGoing = activeUser ? rsvps.includes(activeUser.uid) : false;
+      const goingBtnStyle = userGoing ? "background:var(--primary); color:white;" : "background:var(--bg-secondary); color:var(--primary);";
+      const safeEventTitle = escapeHTMLSafe(eData.eventTitle || a.title || 'School Event');
+      const safeEventDate = escapeHTMLSafe(eData.date || a.eventDate || '');
+      const safeEventTime = escapeHTMLSafe(eData.time || a.eventTime || '');
+      const safeEventLocation = escapeHTMLSafe(eData.location || a.eventLocation || '');
+      
+      innerCardHTML = `
+        <h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${safeEventTitle}</h3>
+        ${contentText}
+        <div class="event-details" style="background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:1rem;">
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;"><ion-icon name="calendar" style="color:var(--primary);"></ion-icon> <strong>${safeEventDate}</strong> at ${safeEventTime}</div>
+          <div style="display:flex; align-items:center; gap:0.5rem;"><ion-icon name="location" style="color:var(--primary);"></ion-icon> ${safeEventLocation}</div>
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.75rem; border-top:1px dashed var(--border-color); padding-top:0.75rem;">
+            <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">${rsvps.length || a.eventGoing || 0} people going</span>
+            <button class="btn-action btn-rsvp" data-id="${safePostId}" style="padding:0.4rem 1rem; font-size:0.8rem; border-radius:50px; ${goingBtnStyle}; border:1px solid var(--primary); font-weight:600;">${userGoing ? "I'm Going!" : "RSVP"}</button>
+          </div>
+        </div>
+      `;
+    } else if (a.type === 'poll') {
+      const pData = a.extraData || {};
+      const opts = pData.options || (a.pollOptions ? a.pollOptions.map(o => o.text) : []);
+      const votes = pData.votes || (a.pollOptions ? a.pollOptions.map(o => o.votes) : []);
+      const totalVotes = votes.reduce((sum, v) => sum + v, 0);
+      const votedUsers = pData.votedUsers || {};
+      const userVoteIndex = activeUser ? votedUsers[activeUser.uid] : undefined;
+
+      const pollHTML = opts.map((optText, idx) => {
+        const percent = totalVotes === 0 ? 0 : Math.round((votes[idx] / totalVotes) * 100);
+        const isVoted = userVoteIndex === idx;
+        const barColor = isVoted ? 'rgba(99,102,241,0.2)' : 'var(--bg-secondary)';
+        return `
+          <div class="poll-option btn-poll-vote" data-id="${safePostId}" data-idx="${idx}" style="position:relative; margin-bottom:0.5rem; border:1px solid ${isVoted ? 'var(--primary)' : 'var(--border-color)'}; border-radius:var(--radius-sm); overflow:hidden; cursor:pointer;">
+            <div class="poll-progress" style="width:${percent}%; background:${barColor}; height:100%; position:absolute; top:0; left:0; z-index:1;"></div>
+            <div style="position:relative; z-index:2; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+              <span class="poll-text" style="font-size:0.9rem; font-weight:500;">${escapeHTMLSafe(optText)}</span>
+              <span class="poll-percent" style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">${percent}%</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      innerCardHTML = `
+        ${titleText}
+        ${contentText}
+        <div class="poll-card" style="margin-bottom:1rem;">
+          ${pollHTML}
+          <div style="font-size:0.75rem; color:var(--text-secondary); margin-top:0.5rem; text-align:right;">${totalVotes} total votes</div>
+        </div>
+      `;
+    } else if (a.type === 'location') {
+      const locName = escapeHTMLSafe((a.extraData && a.extraData.locationName) ? a.extraData.locationName : 'Unknown Location');
+      innerCardHTML = `
+        <div style="font-size:0.85rem; color:var(--danger); font-weight:600; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.25rem;">
+          <ion-icon name="location"></ion-icon> Checked in at ${locName}
+        </div>
+        ${titleText}
+        ${contentText}
+      `;
+    } else if (a.type === 'link') {
+      const linkUrl = (a.extraData && a.extraData.linkUrl) ? a.extraData.linkUrl : '#';
+      const safeLinkUrl = sanitizeUrlSafe(linkUrl, { allowHash: false });
+      const safeLinkLabel = escapeHTMLSafe(linkUrl);
+      extractedUrl = linkUrl;
+      innerCardHTML = `
+        ${titleText}
+        ${contentText}
+      `;
+    } else {
+      // Default standard post
+      innerCardHTML = `
+        ${titleText}
+        ${contentText}
+      `;
+    }
+    
+    if (extractedUrl) {
+      innerCardHTML += `<div class="link-preview-container" data-url="${escapeAttrSafe(extractedUrl)}"></div>`;
+    }
+
+    // Global Photo Appending
+    if (a.imageData) {
+      innerCardHTML += `
+        <div style="position:relative; margin-bottom:1rem; width:100%;">
+          <a href="javascript:void(0)" onclick="openPhotoTheater(decodeURIComponent('${encodedImageData}'), '${safePostId}')" style="display:block; cursor:zoom-in;" title="Click to view full image">
+            <img src="${safeImageUrl}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--border-color); display:block; transition: filter 0.2s;" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='brightness(1)'">
+          </a>
+          <a href="${safeImageUrl}" download="post_image_${safePostId}.png" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.65); color:white; padding:0.4rem 0.8rem; border-radius:50px; font-size:0.8rem; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:0.3rem; backdrop-filter:blur(4px); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.65)'" title="Download Image">
+            <ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Save
+          </a>
+        </div>
+      `;
+    }
+
+    // Global Document Appending
+    if (a.extraData && a.extraData.document) {
+      const doc = a.extraData.document;
+      const safeDocName = escapeHTMLSafe(doc.name || 'Document');
+      const safeDocSize = escapeHTMLSafe(doc.size || '');
+      const safeDocHref = sanitizeUrlSafe(doc.fileData || '#', { allowDataFile: true });
+      innerCardHTML += `
+        <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:1rem;">
+          <ion-icon name="document-text" style="color:var(--primary); font-size:1.75rem;"></ion-icon>
+          <div style="flex:1;">
+            <div style="font-size:0.9rem; font-weight:600;">${safeDocName}</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">${safeDocSize}</div>
+          </div>
+          <a href="${safeDocHref}" ${doc.fileData ? `download="${escapeAttrSafe(doc.name || 'document')}"` : `onclick="showToast('Downloading document...')"`} style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.2rem;"><ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Download</a>
+        </div>
+      `;
+    }
+
+    // Reaction calculations
+    const reactions = a.reactions || {};
+    const totalReactions = Object.keys(reactions).length;
+    let userReaction = activeUser ? reactions[activeUser.uid] : null;
+    
+    // Moderation Menu
+    let contextMenuHTML = '';
+    if (activeUser) {
+      let menuItems = [];
+      if (activeUser.name === a.author) {
+        menuItems.push(`<button class="btn-edit-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="create"></ion-icon> Edit</button>`);
+      }
+      if (activeUser.role === 'admin' || activeUser.name === a.author) {
+        menuItems.push(`<button class="btn-delete-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:var(--danger);"><ion-icon name="trash"></ion-icon> Delete</button>`);
+      }
+      if (activeUser.role === 'teacher' && activeUser.name !== a.author) {
+        menuItems.push(`<button class="btn-flag-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:#f59e0b;"><ion-icon name="flag"></ion-icon> Flag for Review</button>`);
+      }
+      if (activeUser.role === 'admin' || activeUser.role === 'teacher') {
+        const pinText = a.isPinned ? "Unpin Post" : "Pin Post";
+        const pinIcon = a.isPinned ? "close-circle" : "pin";
+        menuItems.push(`<button class="btn-pin-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="${pinIcon}"></ion-icon> ${pinText}</button>`);
+      }
+      if (menuItems.length > 0) {
+        contextMenuHTML = `
+          <div style="position:relative;" class="post-context-menu">
+            <button class="btn-context-trigger" style="background:none; border:none; color:var(--text-secondary); font-size:1.2rem; cursor:pointer; padding:0.25rem;"><ion-icon name="ellipsis-horizontal"></ion-icon></button>
+            <div class="context-dropdown" style="display:none; position:absolute; right:0; top:100%; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); box-shadow:var(--shadow-sm); z-index:10; min-width:120px; overflow:hidden;">
+              ${menuItems.join('')}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    return `
+      <article id="post-${safePostId}" class="news-card ${a.type === 'achievement' ? 'achievement-card' : (a.type === 'event' ? 'event-card' : '')}" style="margin-bottom:1.5rem;">
+        <!-- Card Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <a href="#/user/${safeAuthorUid}" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; color:inherit;">
+              <img class="thread-avatar" src="${safeAvatarUrl}" alt="avatar">
+              <div>
+                <strong style="font-size:0.95rem; display:block;">${safeAuthor}</strong>
+              <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${safeAuthorRole} &bull; ${safeDate}</span>
+            </div>
+            </a>
+          </div>
+          ${contextMenuHTML}
+        </div>
+
+        <div id="post-body-${safePostId}">
+          ${innerCardHTML}
+        </div>
+        
+        <!-- Edit container -->
+        <div id="post-edit-container-${safePostId}" style="display:none; margin-bottom:1rem;">
+          <textarea id="edit-input-${safePostId}" class="form-control" style="width:100%; resize:vertical; min-height:80px; margin-bottom:0.5rem;">${safeContentValue}</textarea>
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+            <button class="btn-secondary btn-cancel-edit" data-id="${safePostId}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Cancel</button>
+            <button class="btn-primary btn-save-edit" data-id="${safePostId}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Save</button>
+          </div>
+        </div>
+        
+        <!-- Interactive Status bar -->
+        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.5rem;">
+          <span id="likes-count-${a.id}">👍 ${totalReactions} Reactions</span>
+          <span style="cursor:pointer;" class="btn-expand-comments" data-id="${a.id}">💬 Comments</span>
+        </div>
+
+        <!-- Custom School Reactions Bar -->
+        <div class="reactions-bar" style="display:flex; gap:0.5rem; padding-top:0.5rem; border-top:1px solid var(--border-color);">
+          <button class="reaction-btn ${userReaction === 'love' ? 'reacted' : ''}" data-id="${a.id}" data-react="love"><ion-icon name="heart"></ion-icon> Love</button>
+          <button class="reaction-btn ${userReaction === 'celebrate' ? 'reacted' : ''}" data-id="${a.id}" data-react="celebrate"><ion-icon name="medal"></ion-icon> Celebrate</button>
+          <button class="reaction-btn ${userReaction === 'inspired' ? 'reacted' : ''}" data-id="${a.id}" data-react="inspired"><ion-icon name="bulb"></ion-icon> Inspired</button>
+          <button class="reaction-btn ${userReaction === 'helpful' ? 'reacted' : ''}" data-id="${a.id}" data-react="helpful"><ion-icon name="information-circle"></ion-icon> Helpful</button>
+        </div>
+
+        <!-- Comments Area (Hidden by default) -->
+        <div id="comments-box-${safePostId}" class="comments-section" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-color);">
+          <div id="comments-list-${safePostId}" style="max-height: 300px; overflow-y: auto; padding-right: 0.5rem;"></div>
+          ${activeUser ? `
+            <form class="comment-form" data-ann-id="${safePostId}" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+              <input type="text" class="form-control" placeholder="Write a comment..." style="flex:1; border-radius:50px; font-size:0.85rem; padding:0.5rem 1rem;">
+              <button type="submit" class="btn-primary" style="border-radius:50px; padding:0.5rem 1rem;"><ion-icon name="send"></ion-icon></button>
+            </form>
+          ` : `<p style="font-size:0.75rem; color:var(--text-secondary);">Log in to comment.</p>`}
+        </div>
+      </article>
+    `;
+  }).join('');
+
+  // Fetch Link Previews
+  container.querySelectorAll('.link-preview-container').forEach(async (previewDiv) => {
+    const url = previewDiv.dataset.url;
+    if (!url) return;
+    
+    const cacheKey = 'link_preview_v2_' + url;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      previewDiv.innerHTML = cached;
+      return;
+    }
+
+    try {
+      previewDiv.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:center; padding:1.5rem; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); margin-top:0.75rem;">
+          <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; align-items:center; gap:0.5rem;">
+            <ion-icon name="sync-outline" style="animation: spin 2s linear infinite;"></ion-icon> Loading preview...
+          </div>
+        </div>
+      `;
+      const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      if (data.status === 'success' && data.data) {
+        const pd = data.data;
+        const html = `
+          <a href="${url}" target="_blank" rel="noopener noreferrer" class="link-preview-card" style="display:block; text-decoration:none; color:inherit; border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden; margin-top:0.75rem; transition:border-color 0.2s, box-shadow 0.2s;">
+            ${pd.image && pd.image.url ? `<img src="${pd.image.url}" alt="Preview" style="width:100%; height:auto; max-height:400px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;">` : ''}
+            <div style="padding:1rem; background:var(--bg-secondary);">
+              <div style="font-weight:700; font-size:1rem; margin-bottom:0.25rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.title || url)}</div>
+              ${pd.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.description)}</div>` : ''}
+              <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem; color:var(--text-secondary); font-weight:600;">
+                ${pd.logo && pd.logo.url ? `<img src="${pd.logo.url}" style="width:16px; height:16px; border-radius:50%; object-fit:cover;">` : '<ion-icon name="link"></ion-icon>'}
+                <span>${escapeHTMLSafe(pd.publisher || new URL(url).hostname)}</span>
+              </div>
+            </div>
+          </a>
+        `;
+        previewDiv.innerHTML = html;
+        sessionStorage.setItem(cacheKey, html);
+      } else {
+        previewDiv.innerHTML = '';
+      }
+    } catch(e) {
+      previewDiv.innerHTML = '';
+    }
+  });
+
+  // Interaction Bindings
+  container.querySelectorAll('.reaction-btn').forEach(btn => {
+    btn.onclick = async (e) => {
+      if (!activeUser) return showToast("Please log in to react!");
+      const annId = e.currentTarget.dataset.id;
+      const reactType = e.currentTarget.dataset.react;
+      await dbService.addReaction(annId, activeUser.uid, reactType);
+      if (typeof customRenderCallback === "function") customRenderCallback(); else if (typeof renderNewsfeed === "function") renderNewsfeed();
+    };
+  });
+
+  container.querySelectorAll('.btn-rsvp').forEach(btn => {
+    btn.onclick = async (e) => {
+      if (!activeUser) return showToast("Please log in to RSVP!");
+      const annId = e.currentTarget.dataset.id;
+      await dbService.rsvpEvent(annId, activeUser.uid);
+      if (typeof customRenderCallback === "function") customRenderCallback(); else if (typeof renderNewsfeed === "function") renderNewsfeed();
+    };
+  });
+
+  container.querySelectorAll('.btn-poll-vote').forEach(btn => {
+    btn.onclick = async (e) => {
+      if (!activeUser) return showToast("Please log in to vote!");
+      const annId = e.currentTarget.dataset.id;
+      const optIdx = parseInt(e.currentTarget.dataset.idx);
+      await dbService.votePoll(annId, optIdx, activeUser.uid);
+      if (typeof customRenderCallback === "function") customRenderCallback(); else if (typeof renderNewsfeed === "function") renderNewsfeed();
+    };
+  });
+
+  // Context Menu Toggle
+  container.querySelectorAll('.btn-context-trigger').forEach(btn => {
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const dropdown = e.currentTarget.nextElementSibling;
+      const isVisible = dropdown.style.display === 'block';
+      document.querySelectorAll('.context-dropdown').forEach(d => d.style.display = 'none');
+      dropdown.style.display = isVisible ? 'none' : 'block';
+    };
+  });
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.context-dropdown').forEach(d => d.style.display = 'none');
+  });
+
+  // Moderation Actions
+  container.querySelectorAll('.btn-delete-post').forEach(btn => {
+    btn.onclick = async (e) => {
+      if (!confirm("Are you sure you want to delete this post?")) return;
+      await dbService.deleteAnnouncement(e.currentTarget.dataset.id);
+      if (typeof customRenderCallback === "function") customRenderCallback(); else if (typeof renderNewsfeed === "function") renderNewsfeed();
+    };
+  });
+  
+  container.querySelectorAll('.btn-flag-post').forEach(btn => {
+    btn.onclick = async (e) => {
+      await dbService.flagAnnouncement(e.currentTarget.dataset.id);
+      showToast("Post flagged and hidden for review.");
+      if (typeof customRenderCallback === "function") customRenderCallback(); else if (typeof renderNewsfeed === "function") renderNewsfeed();
+    };
+  });
+
+  container.querySelectorAll('.btn-pin-post').forEach(btn => {
+    btn.onclick = async (e) => {
+      await dbService.togglePinAnnouncement(e.currentTarget.dataset.id);
+      if (typeof customRenderCallback === "function") customRenderCallback(); else if (typeof renderNewsfeed === "function") renderNewsfeed();
+      renderPinnedPosts();
+    };
+  });
+
+  // Edit Action
+  container.querySelectorAll('.btn-edit-post').forEach(btn => {
+    btn.onclick = (e) => {
+      const id = e.currentTarget.dataset.id;
+      document.getElementById(`post-body-${id}`).style.display = 'none';
+      document.getElementById(`post-edit-container-${id}`).style.display = 'block';
+    };
+  });
+  container.querySelectorAll('.btn-cancel-edit').forEach(btn => {
+    btn.onclick = (e) => {
+      const id = e.currentTarget.dataset.id;
+      document.getElementById(`post-body-${id}`).style.display = 'block';
+      document.getElementById(`post-edit-container-${id}`).style.display = 'none';
+    };
+  });
+  container.querySelectorAll('.btn-save-edit').forEach(btn => {
+    btn.onclick = async (e) => {
+      const id = e.currentTarget.dataset.id;
+      const newText = document.getElementById(`edit-input-${id}`).value.trim();
+      if (!newText) return showToast("Post cannot be empty.");
+      await dbService.updateAnnouncementText(id, newText);
+      if (typeof customRenderCallback === "function") customRenderCallback(); else if (typeof renderNewsfeed === "function") renderNewsfeed();
+    };
+  });
+
+  // Comments drawer expand bindings
+  container.querySelectorAll('.btn-expand-comments').forEach(btn => {
+    btn.onclick = async (e) => {
+      const annId = e.currentTarget.dataset.id;
+      const box = document.getElementById(`comments-box-${annId}`);
+      const isHidden = box.style.display === 'none';
+      box.style.display = isHidden ? 'block' : 'none';
+      e.currentTarget.innerText = isHidden ? '💬 Hide Comments' : '💬 Comments';
+      if (isHidden) {
+        renderCommentsList(annId);
+      }
+    };
+  });
+
+};

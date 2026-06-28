@@ -892,9 +892,10 @@ window.renderPublicProfile = async function(uid) {
     feedContainer.innerHTML = '<p style="color:var(--text-secondary);">No recent activity.</p>';
   } else {
     // Re-use feed rendering logic for simplicity
-    if (typeof window.createPostElement === 'function') {
-      userPosts.forEach(post => {
-        feedContainer.appendChild(window.createPostElement(post));
+    if (typeof window.renderPostList === 'function') {
+      await window.renderPostList(userPosts, feedContainer, () => {
+        // Custom callback to re-render the profile if they interact
+        renderPublicProfile(uid);
       });
     }
   }
