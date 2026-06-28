@@ -2,6 +2,9 @@
 // ==========================================
 
 const APP_VERSION = '1.6.0';
+var escapeHTMLSafe = window.escapeHTML || ((value) => String(value ?? ''));
+var escapeAttrSafe = window.escapeAttr || escapeHTMLSafe;
+var sanitizeUrlSafe = window.sanitizeUrl || ((value) => value || '#');
 
 // ==========================================
 // UPDATE BANNER
@@ -98,8 +101,8 @@ async function updateNotificationsList() {
     listEl.innerHTML = `<p style="padding:1rem; text-align:center; color:var(--text-secondary); font-size:0.8rem;">No new notifications</p>`;
   } else {
     listEl.innerHTML = notifs.map(n => `
-      <div class="notif-item ${n.read ? '' : 'unread'}" onclick="window.handleNotificationClick('${n.referenceId}')" style="cursor:pointer;">
-        <div class="notif-text"><strong>${n.senderName}</strong> ${n.messageText}</div>
+      <div class="notif-item ${n.read ? '' : 'unread'}" onclick="window.handleNotificationClick('${escapeAttrSafe(n.referenceId || '')}')" style="cursor:pointer;">
+        <div class="notif-text"><strong>${escapeHTMLSafe(n.senderName)}</strong> ${escapeHTMLSafe(n.messageText)}</div>
       </div>
     `).join('');
   }
@@ -167,10 +170,10 @@ async function updateMessengerDropdownList() {
       const tJson = encodeURIComponent(JSON.stringify(t)).replace(/'/g, "%27");
       return `
         <div class="notif-item" style="cursor:pointer; display:flex; align-items:center;" onclick="openFloatingChat('${tJson}')">
-          <img src="${t.avatar}" style="width:40px; height:40px; border-radius:50%; margin-right:0.75rem;">
+          <img src="${sanitizeUrlSafe(t.avatar, { allowDataImage: true, allowHash: false })}" style="width:40px; height:40px; border-radius:50%; margin-right:0.75rem;">
           <div class="notif-text">
-            <strong>${t.name}</strong><br>
-            <span style="font-size:0.8rem; color:var(--text-secondary);">${isYou}${t.lastMsg.text ? t.lastMsg.text.substring(0,25) + '...' : 'Sent an attachment'}</span>
+            <strong>${escapeHTMLSafe(t.name)}</strong><br>
+            <span style="font-size:0.8rem; color:var(--text-secondary);">${escapeHTMLSafe(isYou)}${escapeHTMLSafe(t.lastMsg.text ? t.lastMsg.text.substring(0,25) + '...' : 'Sent an attachment')}</span>
           </div>
         </div>
       `;
@@ -280,9 +283,9 @@ async function initFloatingChatHeads() {
     // Escape JSON so it can be passed as a string
     const tJson = encodeURIComponent(JSON.stringify(t)).replace(/'/g, "%27");
     return `
-      <div class="chat-head-bubble" style="position:relative;" title="${t.name}">
-        <img src="${t.avatar}" alt="${t.name}" onclick="openFloatingChat('${tJson}')">
-        <button onclick="dismissChatHead('${t.uid}', event)" style="position:absolute; top:-2px; right:-2px; background:var(--danger); color:white; border:none; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; font-size:0.7rem; box-shadow:0 1px 3px rgba(0,0,0,0.3);">
+      <div class="chat-head-bubble" style="position:relative;" title="${escapeAttrSafe(t.name)}">
+        <img src="${sanitizeUrlSafe(t.avatar, { allowDataImage: true, allowHash: false })}" alt="${escapeAttrSafe(t.name)}" onclick="openFloatingChat('${tJson}')">
+        <button onclick="dismissChatHead('${escapeAttrSafe(t.uid)}', event)" style="position:absolute; top:-2px; right:-2px; background:var(--danger); color:white; border:none; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; font-size:0.7rem; box-shadow:0 1px 3px rgba(0,0,0,0.3);">
           <ion-icon name="close"></ion-icon>
         </button>
       </div>
@@ -347,30 +350,30 @@ async function openFloatingChat(encodedUser) {
     let content = '';
     
     if (m.fileAttachment) {
-      const ext = m.fileAttachment.name.split('.').pop().toUpperCase();
       content += `
         <div class="chat-file-attachment" style="background: rgba(0,0,0,0.15); border-radius:12px; margin-bottom:${m.text ? '0.4rem' : '0'}; display:block;">
           <div style="display:flex; align-items:center; gap:0.5rem; padding:0.5rem;">
             <ion-icon name="document-text" class="file-icon"></ion-icon>
-            <div class="file-name" title="${m.fileAttachment.name}" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${m.fileAttachment.name}</div>
-            <a href="${m.fileAttachment.data}" download="${m.fileAttachment.name}" class="file-download" style="color:inherit; display:flex;">
+            <div class="file-name" title="${escapeAttrSafe(m.fileAttachment.name || 'Attachment')}" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:140px;">${escapeHTMLSafe(m.fileAttachment.name || 'Attachment')}</div>
+            <a href="${sanitizeUrlSafe(m.fileAttachment.data, { allowDataFile: true, allowHash: false })}" download="${escapeAttrSafe(m.fileAttachment.name || 'attachment')}" class="file-download" style="color:inherit; display:flex;">
               <ion-icon name="download-outline"></ion-icon>
             </a>
           </div>
         </div>
       `;
       } else if (m.imageData) {
+        const encodedMessageImage = encodeURIComponent(m.imageData);
         content += `
-          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${m.imageData}', 'float_${m.timestamp}')">
-            <img src="${m.imageData}" style="max-width:200px; border-radius:12px; display:block;">
-            <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
+          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater(decodeURIComponent('${encodedMessageImage}'), 'float_${m.timestamp}')">
+            <img src="${sanitizeUrlSafe(m.imageData, { allowDataImage: true, allowHash: false })}" style="max-width:200px; border-radius:12px; display:block;">
+            <a href="${sanitizeUrlSafe(m.imageData, { allowDataImage: true, allowHash: false })}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
               <ion-icon name="download-outline" style="font-size:0.9rem;"></ion-icon>
             </a>
           </div>
         `;
       }
     
-    if (m.text) content += `<span>${m.text}</span>`;
+    if (m.text) content += `<span>${escapeHTMLSafe(m.text)}</span>`;
     
     if (isOut) {
       return `
@@ -383,7 +386,7 @@ async function openFloatingChat(encodedUser) {
     } else {
       return `
         <div class="chat-msg-row received">
-          <img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">
+          <img class="chat-msg-avatar" src="${sanitizeUrlSafe(targetUser.avatar, { allowDataImage: true, allowHash: false })}" alt="Avatar">
           <div style="max-width:75%; text-align:left; flex-shrink:0;">
             <div class="chat-msg-bubble bg-dark" style="display:inline-block; text-align:left;">${content}</div>
           </div>
@@ -802,20 +805,20 @@ window.renderPublicProfile = async function(uid) {
   
   // Populate Info
   document.getElementById('public-name').innerHTML = `
-    ${targetUser.name} <span class="role-badge">${targetUser.role}</span>
+    ${escapeHTMLSafe(targetUser.name)} <span class="role-badge">${escapeHTMLSafe(targetUser.role)}</span>
   `;
-  document.getElementById('public-avatar').src = targetUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder';
+  document.getElementById('public-avatar').src = sanitizeUrlSafe(targetUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder', { allowDataImage: true, allowHash: false });
   
   const coverEl = document.getElementById('public-cover-photo');
   if (targetUser.coverPhoto) {
-    coverEl.style.backgroundImage = `url('${targetUser.coverPhoto}')`;
+    coverEl.style.backgroundImage = `url('${sanitizeUrlSafe(targetUser.coverPhoto, { allowDataImage: true, allowHash: false })}')`;
   } else {
     coverEl.style.backgroundImage = 'none';
   }
   
   const contactEl = document.getElementById('public-contact');
   if (targetUser.contactInfo || targetUser.email) {
-    contactEl.innerHTML = `<ion-icon name="mail-outline"></ion-icon> <span>${targetUser.contactInfo || targetUser.email}</span>`;
+    contactEl.innerHTML = `<ion-icon name="mail-outline"></ion-icon> <span>${escapeHTMLSafe(targetUser.contactInfo || targetUser.email)}</span>`;
     contactEl.style.display = 'block';
   } else {
     contactEl.style.display = 'none';

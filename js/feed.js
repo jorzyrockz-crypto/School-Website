@@ -48,6 +48,10 @@ function generateStories() {
   container.innerHTML = html;
 }
 
+var escapeHTMLSafe = window.escapeHTML || ((value) => String(value ?? ''));
+var escapeAttrSafe = window.escapeAttr || escapeHTMLSafe;
+var sanitizeUrlSafe = window.sanitizeUrl || ((value) => value || '#');
+
 let currentFeedFilter = 'all';
 
 async function renderNewsfeed(filterType = currentFeedFilter) {
@@ -103,10 +107,20 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
   container.innerHTML = filtered.map(a => {
     const likes = a.likes || [];
     const userHasLiked = activeUser ? likes.includes(activeUser.uid) : false;
+    const safePostId = escapeAttrSafe(a.id || '');
+    const safeAuthorUid = escapeAttrSafe(a.authorUid || '');
+    const safeAuthor = escapeHTMLSafe(a.author || 'Unknown Author');
+    const safeAuthorRole = escapeHTMLSafe(a.authorRole || 'member');
+    const safeDate = escapeHTMLSafe(a.date || '');
+    const safeTitleValue = escapeHTMLSafe(a.title || '');
+    const safeContentValue = escapeHTMLSafe(a.content || '');
+    const safeAvatarUrl = sanitizeUrlSafe(a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder', { allowDataImage: true, allowHash: false });
+    const safeImageUrl = a.imageData ? sanitizeUrlSafe(a.imageData, { allowDataImage: true, allowHash: false }) : '';
+    const encodedImageData = a.imageData ? encodeURIComponent(a.imageData) : '';
     
     let innerCardHTML = '';
-    const titleText = a.title ? `<h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${a.title}</h3>` : '';
-    const contentText = `<p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${a.content}</p>`;
+    const titleText = a.title ? `<h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${safeTitleValue}</h3>` : '';
+    const contentText = `<p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${safeContentValue}</p>`;
 
     if (a.type === 'announcement') {
       innerCardHTML = `
@@ -114,29 +128,33 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
           <ion-icon name="megaphone"></ion-icon> OFFICIAL ANNOUNCEMENT
         </div>
         ${titleText}
-        <p style="color:var(--text-primary); margin-bottom:1rem; font-size:1.05rem; font-weight:600;">${a.content}</p>
+        <p style="color:var(--text-primary); margin-bottom:1rem; font-size:1.05rem; font-weight:600;">${safeContentValue}</p>
       `;
     } else if (a.type === 'achievement') {
       innerCardHTML = `
         <div class="achievement-badge"><ion-icon name="trophy"></ion-icon> Achievement</div>
         ${titleText}
-        <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:1rem; font-weight:500;">${a.content}</p>
+        <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:1rem; font-weight:500;">${safeContentValue}</p>
       `;
     } else if (a.type === 'event') {
       const eData = a.extraData || {};
       const rsvps = eData.rsvps || [];
       const userGoing = activeUser ? rsvps.includes(activeUser.uid) : false;
       const goingBtnStyle = userGoing ? "background:var(--primary); color:white;" : "background:var(--bg-secondary); color:var(--primary);";
+      const safeEventTitle = escapeHTMLSafe(eData.eventTitle || a.title || 'School Event');
+      const safeEventDate = escapeHTMLSafe(eData.date || a.eventDate || '');
+      const safeEventTime = escapeHTMLSafe(eData.time || a.eventTime || '');
+      const safeEventLocation = escapeHTMLSafe(eData.location || a.eventLocation || '');
       
       innerCardHTML = `
-        <h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${eData.eventTitle || a.title || 'School Event'}</h3>
+        <h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${safeEventTitle}</h3>
         ${contentText}
         <div class="event-details" style="background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:1rem;">
-          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;"><ion-icon name="calendar" style="color:var(--primary);"></ion-icon> <strong>${eData.date || a.eventDate}</strong> at ${eData.time || a.eventTime}</div>
-          <div style="display:flex; align-items:center; gap:0.5rem;"><ion-icon name="location" style="color:var(--primary);"></ion-icon> ${eData.location || a.eventLocation}</div>
+          <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;"><ion-icon name="calendar" style="color:var(--primary);"></ion-icon> <strong>${safeEventDate}</strong> at ${safeEventTime}</div>
+          <div style="display:flex; align-items:center; gap:0.5rem;"><ion-icon name="location" style="color:var(--primary);"></ion-icon> ${safeEventLocation}</div>
           <div style="display:flex; align-items:center; justify-content:space-between; margin-top:0.75rem; border-top:1px dashed var(--border-color); padding-top:0.75rem;">
             <span style="font-size:0.8rem; font-weight:600; color:var(--text-secondary);">${rsvps.length || a.eventGoing || 0} people going</span>
-            <button class="btn-action btn-rsvp" data-id="${a.id}" style="padding:0.4rem 1rem; font-size:0.8rem; border-radius:50px; ${goingBtnStyle}; border:1px solid var(--primary); font-weight:600;">${userGoing ? "I'm Going!" : "RSVP"}</button>
+            <button class="btn-action btn-rsvp" data-id="${safePostId}" style="padding:0.4rem 1rem; font-size:0.8rem; border-radius:50px; ${goingBtnStyle}; border:1px solid var(--primary); font-weight:600;">${userGoing ? "I'm Going!" : "RSVP"}</button>
           </div>
         </div>
       `;
@@ -153,10 +171,10 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
         const isVoted = userVoteIndex === idx;
         const barColor = isVoted ? 'rgba(99,102,241,0.2)' : 'var(--bg-secondary)';
         return `
-          <div class="poll-option btn-poll-vote" data-id="${a.id}" data-idx="${idx}" style="position:relative; margin-bottom:0.5rem; border:1px solid ${isVoted ? 'var(--primary)' : 'var(--border-color)'}; border-radius:var(--radius-sm); overflow:hidden; cursor:pointer;">
+          <div class="poll-option btn-poll-vote" data-id="${safePostId}" data-idx="${idx}" style="position:relative; margin-bottom:0.5rem; border:1px solid ${isVoted ? 'var(--primary)' : 'var(--border-color)'}; border-radius:var(--radius-sm); overflow:hidden; cursor:pointer;">
             <div class="poll-progress" style="width:${percent}%; background:${barColor}; height:100%; position:absolute; top:0; left:0; z-index:1;"></div>
             <div style="position:relative; z-index:2; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
-              <span class="poll-text" style="font-size:0.9rem; font-weight:500;">${optText}</span>
+              <span class="poll-text" style="font-size:0.9rem; font-weight:500;">${escapeHTMLSafe(optText)}</span>
               <span class="poll-percent" style="font-size:0.8rem; font-weight:700; color:var(--text-secondary);">${percent}%</span>
             </div>
           </div>
@@ -171,7 +189,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
         </div>
       `;
     } else if (a.type === 'location') {
-      const locName = (a.extraData && a.extraData.locationName) ? a.extraData.locationName : 'Unknown Location';
+      const locName = escapeHTMLSafe((a.extraData && a.extraData.locationName) ? a.extraData.locationName : 'Unknown Location');
       innerCardHTML = `
         <div style="font-size:0.85rem; color:var(--danger); font-weight:600; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.25rem;">
           <ion-icon name="location"></ion-icon> Checked in at ${locName}
@@ -181,13 +199,15 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
       `;
     } else if (a.type === 'link') {
       const linkUrl = (a.extraData && a.extraData.linkUrl) ? a.extraData.linkUrl : '#';
+      const safeLinkUrl = sanitizeUrlSafe(linkUrl, { allowHash: false });
+      const safeLinkLabel = escapeHTMLSafe(linkUrl);
       innerCardHTML = `
         ${titleText}
         ${contentText}
-        <a href="${linkUrl}" target="_blank" style="display:flex; align-items:center; gap:0.75rem; background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.75rem; text-decoration:none; color:inherit; transition: border-color 0.2s;">
+        <a href="${safeLinkUrl}" target="_blank" rel="noopener noreferrer" style="display:flex; align-items:center; gap:0.75rem; background:var(--bg-secondary); padding:1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-top:0.75rem; text-decoration:none; color:inherit; transition: border-color 0.2s;">
           <ion-icon name="link" style="font-size:1.5rem; color:var(--primary);"></ion-icon>
           <div style="flex:1; overflow:hidden;">
-            <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${linkUrl}</div>
+            <div style="font-weight:600; font-size:0.95rem; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;">${safeLinkLabel}</div>
             <div style="font-size:0.75rem; color:var(--text-secondary);">Click to visit link</div>
           </div>
           <ion-icon name="open-outline" style="color:var(--text-secondary);"></ion-icon>
@@ -205,10 +225,10 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     if (a.imageData) {
       innerCardHTML += `
         <div style="position:relative; margin-bottom:1rem; width:100%;">
-          <a href="javascript:void(0)" onclick="openPhotoTheater('${a.imageData}', '${a.id}')" style="display:block; cursor:zoom-in;" title="Click to view full image">
-            <img src="${a.imageData}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--border-color); display:block; transition: filter 0.2s;" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='brightness(1)'">
+          <a href="javascript:void(0)" onclick="openPhotoTheater(decodeURIComponent('${encodedImageData}'), '${safePostId}')" style="display:block; cursor:zoom-in;" title="Click to view full image">
+            <img src="${safeImageUrl}" alt="Post image" style="width:100%; max-height:400px; object-fit:cover; border-radius:var(--radius-md); border:1px solid var(--border-color); display:block; transition: filter 0.2s;" onmouseover="this.style.filter='brightness(0.9)'" onmouseout="this.style.filter='brightness(1)'">
           </a>
-          <a href="${a.imageData}" download="post_image_${a.id}.png" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.65); color:white; padding:0.4rem 0.8rem; border-radius:50px; font-size:0.8rem; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:0.3rem; backdrop-filter:blur(4px); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.65)'" title="Download Image">
+          <a href="${safeImageUrl}" download="post_image_${safePostId}.png" style="position:absolute; bottom:10px; right:10px; background:rgba(0,0,0,0.65); color:white; padding:0.4rem 0.8rem; border-radius:50px; font-size:0.8rem; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:0.3rem; backdrop-filter:blur(4px); transition:background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.85)'" onmouseout="this.style.background='rgba(0,0,0,0.65)'" title="Download Image">
             <ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Save
           </a>
         </div>
@@ -218,14 +238,17 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     // Global Document Appending
     if (a.extraData && a.extraData.document) {
       const doc = a.extraData.document;
+      const safeDocName = escapeHTMLSafe(doc.name || 'Document');
+      const safeDocSize = escapeHTMLSafe(doc.size || '');
+      const safeDocHref = sanitizeUrlSafe(doc.fileData || '#', { allowDataFile: true });
       innerCardHTML += `
         <div style="display:flex; align-items:center; gap:0.5rem; background:var(--bg-secondary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); margin-bottom:1rem;">
           <ion-icon name="document-text" style="color:var(--primary); font-size:1.75rem;"></ion-icon>
           <div style="flex:1;">
-            <div style="font-size:0.9rem; font-weight:600;">${doc.name}</div>
-            <div style="font-size:0.75rem; color:var(--text-secondary);">${doc.size}</div>
+            <div style="font-size:0.9rem; font-weight:600;">${safeDocName}</div>
+            <div style="font-size:0.75rem; color:var(--text-secondary);">${safeDocSize}</div>
           </div>
-          <a href="${doc.fileData || '#'}" ${doc.fileData ? `download="${doc.name}"` : `onclick="showToast('Downloading ${doc.name}...')"`} style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.2rem;"><ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Download</a>
+          <a href="${safeDocHref}" ${doc.fileData ? `download="${escapeAttrSafe(doc.name || 'document')}"` : `onclick="showToast('Downloading document...')"`} style="background:none; border:none; color:var(--primary); cursor:pointer; font-weight:600; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.2rem;"><ion-icon name="download-outline" style="font-size:1.1rem;"></ion-icon> Download</a>
         </div>
       `;
     }
@@ -240,18 +263,18 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     if (activeUser) {
       let menuItems = [];
       if (activeUser.name === a.author) {
-        menuItems.push(`<button class="btn-edit-post" data-id="${a.id}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="create"></ion-icon> Edit</button>`);
+        menuItems.push(`<button class="btn-edit-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="create"></ion-icon> Edit</button>`);
       }
       if (activeUser.role === 'admin' || activeUser.name === a.author) {
-        menuItems.push(`<button class="btn-delete-post" data-id="${a.id}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:var(--danger);"><ion-icon name="trash"></ion-icon> Delete</button>`);
+        menuItems.push(`<button class="btn-delete-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:var(--danger);"><ion-icon name="trash"></ion-icon> Delete</button>`);
       }
       if (activeUser.role === 'teacher' && activeUser.name !== a.author) {
-        menuItems.push(`<button class="btn-flag-post" data-id="${a.id}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:#f59e0b;"><ion-icon name="flag"></ion-icon> Flag for Review</button>`);
+        menuItems.push(`<button class="btn-flag-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem; color:#f59e0b;"><ion-icon name="flag"></ion-icon> Flag for Review</button>`);
       }
       if (activeUser.role === 'admin' || activeUser.role === 'teacher') {
         const pinText = a.isPinned ? "Unpin Post" : "Pin Post";
         const pinIcon = a.isPinned ? "close-circle" : "pin";
-        menuItems.push(`<button class="btn-pin-post" data-id="${a.id}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="${pinIcon}"></ion-icon> ${pinText}</button>`);
+        menuItems.push(`<button class="btn-pin-post" data-id="${safePostId}" style="display:block; width:100%; padding:0.5rem; text-align:left; background:none; border:none; cursor:pointer; font-size:0.85rem;"><ion-icon name="${pinIcon}"></ion-icon> ${pinText}</button>`);
       }
       if (menuItems.length > 0) {
         contextMenuHTML = `
@@ -266,31 +289,31 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     }
 
     return `
-      <article id="post-${a.id}" class="news-card ${a.type === 'achievement' ? 'achievement-card' : (a.type === 'event' ? 'event-card' : '')}" style="margin-bottom:1.5rem;">
+      <article id="post-${safePostId}" class="news-card ${a.type === 'achievement' ? 'achievement-card' : (a.type === 'event' ? 'event-card' : '')}" style="margin-bottom:1.5rem;">
         <!-- Card Header -->
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
-            <a href="#/user/${a.authorUid || ''}" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; color:inherit;">
-              <img class="thread-avatar" src="${a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder'}" alt="avatar">
+            <a href="#/user/${safeAuthorUid}" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; color:inherit;">
+              <img class="thread-avatar" src="${safeAvatarUrl}" alt="avatar">
               <div>
-                <strong style="font-size:0.95rem; display:block;">${a.author}</strong>
-              <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${a.authorRole} &bull; ${a.date}</span>
+                <strong style="font-size:0.95rem; display:block;">${safeAuthor}</strong>
+              <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${safeAuthorRole} &bull; ${safeDate}</span>
             </div>
             </a>
           </div>
           ${contextMenuHTML}
         </div>
 
-        <div id="post-body-${a.id}">
+        <div id="post-body-${safePostId}">
           ${innerCardHTML}
         </div>
         
         <!-- Edit container -->
-        <div id="post-edit-container-${a.id}" style="display:none; margin-bottom:1rem;">
-          <textarea id="edit-input-${a.id}" class="form-control" style="width:100%; resize:vertical; min-height:80px; margin-bottom:0.5rem;">${a.content}</textarea>
+        <div id="post-edit-container-${safePostId}" style="display:none; margin-bottom:1rem;">
+          <textarea id="edit-input-${safePostId}" class="form-control" style="width:100%; resize:vertical; min-height:80px; margin-bottom:0.5rem;">${safeContentValue}</textarea>
           <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
-            <button class="btn-secondary btn-cancel-edit" data-id="${a.id}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Cancel</button>
-            <button class="btn-primary btn-save-edit" data-id="${a.id}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Save</button>
+            <button class="btn-secondary btn-cancel-edit" data-id="${safePostId}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Cancel</button>
+            <button class="btn-primary btn-save-edit" data-id="${safePostId}" style="padding:0.3rem 0.75rem; font-size:0.8rem;">Save</button>
           </div>
         </div>
         
@@ -309,10 +332,10 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
         </div>
 
         <!-- Comments Area (Hidden by default) -->
-        <div id="comments-box-${a.id}" class="comments-section" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-color);">
-          <div id="comments-list-${a.id}" style="max-height: 300px; overflow-y: auto; padding-right: 0.5rem;"></div>
+        <div id="comments-box-${safePostId}" class="comments-section" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-color);">
+          <div id="comments-list-${safePostId}" style="max-height: 300px; overflow-y: auto; padding-right: 0.5rem;"></div>
           ${activeUser ? `
-            <form class="comment-form" data-ann-id="${a.id}" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+            <form class="comment-form" data-ann-id="${safePostId}" style="display:flex; gap:0.5rem; margin-top:0.5rem;">
               <input type="text" class="form-control" placeholder="Write a comment..." style="flex:1; border-radius:50px; font-size:0.85rem; padding:0.5rem 1rem;">
               <button type="submit" class="btn-primary" style="border-radius:50px; padding:0.5rem 1rem;"><ion-icon name="send"></ion-icon></button>
             </form>
@@ -440,24 +463,47 @@ async function renderCommentsList(annId) {
   } else {
     list.innerHTML = comments.map(c => `
       <div class="comment-item" style="display:flex; gap:0.5rem; margin-bottom:1rem;">
-        <a href="#/user/${c.authorUid || ''}" style="display:block; flex-shrink:0;">
-          <img src="${c.authorAvatar || `https://api.dicebear.com/7.x/micah/svg?seed=${c.author}`}" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+        <a href="#/user/${escapeAttrSafe(c.authorUid || '')}" style="display:block; flex-shrink:0;">
+          <img src="${sanitizeUrlSafe(c.authorAvatar || `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(c.author || 'user')}`, { allowDataImage: true, allowHash: false })}" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
         </a>
         <div style="flex:1;">
           <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:1rem; padding:0.5rem 0.75rem; display:inline-block; min-width:150px;">
-            <a href="#/user/${c.authorUid || ''}" style="text-decoration:none;">
-              <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem; margin-bottom:0.1rem;">${c.author}</div>
+            <a href="#/user/${escapeAttrSafe(c.authorUid || '')}" style="text-decoration:none;">
+              <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem; margin-bottom:0.1rem;">${escapeHTMLSafe(c.author)}</div>
             </a>
-            <div style="font-size:0.85rem; color:var(--text-primary); word-break:break-word;">${c.text}</div>
+            <div style="font-size:0.85rem; color:var(--text-primary); word-break:break-word;">${escapeHTMLSafe(c.text)}</div>
           </div>
           <div style="display:flex; gap:0.75rem; font-size:0.7rem; color:var(--text-secondary); font-weight:600; margin-top:0.25rem; margin-left:0.5rem;">
-            <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="if(this.innerText==='React') this.style.color='var(--text-secondary)'" onclick="this.innerText = this.innerText === 'React' ? 'Liked' : 'React'; this.style.color = this.innerText === 'Liked' ? 'var(--primary)' : 'var(--text-secondary)'; showToast(this.innerText === 'Liked' ? 'Reacted to comment' : 'Reaction removed');">React</span>
-            <span style="cursor:pointer; transition:color 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-secondary)'" onclick="const i = document.querySelector('.comment-form[data-ann-id=\\\'${annId}\\\'] input'); i.focus(); i.value = '@${c.author} ';">Reply</span>
+            <span class="comment-react-toggle" style="cursor:pointer; transition:color 0.2s;">React</span>
+            <span class="comment-reply-trigger" data-author="${escapeAttrSafe(c.author)}" style="cursor:pointer; transition:color 0.2s;">Reply</span>
           </div>
         </div>
       </div>
     `).join('');
   }
+
+  list.querySelectorAll('.comment-react-toggle').forEach((item) => {
+    item.onmouseover = () => { item.style.color = 'var(--primary)'; };
+    item.onmouseout = () => {
+      if (item.innerText === 'React') item.style.color = 'var(--text-secondary)';
+    };
+    item.onclick = () => {
+      item.innerText = item.innerText === 'React' ? 'Liked' : 'React';
+      item.style.color = item.innerText === 'Liked' ? 'var(--primary)' : 'var(--text-secondary)';
+      showToast(item.innerText === 'Liked' ? 'Reacted to comment' : 'Reaction removed');
+    };
+  });
+
+  list.querySelectorAll('.comment-reply-trigger').forEach((item) => {
+    item.onmouseover = () => { item.style.color = 'var(--primary)'; };
+    item.onmouseout = () => { item.style.color = 'var(--text-secondary)'; };
+    item.onclick = () => {
+      const input = document.querySelector(`.comment-form[data-ann-id="${annId}"] input`);
+      if (!input) return;
+      input.focus();
+      input.value = `@${item.dataset.author} `;
+    };
+  });
 
   const form = document.querySelector(`.comment-form[data-ann-id="${annId}"]`);
   form.onsubmit = async (e) => {
@@ -482,10 +528,10 @@ async function renderTransparencyDocs() {
   const school = await dbService.getSchool(currentSchoolId);
   list.innerHTML = school.transparencyDocs.map(d => `
     <tr>
-      <td><strong>${d.title}</strong></td>
+      <td><strong>${escapeHTMLSafe(d.title)}</strong></td>
       <td>June 2026</td>
       <td>
-        <a href="${d.url}" class="nav-link" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;">
+        <a href="${sanitizeUrlSafe(d.url, { allowHash: false })}" class="nav-link" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;" rel="noopener noreferrer">
           <ion-icon name="download-outline"></ion-icon> View Document
         </a>
       </td>
@@ -1023,7 +1069,7 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
       .map(a => ({
         title: a.title,
         content: a.content,
-        timestamp: a.timestamp,
+        timestamp: a.timestamp || new Date(a.date).getTime(),
         imageData: a.imageData,
         type: a.type === 'event' ? 'event' : 'announcement',
         icon: a.type === 'event' ? 'calendar-outline' : 'megaphone-outline',

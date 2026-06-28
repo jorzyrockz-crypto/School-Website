@@ -1,6 +1,10 @@
 // AUTH PORTAL DASHBOARDS
 // ==========================================
 
+var escapeHTMLSafe = window.escapeHTML || ((value) => String(value ?? ''));
+var escapeAttrSafe = window.escapeAttr || escapeHTMLSafe;
+var sanitizeUrlSafe = window.sanitizeUrl || ((value) => value || '#');
+
 async function renderRolePortal() {
   if (!activeUser) return;
   const role = activeUser.role;
@@ -249,15 +253,15 @@ async function initMessagesPanel() {
     }
 
     return `
-    <div class="thread-item" data-uid="${t.uid}" style="position:relative;">
-      <img class="thread-avatar" src="${t.avatar}" alt="avatar">
+    <div class="thread-item" data-uid="${escapeAttrSafe(t.uid)}" style="position:relative;">
+      <img class="thread-avatar" src="${sanitizeUrlSafe(t.avatar, { allowDataImage: true, allowHash: false })}" alt="avatar">
       <div class="thread-details" style="flex:1; overflow:hidden;">
         <div style="display:flex; justify-content:space-between; align-items:baseline;">
-          <div class="thread-name" style="font-weight:${t.unread ? '700' : '500'};">${t.name}</div>
+          <div class="thread-name" style="font-weight:${t.unread ? '700' : '500'};">${escapeHTMLSafe(t.name)}</div>
           <span class="thread-time">${timeStr}</span>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
-          <div class="thread-snippet" style="font-weight:${t.unread ? '700' : '400'}; color:${t.unread ? 'var(--text-primary)' : 'var(--text-secondary)'};">${snippet}</div>
+          <div class="thread-snippet" style="font-weight:${t.unread ? '700' : '400'}; color:${t.unread ? 'var(--text-primary)' : 'var(--text-secondary)'};">${escapeHTMLSafe(snippet)}</div>
           ${t.unread ? `<div class="thread-unread-badge"></div>` : ''}
         </div>
       </div>
@@ -312,29 +316,29 @@ async function openChatWindow(targetUser, forceNoIndicator = false) {
       let content = '';
       
       if (m.fileAttachment) {
-        const ext = m.fileAttachment.name.split('.').pop().toUpperCase();
         content += `
           <div class="chat-file-attachment" style="background:rgba(0,0,0,0.1); padding:0.5rem; border-radius:8px; display:flex; align-items:center; gap:0.5rem;">
             <ion-icon name="document-text" class="file-icon" style="font-size:1.5rem;"></ion-icon>
-            <div class="file-name" title="${m.fileAttachment.name}" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.85rem;">${m.fileAttachment.name}</div>
-            <a href="${m.fileAttachment.data}" download="${m.fileAttachment.name}" class="file-download" title="Download ${ext}" style="color:inherit;">
+            <div class="file-name" title="${escapeAttrSafe(m.fileAttachment.name || 'Attachment')}" style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:0.85rem;">${escapeHTMLSafe(m.fileAttachment.name || 'Attachment')}</div>
+            <a href="${sanitizeUrlSafe(m.fileAttachment.data, { allowDataFile: true, allowHash: false })}" download="${escapeAttrSafe(m.fileAttachment.name || 'attachment')}" class="file-download" title="Download attachment" style="color:inherit;">
               <ion-icon name="download-outline"></ion-icon>
             </a>
           </div>
         `;
       } else if (m.imageData) {
         mediaItems.push(m.imageData);
+        const encodedMessageImage = encodeURIComponent(m.imageData);
         content += `
-          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in; max-width:100%;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${m.imageData}', 'chat_${m.timestamp}')">
-            <img src="${m.imageData}" alt="Image" style="max-width:100%; width:220px; max-height:200px; object-fit:cover; border-radius:8px; display:block; border:1px solid rgba(255,255,255,0.2);">
-            <a href="${m.imageData}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
+          <div style="position:relative; display:inline-block; margin-bottom:${m.text ? '0.4rem' : '0'}; cursor:zoom-in; max-width:100%;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater(decodeURIComponent('${encodedMessageImage}'), 'chat_${m.timestamp}')">
+            <img src="${sanitizeUrlSafe(m.imageData, { allowDataImage: true, allowHash: false })}" alt="Image" style="max-width:100%; width:220px; max-height:200px; object-fit:cover; border-radius:8px; display:block; border:1px solid rgba(255,255,255,0.2);">
+            <a href="${sanitizeUrlSafe(m.imageData, { allowDataImage: true, allowHash: false })}" download="image_${m.timestamp}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
               <ion-icon name="download-outline"></ion-icon>
             </a>
           </div>
         `;
       }
       
-      if (m.text) content += `<span>${m.text}</span>`;
+      if (m.text) content += `<span>${escapeHTMLSafe(m.text)}</span>`;
       
       const timeStr = new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       const isLastMsg = idx === messages.length - 1;
@@ -346,7 +350,7 @@ async function openChatWindow(targetUser, forceNoIndicator = false) {
       const bubbleCls = m.imageData && !m.text ? 'chat-msg-bubble chat-msg-media-bubble' : 'chat-msg-bubble';
       return `
         <div class="chat-msg-row ${rowCls}">
-          ${!isOut ? `<img class="chat-msg-avatar" src="${targetUser.avatar}" alt="Avatar">` : ''}
+          ${!isOut ? `<img class="chat-msg-avatar" src="${sanitizeUrlSafe(targetUser.avatar, { allowDataImage: true, allowHash: false })}" alt="Avatar">` : ''}
           <div style="max-width:75%; text-align:${isOut ? 'right' : 'left'}; flex-shrink:0;">
             <div class="${bubbleCls}" style="display:inline-block; text-align:left;">${content}</div>
             <span class="chat-msg-timestamp">${timeStr}</span>
@@ -364,9 +368,9 @@ async function openChatWindow(targetUser, forceNoIndicator = false) {
       
       if (mediaItems.length > 0) {
         mediaGrid.innerHTML = mediaItems.map((src, i) => `
-          <div style="position:relative; width:100%; aspect-ratio:1; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater('${src}', 'media_${i}')">
-            <img class="media-item" src="${src}" style="width:100%; height:100%; display:block;">
-            <a href="${src}" download="media_${i}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
+          <div style="position:relative; width:100%; aspect-ratio:1; cursor:zoom-in;" onclick="if(typeof openPhotoTheater === 'function') openPhotoTheater(decodeURIComponent('${encodeURIComponent(src)}'), 'media_${i}')">
+            <img class="media-item" src="${sanitizeUrlSafe(src, { allowDataImage: true, allowHash: false })}" style="width:100%; height:100%; display:block;">
+            <a href="${sanitizeUrlSafe(src, { allowDataImage: true, allowHash: false })}" download="media_${i}.jpg" title="Download Image" style="position:absolute; bottom:5px; right:5px; background:rgba(0,0,0,0.6); color:white; border-radius:50%; width:24px; height:24px; display:flex; align-items:center; justify-content:center; text-decoration:none;" onclick="event.stopPropagation();">
               <ion-icon name="download-outline"></ion-icon>
             </a>
           </div>

@@ -104,10 +104,12 @@ const DEFAULT_LOCAL_DB = {
       status: "approved",
       likes: [],
       type: "event",
-      eventDate: "July 10, 2026",
-      eventTime: "08:00 AM",
-      eventLocation: "School Gymnasium",
-      eventGoing: 45
+      extraData: {
+        date: "July 10, 2026",
+        time: "08:00 AM",
+        location: "School Gymnasium",
+        rsvps: []
+      }
     },
     {
       id: "ann6",
@@ -122,11 +124,11 @@ const DEFAULT_LOCAL_DB = {
       status: "approved",
       likes: ["learner1"],
       type: "poll",
-      pollOptions: [
-        { text: "Futuristic / Sci-Fi", votes: 120 },
-        { text: "Mythology & Legends", votes: 85 },
-        { text: "Philippine Festivals", votes: 210 }
-      ]
+      extraData: {
+        options: ["Futuristic / Sci-Fi", "Mythology & Legends", "Philippine Festivals"],
+        votes: [120, 85, 210],
+        votedUsers: {}
+      }
     }
   ],
   comments: [
@@ -401,6 +403,7 @@ const dbService = {
       authorRole: activeUser.role,
       authorAvatar: activeUser.avatar,
       date: new Date().toISOString().split('T')[0],
+      timestamp: Date.now(),
       status: status || 'pending',
       likes: [],
       reactions: {}, // { uid: 'love', uid2: 'celebrate' }
@@ -435,6 +438,14 @@ const dbService = {
     const post = local.announcements.find(a => a.id === postId);
     if (!post || post.type !== 'poll') return;
     
+    if (!post.extraData) {
+      post.extraData = {
+        options: post.pollOptions ? post.pollOptions.map(o => o.text) : [],
+        votes: post.pollOptions ? post.pollOptions.map(o => o.votes) : [],
+        votedUsers: {}
+      };
+    }
+    
     if (post.extraData.votedUsers[uid] !== undefined) {
       // Remove old vote
       post.extraData.votes[post.extraData.votedUsers[uid]]--;
@@ -448,6 +459,7 @@ const dbService = {
     const post = local.announcements.find(a => a.id === postId);
     if (!post || post.type !== 'event') return;
     
+    if (!post.extraData) post.extraData = {};
     if (!post.extraData.rsvps) post.extraData.rsvps = [];
     if (!post.extraData.rsvps.includes(uid)) {
       post.extraData.rsvps.push(uid);
