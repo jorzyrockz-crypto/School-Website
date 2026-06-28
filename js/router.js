@@ -47,6 +47,14 @@ function switchView(viewName, pathParam) {
   // Handle Special Routes
   let domViewId = viewName;
   if (viewName === 'user') {
+    if (!pathParam && activeUser) {
+      window.location.hash = `#/user/${activeUser.uid}`;
+      return;
+    } else if (!pathParam) {
+      window.location.hash = `#/home`;
+      return;
+    }
+    
     domViewId = 'user-profile';
     if (typeof renderPublicProfile === 'function') {
       renderPublicProfile(pathParam);
