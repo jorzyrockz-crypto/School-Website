@@ -118,9 +118,21 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     const safeImageUrl = a.imageData ? sanitizeUrlSafe(a.imageData, { allowDataImage: true, allowHash: false }) : '';
     const encodedImageData = a.imageData ? encodeURIComponent(a.imageData) : '';
     
+    let extractedUrl = null;
+    let textWithLinks = safeContentValue;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    
+    if (!a.type || a.type === 'standard' || a.type === 'announcement') {
+      const urls = safeContentValue.match(urlRegex);
+      if (urls && urls.length > 0) {
+        extractedUrl = urls[0];
+        textWithLinks = safeContentValue.replace(urlRegex, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:var(--primary); text-decoration:underline; word-break:break-all;">$1</a>');
+      }
+    }
+    
     let innerCardHTML = '';
     const titleText = a.title ? `<h3 class="news-title" style="font-size:1.2rem; margin-bottom:0.75rem;">${safeTitleValue}</h3>` : '';
-    const contentText = `<p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${safeContentValue}</p>`;
+    const contentText = `<p style="color:var(--text-secondary); margin-bottom:1rem; font-size:0.95rem;">${textWithLinks}</p>`;
 
     if (a.type === 'announcement') {
       innerCardHTML = `
@@ -128,13 +140,13 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
           <ion-icon name="megaphone"></ion-icon> OFFICIAL ANNOUNCEMENT
         </div>
         ${titleText}
-        <p style="color:var(--text-primary); margin-bottom:1rem; font-size:1.05rem; font-weight:600;">${safeContentValue}</p>
+        <p style="color:var(--text-primary); margin-bottom:1rem; font-size:1.05rem; font-weight:600;">${textWithLinks}</p>
       `;
     } else if (a.type === 'achievement') {
       innerCardHTML = `
         <div class="achievement-badge"><ion-icon name="trophy"></ion-icon> Achievement</div>
         ${titleText}
-        <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:1rem; font-weight:500;">${safeContentValue}</p>
+        <p style="color:var(--text-secondary); margin-bottom:1rem; font-size:1rem; font-weight:500;">${textWithLinks}</p>
       `;
     } else if (a.type === 'event') {
       const eData = a.extraData || {};
@@ -219,6 +231,10 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
         ${titleText}
         ${contentText}
       `;
+    }
+    
+    if (extractedUrl) {
+      innerCardHTML += `<div class="link-preview-container" data-url="${escapeAttrSafe(extractedUrl)}"></div>`;
     }
 
     // Global Photo Appending
@@ -344,6 +360,53 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
       </article>
     `;
   }).join('');
+
+  // Fetch Link Previews
+  container.querySelectorAll('.link-preview-container').forEach(async (previewDiv) => {
+    const url = previewDiv.dataset.url;
+    if (!url) return;
+    
+    const cacheKey = 'link_preview_' + url;
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached) {
+      previewDiv.innerHTML = cached;
+      return;
+    }
+
+    try {
+      previewDiv.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:center; padding:1.5rem; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-sm); margin-top:0.75rem;">
+          <div style="font-size:0.85rem; color:var(--text-secondary); display:flex; align-items:center; gap:0.5rem;">
+            <ion-icon name="sync-outline" style="animation: spin 2s linear infinite;"></ion-icon> Loading preview...
+          </div>
+        </div>
+      `;
+      const res = await fetch(`https://api.microlink.io/?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+      if (data.status === 'success' && data.data) {
+        const pd = data.data;
+        const html = `
+          <a href="${url}" target="_blank" rel="noopener noreferrer" class="link-preview-card" style="display:block; text-decoration:none; color:inherit; border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden; margin-top:0.75rem; transition:border-color 0.2s, box-shadow 0.2s;">
+            ${pd.image && pd.image.url ? `<img src="${pd.image.url}" alt="Preview" style="width:100%; height:200px; object-fit:cover; display:block;">` : ''}
+            <div style="padding:1rem; background:var(--bg-secondary);">
+              <div style="font-weight:700; font-size:1rem; margin-bottom:0.25rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.title || url)}</div>
+              ${pd.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.description)}</div>` : ''}
+              <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem; color:var(--text-secondary); font-weight:600;">
+                ${pd.logo && pd.logo.url ? `<img src="${pd.logo.url}" style="width:16px; height:16px; border-radius:50%; object-fit:cover;">` : '<ion-icon name="link"></ion-icon>'}
+                <span>${escapeHTMLSafe(pd.publisher || new URL(url).hostname)}</span>
+              </div>
+            </div>
+          </a>
+        `;
+        previewDiv.innerHTML = html;
+        sessionStorage.setItem(cacheKey, html);
+      } else {
+        previewDiv.innerHTML = '';
+      }
+    } catch(e) {
+      previewDiv.innerHTML = '';
+    }
+  });
 
   // Interaction Bindings
   container.querySelectorAll('.reaction-btn').forEach(btn => {

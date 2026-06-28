@@ -220,6 +220,10 @@
   box-shadow: 0 6px 24px rgba(0,0,0,0.06);
   transform: translateY(-2px);
 }
+.link-preview-card:hover {
+  border-color: var(--primary) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
 
 @media (max-width: 768px) {
   .news-card {
