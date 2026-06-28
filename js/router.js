@@ -6,8 +6,11 @@ function initRouter() {
     const hash = window.location.hash || '#/home';
     
     let viewName = 'home';
+    let pathParam = '';
     if (hash.startsWith('#/')) {
-      viewName = hash.split('#/')[1].split('/')[0];
+      const parts = hash.split('#/')[1].split('/');
+      viewName = parts[0];
+      pathParam = parts[1] || '';
     }
 
     // Guard portal routes
@@ -18,14 +21,14 @@ function initRouter() {
       return;
     }
 
-    switchView(viewName);
+    switchView(viewName, pathParam);
   };
 
   window.addEventListener('hashchange', handleRouting);
   handleRouting();
 }
 
-function switchView(viewName) {
+function switchView(viewName, pathParam) {
   // Check auth and show login screen if not authenticated
   const loginOverlay = document.getElementById('login-screen-overlay');
   if (!activeUser) {
@@ -35,11 +38,20 @@ function switchView(viewName) {
     if (loginOverlay) loginOverlay.style.display = 'none';
   }
 
-  // Restore saved theme on navigation (in case user was previewing a theme in settings but didn't save)
+  // Restore saved theme on navigation
   const currentSchoolId = activeUser ? activeUser.schoolId : "default-school";
   dbService.getSchool(currentSchoolId).then(school => {
     applyTheme(school.theme, school.logo);
   });
+  
+  // Handle Special Routes
+  let domViewId = viewName;
+  if (viewName === 'user') {
+    domViewId = 'user-profile';
+    if (typeof renderPublicProfile === 'function') {
+      renderPublicProfile(pathParam);
+    }
+  }
 
   // Toggle visibility of route blocks
   document.querySelectorAll('.route-view').forEach(view => {
@@ -47,10 +59,10 @@ function switchView(viewName) {
     view.classList.remove('active');
   });
 
-  const activeView = document.getElementById(`view-${viewName}`);
+  const activeView = document.getElementById(`view-${domViewId}`);
   if (activeView) {
     activeView.classList.add('active');
-    if (viewName === 'messages') {
+    if (domViewId === 'messages') {
       activeView.style.display = 'flex';
       activeView.style.flexDirection = 'column';
       activeView.style.flex = '1';

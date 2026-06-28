@@ -788,3 +788,106 @@ initPage();
     }
   }
 })();
+// ==========================================
+// PUBLIC USER PROFILE RENDERER
+// ==========================================
+window.renderPublicProfile = async function(uid) {
+  if (!uid) return;
+  const targetUser = await window.dbService.getUserById(uid);
+  if (!targetUser) {
+    showToast('User not found.');
+    window.location.hash = '#/home';
+    return;
+  }
+  
+  // Populate Info
+  document.getElementById('public-name').innerHTML = 
+    \ <span class="role-badge">\</span>
+  ;
+  document.getElementById('public-avatar').src = targetUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder';
+  
+  const coverEl = document.getElementById('public-cover-photo');
+  if (targetUser.coverPhoto) {
+    coverEl.style.backgroundImage = url('\');
+  } else {
+    coverEl.style.backgroundImage = 'none';
+  }
+  
+  const contactEl = document.getElementById('public-contact');
+  if (targetUser.contactInfo || targetUser.email) {
+    contactEl.innerHTML = <ion-icon name="mail-outline"></ion-icon> <span>\</span>;
+    contactEl.style.display = 'block';
+  } else {
+    contactEl.style.display = 'none';
+  }
+  
+  document.getElementById('public-bio').innerText = targetUser.bio || 'No bio provided.';
+  
+  const connectionsCount = (targetUser.connections || []).length;
+  document.getElementById('public-connections-count').innerText = \ Connection\;
+  
+  // Handle Action Buttons (Connect/Message)
+  const btnConnect = document.getElementById('btn-public-connect');
+  const btnMessage = document.getElementById('btn-public-message');
+  
+  if (activeUser && activeUser.uid !== uid) {
+    btnMessage.style.display = 'inline-block';
+    btnConnect.style.display = 'inline-block';
+    
+    // Check connection status
+    const isConnected = (activeUser.connections || []).includes(uid);
+    btnConnect.innerHTML = isConnected 
+      ? <ion-icon name="person-remove-outline"></ion-icon> Disconnect 
+      : <ion-icon name="person-add-outline"></ion-icon> Connect;
+      
+    btnConnect.onclick = async () => {
+      const newStatus = await window.dbService.toggleConnection(activeUser.uid, uid);
+      // Update activeUser memory
+      if (newStatus) {
+        if (!activeUser.connections) activeUser.connections = [];
+        activeUser.connections.push(uid);
+      } else {
+        activeUser.connections = activeUser.connections.filter(id => id !== uid);
+      }
+      try { sessionStorage.setItem('activeUser', JSON.stringify(activeUser)); } catch(e){}
+      renderPublicProfile(uid); // Re-render to update counts
+    };
+    
+    btnMessage.onclick = () => {
+      // Just initiate a chat by creating a mock thread or opening it if it exists
+      const chatId = [activeUser.uid, uid].sort().join('_');
+      const thread = {
+        uid: uid,
+        name: targetUser.name,
+        avatar: targetUser.avatar,
+        role: targetUser.role
+      };
+      if (typeof openFloatingChat === 'function') {
+        openFloatingChat(encodeURIComponent(JSON.stringify(thread)).replace(/'/g, "%27"));
+      } else {
+        window.location.hash = '#/messages';
+      }
+    };
+  } else {
+    btnMessage.style.display = 'none';
+    btnConnect.style.display = 'none';
+  }
+  
+  // Load User's Posts
+  const allPosts = await window.dbService.getAnnouncements();
+  const userPosts = allPosts.filter(p => p.author === targetUser.name);
+  
+  const feedContainer = document.getElementById('public-activity-feed');
+  feedContainer.innerHTML = '';
+  
+  if (userPosts.length === 0) {
+    feedContainer.innerHTML = '<p style="color:var(--text-secondary);">No recent activity.</p>';
+  } else {
+    // Re-use feed rendering logic for simplicity
+    if (typeof window.createPostElement === 'function') {
+      userPosts.forEach(post => {
+        feedContainer.appendChild(window.createPostElement(post));
+      });
+    }
+  }
+};

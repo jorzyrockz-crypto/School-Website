@@ -270,11 +270,13 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
         <!-- Card Header -->
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
-            <img class="thread-avatar" src="${a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder'}" alt="avatar">
-            <div>
-              <strong style="font-size:0.95rem; display:block;">${a.author}</strong>
+            <a href="#/user/${a.authorUid || ''}" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; color:inherit;">
+              <img class="thread-avatar" src="${a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder'}" alt="avatar">
+              <div>
+                <strong style="font-size:0.95rem; display:block;">${a.author}</strong>
               <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${a.authorRole} &bull; ${a.date}</span>
             </div>
+            </a>
           </div>
           ${contextMenuHTML}
         </div>
@@ -438,10 +440,14 @@ async function renderCommentsList(annId) {
   } else {
     list.innerHTML = comments.map(c => `
       <div class="comment-item" style="display:flex; gap:0.5rem; margin-bottom:1rem;">
-        <img src="${c.authorAvatar || `https://api.dicebear.com/7.x/micah/svg?seed=${c.author}`}" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0;">
+        <a href="#/user/${c.authorUid || ''}" style="display:block; flex-shrink:0;">
+          <img src="${c.authorAvatar || `https://api.dicebear.com/7.x/micah/svg?seed=${c.author}`}" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+        </a>
         <div style="flex:1;">
           <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:1rem; padding:0.5rem 0.75rem; display:inline-block; min-width:150px;">
-            <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem; margin-bottom:0.1rem;">${c.author}</div>
+            <a href="#/user/${c.authorUid || ''}" style="text-decoration:none;">
+              <div class="comment-meta" style="font-weight:700; color:var(--primary); font-size:0.8rem; margin-bottom:0.1rem;">${c.author}</div>
+            </a>
             <div style="font-size:0.85rem; color:var(--text-primary); word-break:break-word;">${c.text}</div>
           </div>
           <div style="display:flex; gap:0.75rem; font-size:0.7rem; color:var(--text-secondary); font-weight:600; margin-top:0.25rem; margin-left:0.5rem;">
@@ -461,7 +467,9 @@ async function renderCommentsList(annId) {
     if (!text) return;
     
     const authorName = activeUser ? activeUser.name : "Guest Parent";
-    await dbService.addComment(annId, authorName, text);
+    const authorUid = activeUser ? activeUser.uid : "";
+    const authorAvatar = activeUser ? activeUser.avatar : "";
+    await dbService.addComment(annId, authorName, text, authorUid, authorAvatar);
     input.value = '';
     renderCommentsList(annId);
   };

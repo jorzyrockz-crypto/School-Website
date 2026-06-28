@@ -519,6 +519,36 @@ function initProfilePanel() {
   if (!activeUser) return;
   document.getElementById('profile-avatar-preview').src = activeUser.avatar;
   document.getElementById('profile-name-input').value = activeUser.name;
+  
+  if (document.getElementById('profile-contact-input')) {
+    document.getElementById('profile-contact-input').value = activeUser.contactInfo || activeUser.email || '';
+  }
+  if (document.getElementById('profile-cover-input')) {
+    document.getElementById('profile-cover-input').value = activeUser.coverPhoto || '';
+  }
+  if (document.getElementById('profile-bio-input')) {
+    document.getElementById('profile-bio-input').value = activeUser.bio || '';
+  }
+
+  // --- Settings Tabs Wiring ---
+  document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+    btn.onclick = (e) => {
+      document.querySelectorAll('.settings-tab-btn').forEach(b => {
+        b.classList.remove('active');
+        b.style.background = 'transparent';
+        b.style.color = 'var(--text-primary)';
+      });
+      const el = e.currentTarget;
+      el.classList.add('active');
+      el.style.background = 'var(--bg-primary)';
+      el.style.color = 'var(--primary)';
+      
+      document.querySelectorAll('.settings-tab-content').forEach(content => {
+        content.style.display = 'none';
+      });
+      document.getElementById(el.dataset.tab).style.display = 'block';
+    };
+  });
 
   // --- Profile Photo Upload (click avatar to pick a file) ---
   const profilePhotoInput = document.getElementById('profile-photo-input');
@@ -652,6 +682,10 @@ function initProfilePanel() {
     e.preventDefault();
     const name = document.getElementById('profile-name-input').value.trim();
     const avatar = document.getElementById('profile-avatar-preview').src;
+    
+    const contactInfo = document.getElementById('profile-contact-input') ? document.getElementById('profile-contact-input').value.trim() : activeUser.contactInfo;
+    const coverPhoto = document.getElementById('profile-cover-input') ? document.getElementById('profile-cover-input').value.trim() : activeUser.coverPhoto;
+    const bio = document.getElementById('profile-bio-input') ? document.getElementById('profile-bio-input').value.trim() : activeUser.bio;
 
     // Extract Role Data
     const roleData = {};
@@ -674,7 +708,7 @@ function initProfilePanel() {
       roleData.position = document.getElementById('rf-position').value;
     }
 
-    activeUser = await dbService.saveUser(activeUser.uid, { name, avatar, roleData });
+    activeUser = await dbService.saveUser(activeUser.uid, { name, avatar, contactInfo, coverPhoto, bio, roleData });
     try { sessionStorage.setItem('activeUser', JSON.stringify(activeUser)); } catch(err) {}
     showToast('Profile updated successfully!');
 
@@ -682,9 +716,9 @@ function initProfilePanel() {
     syncSidebarProfile();
   };
 
-  const adminBox = document.getElementById('admin-branding-settings');
+  const adminSidebarSection = document.getElementById('admin-sidebar-section');
   if (activeUser.role === 'admin') {
-    adminBox.style.display = 'block';
+    if (adminSidebarSection) adminSidebarSection.style.display = 'block';
     
     dbService.getSchool(currentSchoolId).then(school => {
       document.getElementById('school-name-input').value = school.name;
@@ -747,7 +781,7 @@ function initProfilePanel() {
       showToast("Branding settings saved successfully!");
     };
   } else {
-    adminBox.style.display = 'none';
+    if (adminSidebarSection) adminSidebarSection.style.display = 'none';
   }
 }
 

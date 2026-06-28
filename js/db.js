@@ -31,10 +31,10 @@ const DEFAULT_LOCAL_DB = {
     { id: "fs5", url: "https://www.teacherph.com/feed/", type: "Teacher Resources", tag: "library", color: "#8b5cf6" }
   ],
   users: {
-    "admin1":   { uid: "admin1",   email: "admin@school.edu",   name: "Maria Santos (Admin)",    role: "admin",   schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos" },
-    "teacher1": { uid: "teacher1", email: "teacher@school.edu", name: "Teacher Jose (Math)",    role: "teacher", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose" },
-    "parent1":  { uid: "parent1",  email: "parent@school.edu",  name: "Mrs. Cruz (Parent)",     role: "parent",  schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz" },
-    "learner1": { uid: "learner1", email: "learner@school.edu", name: "Juan Cruz (Grade 10)",   role: "learner", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz" }
+    "admin1":   { uid: "admin1",   email: "admin@school.edu",   name: "Maria Santos (Admin)",    role: "admin",   schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos", bio: "Leading the school administration to foster a community of excellence.", coverPhoto: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80", contactInfo: "maria.santos@school.edu", connections: [] },
+    "teacher1": { uid: "teacher1", email: "teacher@school.edu", name: "Teacher Jose (Math)",    role: "teacher", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose", bio: "Passionate mathematics teacher helping students discover the joy of numbers.", coverPhoto: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80", contactInfo: "jose.math@school.edu", connections: [] },
+    "parent1":  { uid: "parent1",  email: "parent@school.edu",  name: "Mrs. Cruz (Parent)",     role: "parent",  schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz", bio: "Proud parent of Juan Cruz. PTA Committee Member.", coverPhoto: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1200&q=80", contactInfo: "mrs.cruz@email.com", connections: [] },
+    "learner1": { uid: "learner1", email: "learner@school.edu", name: "Juan Cruz (Grade 10)",   role: "learner", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz", bio: "Grade 10 student. Member of the Science Club.", coverPhoto: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80", contactInfo: "juan.cruz@student.school.edu", connections: [] }
   },
   announcements: [
     {
@@ -43,6 +43,7 @@ const DEFAULT_LOCAL_DB = {
       title: "AY 2026-2027 Enrollment Open",
       content: "We are pleased to announce that enrollment for both Junior and Senior High School is now officially open. Please submit requirements to the registrar's office.",
       author: "Maria Santos",
+      authorUid: "admin1",
       authorRole: "admin",
       authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
       date: "2026-06-24",
@@ -55,9 +56,10 @@ const DEFAULT_LOCAL_DB = {
       title: "Class Suspensions Due to Inclement Weather",
       content: "In compliance with local school directives, classes in all levels are suspended today due to heavy rains. Please stay safe and monitor our channels for further updates.",
       author: "Teacher Jose",
+      authorUid: "teacher1",
       authorRole: "teacher",
       authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
-      date: "2026-06-23",
+      date: "2026-06-22",
       status: "approved",
       likes: ["parent1"]
     },
@@ -67,6 +69,7 @@ const DEFAULT_LOCAL_DB = {
       title: "Upcoming Brigada Eskwela Activities",
       content: "Join us this coming Monday for our annual school maintenance and cleanup drive. Let's work together to prepare classrooms for our learners.",
       author: "Teacher Jose",
+      authorUid: "teacher1",
       authorRole: "teacher",
       authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
       date: "2026-06-23",
@@ -78,9 +81,10 @@ const DEFAULT_LOCAL_DB = {
       schoolId: "default-school",
       title: "Learner of the Month",
       content: "Congratulations to Juan Cruz for demonstrating outstanding academic excellence and leadership in the Grade 10 Science class!",
-      author: "Maria Santos",
-      authorRole: "admin",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
+      author: "System Auto-Update",
+      authorUid: "system",
+      authorRole: "bot",
+      authorAvatar: "https://api.dicebear.com/7.x/bot/svg?seed=System",
       date: "2026-06-25",
       status: "approved",
       likes: ["teacher1"],
@@ -93,6 +97,7 @@ const DEFAULT_LOCAL_DB = {
       title: "PTA General Assembly",
       content: "All parents are invited to the first General Assembly of the Academic Year to discuss school policies and upcoming events.",
       author: "Maria Santos",
+      authorUid: "admin1",
       authorRole: "admin",
       authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
       date: "2026-07-05",
@@ -110,6 +115,7 @@ const DEFAULT_LOCAL_DB = {
       title: "Intramurals Theme Selection",
       content: "Learners, please vote for this year's Intramurals theme!",
       author: "Teacher Jose",
+      authorUid: "teacher1",
       authorRole: "teacher",
       authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
       date: "2026-06-26",
@@ -295,6 +301,28 @@ const dbService = {
     saveLocalDB(local);
     return local.users[uid];
   },
+  toggleConnection: async (followerUid, targetUid) => {
+    const local = getLocalDB();
+    const follower = local.users[followerUid];
+    const target = local.users[targetUid];
+    if (!follower || !target) return false;
+    
+    if (!follower.connections) follower.connections = [];
+    if (!target.connections) target.connections = [];
+    
+    const followerHasTarget = follower.connections.includes(targetUid);
+    
+    if (followerHasTarget) {
+      follower.connections = follower.connections.filter(id => id !== targetUid);
+      target.connections = target.connections.filter(id => id !== followerUid);
+    } else {
+      follower.connections.push(targetUid);
+      target.connections.push(followerUid);
+    }
+    
+    saveLocalDB(local);
+    return !followerHasTarget; // returns true if connected, false if disconnected
+  },
   getAnnouncements: async () => {
     const local = getLocalDB();
     
@@ -369,6 +397,7 @@ const dbService = {
       audiences: audiences || ['all'],
       extraData: extraData || {},
       author: activeUser.name,
+      authorUid: activeUser.uid,
       authorRole: activeUser.role,
       authorAvatar: activeUser.avatar,
       date: new Date().toISOString().split('T')[0],
@@ -497,12 +526,14 @@ const dbService = {
     const local = getLocalDB();
     return local.comments.filter(c => c.announcementId === annId);
   },
-  addComment: async (annId, author, text) => {
+  addComment: async (annId, author, text, authorUid, authorAvatar) => {
     const local = getLocalDB();
     const newComment = {
       id: "comment_" + Date.now(),
       announcementId: annId,
       author,
+      authorUid: authorUid || '',
+      authorAvatar: authorAvatar || '',
       text,
       timestamp: Date.now()
     };
