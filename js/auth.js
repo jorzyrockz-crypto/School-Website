@@ -81,15 +81,18 @@ function syncSidebarProfile() {
   const headerAvatar = document.getElementById('header-user-avatar');
   const dropdownAvatar = document.getElementById('dropdown-user-avatar');
   const name = document.getElementById('header-user-name');
+  const profileLink = document.getElementById('dropdown-user-profile-link');
 
   if (activeUser) {
     if (headerAvatar) headerAvatar.src = activeUser.avatar;
     if (dropdownAvatar) dropdownAvatar.src = activeUser.avatar;
     if (name) name.innerText = activeUser.name;
+    if (profileLink) profileLink.href = `#/user/${activeUser.uid}`;
   } else {
     if (headerAvatar) headerAvatar.src = "https://api.dicebear.com/7.x/micah/svg?seed=guest";
     if (dropdownAvatar) dropdownAvatar.src = "https://api.dicebear.com/7.x/micah/svg?seed=guest";
     if (name) name.innerText = "Guest User";
+    if (profileLink) profileLink.href = `#/home`;
   }
 }
 
