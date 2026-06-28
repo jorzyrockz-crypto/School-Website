@@ -359,7 +359,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
     const url = previewDiv.dataset.url;
     if (!url) return;
     
-    const cacheKey = 'link_preview_' + url;
+    const cacheKey = 'link_preview_v2_' + url;
     const cached = sessionStorage.getItem(cacheKey);
     if (cached) {
       previewDiv.innerHTML = cached;
@@ -380,7 +380,7 @@ async function renderNewsfeed(filterType = currentFeedFilter) {
         const pd = data.data;
         const html = `
           <a href="${url}" target="_blank" rel="noopener noreferrer" class="link-preview-card" style="display:block; text-decoration:none; color:inherit; border:1px solid var(--border-color); border-radius:var(--radius-md); overflow:hidden; margin-top:0.75rem; transition:border-color 0.2s, box-shadow 0.2s;">
-            ${pd.image && pd.image.url ? `<img src="${pd.image.url}" alt="Preview" style="width:100%; height:200px; object-fit:cover; display:block;">` : ''}
+            ${pd.image && pd.image.url ? `<img src="${pd.image.url}" alt="Preview" style="width:100%; height:auto; max-height:400px; object-fit:contain; background:rgba(0,0,0,0.02); display:block;">` : ''}
             <div style="padding:1rem; background:var(--bg-secondary);">
               <div style="font-weight:700; font-size:1rem; margin-bottom:0.25rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.title || url)}</div>
               ${pd.description ? `<div style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.5rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(pd.description)}</div>` : ''}
