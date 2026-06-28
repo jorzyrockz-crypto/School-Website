@@ -801,21 +801,21 @@ window.renderPublicProfile = async function(uid) {
   }
   
   // Populate Info
-  document.getElementById('public-name').innerHTML = 
-    \ <span class="role-badge">\</span>
-  ;
+  document.getElementById('public-name').innerHTML = `
+    ${targetUser.name} <span class="role-badge">${targetUser.role}</span>
+  `;
   document.getElementById('public-avatar').src = targetUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder';
   
   const coverEl = document.getElementById('public-cover-photo');
   if (targetUser.coverPhoto) {
-    coverEl.style.backgroundImage = url('\');
+    coverEl.style.backgroundImage = `url('${targetUser.coverPhoto}')`;
   } else {
     coverEl.style.backgroundImage = 'none';
   }
   
   const contactEl = document.getElementById('public-contact');
   if (targetUser.contactInfo || targetUser.email) {
-    contactEl.innerHTML = <ion-icon name="mail-outline"></ion-icon> <span>\</span>;
+    contactEl.innerHTML = `<ion-icon name="mail-outline"></ion-icon> <span>${targetUser.contactInfo || targetUser.email}</span>`;
     contactEl.style.display = 'block';
   } else {
     contactEl.style.display = 'none';
@@ -824,7 +824,7 @@ window.renderPublicProfile = async function(uid) {
   document.getElementById('public-bio').innerText = targetUser.bio || 'No bio provided.';
   
   const connectionsCount = (targetUser.connections || []).length;
-  document.getElementById('public-connections-count').innerText = \ Connection\;
+  document.getElementById('public-connections-count').innerText = `${connectionsCount} Connection${connectionsCount !== 1 ? 's' : ''}`;
   
   // Handle Action Buttons (Connect/Message)
   const btnConnect = document.getElementById('btn-public-connect');
@@ -837,8 +837,8 @@ window.renderPublicProfile = async function(uid) {
     // Check connection status
     const isConnected = (activeUser.connections || []).includes(uid);
     btnConnect.innerHTML = isConnected 
-      ? <ion-icon name="person-remove-outline"></ion-icon> Disconnect 
-      : <ion-icon name="person-add-outline"></ion-icon> Connect;
+      ? `<ion-icon name="person-remove-outline"></ion-icon> Disconnect` 
+      : `<ion-icon name="person-add-outline"></ion-icon> Connect`;
       
     btnConnect.onclick = async () => {
       const newStatus = await window.dbService.toggleConnection(activeUser.uid, uid);
@@ -854,7 +854,6 @@ window.renderPublicProfile = async function(uid) {
     };
     
     btnMessage.onclick = () => {
-      // Just initiate a chat by creating a mock thread or opening it if it exists
       const chatId = [activeUser.uid, uid].sort().join('_');
       const thread = {
         uid: uid,
@@ -875,7 +874,7 @@ window.renderPublicProfile = async function(uid) {
   
   // Load User's Posts
   const allPosts = await window.dbService.getAnnouncements();
-  const userPosts = allPosts.filter(p => p.author === targetUser.name);
+  const userPosts = allPosts.filter(p => p.authorUid === uid || p.author === targetUser.name);
   
   const feedContainer = document.getElementById('public-activity-feed');
   feedContainer.innerHTML = '';
