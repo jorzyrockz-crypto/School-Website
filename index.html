@@ -674,42 +674,68 @@
         </div>
         <!-- ================= VIEW: PUBLIC USER PROFILE ================= -->
         <div id="view-user-profile" class="route-view" style="display:none; padding: 0;">
-          <div style="background:var(--bg-secondary); border-radius:0 0 1rem 1rem; overflow:hidden; border:1px solid var(--border-color); border-top:none;">
+          <div style="background:var(--bg-secondary); border-radius:0 0 1rem 1rem; overflow:hidden; border:1px solid var(--border-color); border-top:none; box-shadow:var(--shadow-sm);">
             <!-- Cover Photo -->
-            <div id="public-cover-photo" style="height: 250px; background-size: cover; background-position: center; background-color: var(--primary);"></div>
+            <div id="public-cover-photo" style="height: 300px; background-size: cover; background-position: center; background-color: var(--primary);"></div>
             
-            <!-- Profile Info Container -->
-            <div style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; position: relative;">
-              <!-- Avatar (Overlaps Cover Photo) -->
-              <div style="position: absolute; top: -60px; left: 1.5rem; background: var(--bg-primary); padding: 0.3rem; border-radius: 50%;">
-                <img id="public-avatar" src="" style="width: 120px; height: 120px; border-radius: 50%; object-fit: cover;" alt="Avatar">
+            <!-- Profile Info Container (FB Style Header) -->
+            <div style="padding: 0 2rem 1rem 2rem; position: relative;">
+              
+              <div class="fb-profile-header" style="display:flex; flex-wrap:wrap; align-items:flex-end; gap:1.5rem; position:relative; top:-40px; margin-bottom:-40px;">
+                <!-- Avatar -->
+                <div style="background: var(--bg-primary); padding: 4px; border-radius: 50%; box-shadow:0 2px 10px rgba(0,0,0,0.1); flex-shrink:0;">
+                  <img id="public-avatar" src="" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;" alt="Avatar">
+                </div>
+                
+                <!-- Name and Role -->
+                <div style="flex: 1; min-width: 200px; padding-bottom: 0.5rem; display:flex; flex-direction:column; justify-content:center;">
+                  <h1 id="public-name" style="margin: 0; font-size: 2rem; display: flex; align-items: center; gap: 0.5rem; font-weight:700;">Name <span id="public-role-badge" class="role-badge">Role</span></h1>
+                  <p id="public-connections-count" style="color: var(--text-secondary); font-weight: 600; font-size: 0.95rem; margin: 0.25rem 0 0 0;">0 Connections</p>
+                </div>
+
+                <!-- Action Buttons -->
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; padding-bottom: 0.5rem; flex-shrink:0;">
+                  <button id="btn-public-message" class="btn-secondary" style="display:none; border-radius:0.5rem; font-weight:600; align-items:center; gap:0.4rem;"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Message</button>
+                  <button id="btn-public-connect" class="btn-action" style="display:none; border-radius:0.5rem; font-weight:600; align-items:center; gap:0.4rem;"><ion-icon name="person-add-outline"></ion-icon> Connect</button>
+                </div>
               </div>
               
-              <!-- Action Buttons (Right Aligned) -->
-              <div style="display: flex; justify-content: flex-end; gap: 0.5rem; min-height: 45px;">
-                <button id="btn-public-message" class="btn-secondary" style="display:none;"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Message</button>
-                <button id="btn-public-connect" class="btn-action" style="display:none;"><ion-icon name="person-add-outline"></ion-icon> Connect</button>
-              </div>
-              
-              <!-- Name and Details -->
-              <div style="margin-top: 0.5rem;">
-                <h1 id="public-name" style="margin: 0; font-size: 1.8rem; display: flex; align-items: center; gap: 0.5rem;">Name <span id="public-role-badge" class="role-badge">Role</span></h1>
-                <p id="public-contact" style="color: var(--text-secondary); margin: 0.5rem 0; font-size: 0.95rem;"><ion-icon name="mail-outline"></ion-icon> <span>email</span></p>
-                <p id="public-connections-count" style="color: var(--primary); font-weight: 600; font-size: 0.9rem; margin: 0;">0 Connections</p>
-              </div>
-              
-              <!-- Bio -->
-              <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color);">
-                <h3 style="margin-top: 0; font-size: 1.1rem;">About</h3>
-                <p id="public-bio" style="line-height: 1.6; color: var(--text-secondary);">No bio provided.</p>
+              <!-- Divider -->
+              <div style="height:1px; background:var(--border-color); margin-top:2.5rem; margin-bottom:0.5rem;"></div>
+
+              <!-- FB Style Navigation Tabs -->
+              <div style="display:flex; gap:1.5rem; font-weight:600; color:var(--text-secondary);">
+                <div style="padding:0.75rem 0; color:var(--primary); border-bottom:3px solid var(--primary); cursor:pointer;">Posts</div>
+                <div style="padding:0.75rem 0; cursor:pointer;" onclick="showToast('The Intro section covers this on desktop!');">About</div>
               </div>
             </div>
           </div>
           
-          <div style="margin-top: 2rem;">
-            <h3>Recent Activity</h3>
-            <div id="public-activity-feed" style="margin-top: 1rem;">
-              <!-- Posts by this user will be injected here -->
+          <!-- 2-Column Layout Below Header -->
+          <div style="margin-top: 1.5rem; display:flex; gap:1.5rem; flex-wrap:wrap; align-items:flex-start;">
+            
+            <!-- Left Column: Intro -->
+            <div style="flex:1; min-width:300px; max-width:400px;">
+              <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1.5rem; box-shadow:var(--shadow-sm); position:sticky; top:80px;">
+                <h3 style="margin-top: 0; font-size: 1.2rem; margin-bottom:1rem; font-weight:700;">Intro</h3>
+                <p id="public-bio" style="line-height: 1.5; color: var(--text-primary); text-align:center; font-size:0.95rem; margin-bottom:1.5rem;">No bio provided.</p>
+                
+                <div style="display:flex; flex-direction:column; gap:1rem; color:var(--text-primary); font-size:0.95rem;">
+                  <div id="public-contact" style="display:flex; align-items:center; gap:0.75rem;">
+                    <!-- Filled by JS -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Feed -->
+            <div style="flex:2; min-width:300px;">
+              <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:1rem 1.5rem; box-shadow:var(--shadow-sm); margin-bottom:1rem;">
+                <h3 style="margin: 0; font-size: 1.2rem; font-weight:700;">Posts</h3>
+              </div>
+              <div id="public-activity-feed">
+                <!-- Posts by this user will be injected here -->
+              </div>
             </div>
           </div>
         </div>

@@ -818,8 +818,8 @@ window.renderPublicProfile = async function(uid) {
   
   const contactEl = document.getElementById('public-contact');
   if (targetUser.contactInfo || targetUser.email) {
-    contactEl.innerHTML = `<ion-icon name="mail-outline"></ion-icon> <span>${escapeHTMLSafe(targetUser.contactInfo || targetUser.email)}</span>`;
-    contactEl.style.display = 'block';
+    contactEl.innerHTML = `<ion-icon name="mail-outline" style="color:var(--text-secondary); font-size:1.2rem;"></ion-icon> <span>${escapeHTMLSafe(targetUser.contactInfo || targetUser.email)}</span>`;
+    contactEl.style.display = 'flex';
   } else {
     contactEl.style.display = 'none';
   }
