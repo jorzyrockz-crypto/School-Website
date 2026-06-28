@@ -830,15 +830,14 @@ window.renderPublicProfile = async function(uid) {
   document.getElementById('public-connections-count').innerText = `${connectionsCount} Connection${connectionsCount !== 1 ? 's' : ''}`;
   
   // Handle Action Buttons (Connect/Message)
-  const btnConnect = document.getElementById('btn-public-connect');
   const btnMessage = document.getElementById('btn-public-message');
+  const btnConnect = document.getElementById('btn-public-connect');
+  const btnEdit = document.getElementById('btn-public-edit');
   
   if (activeUser && activeUser.uid !== uid) {
-    btnMessage.style.display = 'inline-block';
-    btnConnect.style.display = 'inline-block';
-    
-    const btnEditCover = document.getElementById('btn-edit-cover');
-    if (btnEditCover) btnEditCover.style.display = 'none';
+    btnMessage.style.display = 'flex';
+    btnConnect.style.display = 'flex';
+    if (btnEdit) btnEdit.style.display = 'none';
     
     // Check connection status
     const isConnected = (activeUser.connections || []).includes(uid);
@@ -876,6 +875,11 @@ window.renderPublicProfile = async function(uid) {
   } else {
     btnMessage.style.display = 'none';
     btnConnect.style.display = 'none';
+    if (activeUser && activeUser.uid === uid && btnEdit) {
+      btnEdit.style.display = 'flex';
+    } else if (btnEdit) {
+      btnEdit.style.display = 'none';
+    }
   }
   // Load User's Posts
   const allPosts = await window.dbService.getAnnouncements();

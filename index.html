@@ -695,6 +695,7 @@
 
                 <!-- Action Buttons -->
                 <div style="display: flex; justify-content: flex-end; gap: 0.5rem; padding-bottom: 0.5rem; flex-shrink:0;">
+                  <button id="btn-public-edit" class="btn-secondary" style="display:none; border-radius:0.5rem; font-weight:600; align-items:center; gap:0.4rem;" onclick="window.location.hash='#/profile'"><ion-icon name="pencil-outline"></ion-icon> Edit Profile</button>
                   <button id="btn-public-message" class="btn-secondary" style="display:none; border-radius:0.5rem; font-weight:600; align-items:center; gap:0.4rem;"><ion-icon name="chatbubble-ellipses-outline"></ion-icon> Message</button>
                   <button id="btn-public-connect" class="btn-action" style="display:none; border-radius:0.5rem; font-weight:600; align-items:center; gap:0.4rem;"><ion-icon name="person-add-outline"></ion-icon> Connect</button>
                 </div>
@@ -750,6 +751,7 @@
               <h3 style="margin-top: 0; padding-left: 0.5rem; font-size: 0.9rem; text-transform: uppercase; color: var(--text-secondary); letter-spacing: 1px;">User Settings</h3>
               <ul style="list-style: none; padding: 0; margin: 1rem 0; display: flex; flex-direction: column; gap: 0.25rem;">
                 <li><button class="settings-tab-btn active" data-tab="tab-account" style="width: 100%; text-align: left; padding: 0.75rem 1rem; background: var(--bg-primary); border: none; border-radius: 0.5rem; color: var(--primary); font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;"><ion-icon name="person-outline"></ion-icon> Edit Profile</button></li>
+                <li><a id="settings-view-profile-btn" href="#/user" style="text-decoration:none; width: 100%; text-align: left; padding: 0.75rem 1rem; background: transparent; border: none; border-radius: 0.5rem; color: var(--text-primary); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; font-size:0.95rem;"><ion-icon name="eye-outline"></ion-icon> View Public Profile</a></li>
               </ul>
               
               <div id="admin-sidebar-section" style="display:none; margin-top: 2rem;">
@@ -804,7 +806,7 @@
                   <div class="form-group">
                     <label>Cover Photo</label>
                     <div style="display:flex; gap:0.5rem; align-items:center;">
-                      <input type="url" id="profile-cover-input" class="form-control" placeholder="Image URL (or click Upload ->)">
+                      <input type="text" id="profile-cover-input" class="form-control" placeholder="Image URL (or click Upload ->)">
                       <input type="file" id="profile-cover-file" accept="image/*" style="display:none;">
                       <button type="button" class="btn-secondary" onclick="document.getElementById('profile-cover-file').click()" style="white-space:nowrap; padding:0.5rem 1rem;"><ion-icon name="cloud-upload-outline"></ion-icon> Upload</button>
                     </div>
