@@ -19,16 +19,18 @@ const DEFAULT_LOCAL_DB = {
       theme: "blue-gold",
       accentColor: "#d4af37",
       transparencyDocs: [
-        { title: "Citizen's Charter 2026", url: "#" },
-        { title: "School Report Card (SRC) FY 2025", url: "#" },
-        { title: "Annual Procurement Plan (APP)", url: "#" }
+        { id: "td1", title: "Citizen's Charter Comprehensive Handbook", category: "charter", format: "PDF", size: "3.8 MB", date: "June 2026", desc: "Official guidelines, registration protocols, learner rights, and service delivery standards.", url: "#" },
+        { id: "td2", title: "School Report Card (SRC) FY 2025-2026", category: "performance", format: "PDF", size: "5.2 MB", date: "May 2026", desc: "Annual institutional report card covering academic benchmarks, graduation rates, and learner progress.", url: "#" },
+        { id: "td3", title: "Annual Procurement Plan & Bids (APP 2026)", category: "procurement", format: "XLSX", size: "1.4 MB", date: "April 2026", desc: "Itemized capital expenditures, IT infrastructure bidding items, and textbook allocations.", url: "#" },
+        { id: "td4", title: "MOOE Liquidation & Cash Disbursement (Q1-Q2)", category: "financial", format: "PDF", size: "2.6 MB", date: "June 2026", desc: "Quarterly accounting of Maintenance and Other Operating Expenses with 100% liquidation compliance.", url: "#" },
+        { id: "td5", title: "Quality Management System Level III Accreditation", category: "performance", format: "PDF", size: "1.1 MB", date: "January 2026", desc: "Certificate of institutional excellence and academic standard compliance.", url: "#" },
+        { id: "td6", title: "Learner Nutrition & School Feeding Financial Audit", category: "financial", format: "PDF", size: "2.1 MB", date: "June 2026", desc: "Financial accountability audit of school nutritional feeding programs and community donations.", url: "#" },
+        { id: "td7", title: "Learner Safety, Anti-Bullying & Child Protection Policy", category: "charter", format: "PDF", size: "1.9 MB", date: "March 2026", desc: "Institutional policies protecting student welfare, mental health, and physical safety on campus.", url: "#" }
       ]
     }
   },
   feedSources: [
-    { id: "fs1", url: "https://www.deped.gov.ph/feed/", type: "National News", tag: "globe-outline", color: "var(--primary)" },
-    { id: "fs2", url: "https://home.depedaklan.online/feed/", type: "Division Advisory", tag: "business-outline", color: "var(--success)" },
-    { id: "fs5", url: "https://www.teacherph.com/feed/", type: "Teacher Resources", tag: "library", color: "#8b5cf6" }
+    { id: "fs5", url: "https://www.teacherph.com/feed/", type: "Educational Resources", tag: "library", color: "#8b5cf6" }
   ],
   users: {
     "admin1":   { uid: "admin1",   email: "admin@school.edu",   name: "Maria Santos (Admin)",    role: "admin",   schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos", bio: "Leading the school administration to foster a community of excellence.", coverPhoto: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80", contactInfo: "maria.santos@school.edu", connections: [] },
@@ -48,6 +50,7 @@ const DEFAULT_LOCAL_DB = {
       authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
       date: "2026-06-24",
       status: "approved",
+      isPinned: true,
       likes: ["learner1", "parent1"]
     },
     {
@@ -84,7 +87,7 @@ const DEFAULT_LOCAL_DB = {
       author: "System Auto-Update",
       authorUid: "system",
       authorRole: "bot",
-      authorAvatar: "https://api.dicebear.com/7.x/bot/svg?seed=System",
+      authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=ApexSystem",
       date: "2026-06-25",
       status: "approved",
       likes: ["teacher1"],
@@ -129,13 +132,101 @@ const DEFAULT_LOCAL_DB = {
         votes: [120, 85, 210],
         votedUsers: {}
       }
+    },
+    {
+      id: "ann7",
+      schoolId: "default-school",
+      title: "Mid-Year STEM & Robotics Showcase",
+      content: "Join us this Friday at the Main Auditorium as our Junior & Senior High learners demonstrate innovative engineering and coding projects.",
+      author: "Teacher Jose",
+      authorUid: "teacher1",
+      authorRole: "teacher",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
+      date: "2026-11-24",
+      status: "approved",
+      likes: ["learner1", "admin1"],
+      type: "event",
+      extraData: {
+        date: "2026-11-28",
+        time: "09:00 AM",
+        location: "Main Auditorium",
+        rsvps: ["learner1"]
+      }
+    },
+    {
+      id: "ann8",
+      schoolId: "default-school",
+      title: "Parent-Teacher Evaluation & Report Cards",
+      content: "Distribution of Second Quarter academic evaluations and individual student growth consultations with subject teachers.",
+      author: "Maria Santos",
+      authorUid: "admin1",
+      authorRole: "admin",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
+      date: "2026-11-23",
+      status: "approved",
+      likes: ["parent1"],
+      type: "event",
+      extraData: {
+        date: "2026-12-05",
+        time: "08:30 AM",
+        location: "School Gymnasium & Classrooms",
+        rsvps: ["parent1"]
+      }
     }
   ],
   comments: [
     { id: "c1", announcementId: "ann1", author: "Mrs. Cruz (Parent)", text: "Are the enrollment forms downloadable online?", timestamp: Date.now() }
   ],
   attendance: {}, // format: { "default-school": { "learner1": { "2026-06-24": "present" } } }
-  chats: {}, 
+  groups: [
+    {
+      id: "group_faculty",
+      name: "Faculty & Staff Lounge",
+      category: "channel",
+      participants: ["admin1", "teacher1"]
+    },
+    {
+      id: "group_grade10_advisory",
+      name: "Grade 10 Advisory & Parents",
+      category: "channel",
+      participants: ["admin1", "teacher1", "parent1"]
+    },
+    {
+      id: "group_stem_robotics",
+      name: "STEM & Science Club",
+      category: "channel",
+      participants: ["teacher1", "learner1", "admin1"]
+    }
+  ],
+  chats: {
+    "admin1_teacher1": [
+      { senderId: "teacher1", text: "Good day Dr. Santos! Submitting the Grade 10 Math syllabus for the upcoming quarter.", timestamp: Date.now() - 7200000 },
+      { senderId: "admin1", text: "Received, Teacher Jose. The competencies are well-aligned. Approved for implementation.", timestamp: Date.now() - 3600000, reactions: { "👍": ["teacher1"] } },
+      { senderId: "teacher1", text: "Thank you Dr. Santos! I will distribute the modules to the learners tomorrow.", timestamp: Date.now() - 1800000 }
+    ],
+    "admin1_parent1": [
+      { senderId: "parent1", text: "Good morning Ma'am Maria, confirming if the PTA General Assembly on July 10 will have a virtual link?", timestamp: Date.now() - 14400000 },
+      { senderId: "admin1", text: "Good morning Mrs. Cruz! Yes, we will provide a livestream link via the portal announcements.", timestamp: Date.now() - 10800000, reactions: { "❤️": ["parent1"] } }
+    ],
+    "learner1_teacher1": [
+      { senderId: "learner1", text: "Hello sir! Clarifying the deadline for our trigonometry assignment.", timestamp: Date.now() - 86400000 },
+      { senderId: "teacher1", text: "Hi Juan! The deadline is extended until Friday 5:00 PM. Let me know if you need tutoring assistance.", timestamp: Date.now() - 82800000, reactions: { "👏": ["learner1"] } }
+    ],
+    "group_faculty": [
+      { senderId: "admin1", text: "Good morning faculty! Please submit your Q2 grading sheets by Friday 4:00 PM.", timestamp: Date.now() - 172800000 },
+      { senderId: "teacher1", text: "Noted Dr. Santos! Math 10 grades are almost finalized. We had a 94% passing rate in algebra.", timestamp: Date.now() - 86400000, reactions: { "👏": ["admin1"] } },
+      { senderId: "admin1", text: "Outstanding achievement, Teacher Jose! Keep up the great mentorship.", timestamp: Date.now() - 3600000, reactions: { "❤️": ["teacher1"] } }
+    ],
+    "group_grade10_advisory": [
+      { senderId: "teacher1", text: "Reminder to all Grade 10 parents: The midterm PTA meeting is scheduled this coming Saturday at 9:00 AM.", timestamp: Date.now() - 100000000 },
+      { senderId: "parent1", text: "Thank you Teacher Jose! Mrs. Cruz will be attending in person. Will progress report cards be distributed?", timestamp: Date.now() - 50000000, reactions: { "👍": ["teacher1"] } },
+      { senderId: "teacher1", text: "Yes Mrs. Cruz, hard copies will be distributed and digital copies will also be synced to your Parent Advisory Portal.", timestamp: Date.now() - 7200000 }
+    ],
+    "group_stem_robotics": [
+      { senderId: "learner1", text: "Good afternoon Sir Jose! Our robotics prototype passed the sensor calibration test!", timestamp: Date.now() - 25000000, reactions: { "🎉": ["teacher1", "admin1"] } },
+      { senderId: "teacher1", text: "Fantastic news Juan! Be sure to document your circuit schematic in your project journal.", timestamp: Date.now() - 15000000, reactions: { "💡": ["learner1"] } }
+    ]
+  }, 
   notifications: [
     { id: "n1", schoolId: "default-school", recipientId: "admin1", senderName: "Teacher Jose", messageText: "submitted 'Upcoming Brigada Eskwela' for approval.", read: false, timestamp: Date.now() }
   ],
@@ -195,7 +286,21 @@ try {
   console.error("Storage blocked or unavailable", e);
 }
 
+// In-Memory Database Cache for 60fps performance and zero redundant JSON parsing
+let cachedLocalDB = null;
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'deped_saas_db') {
+      cachedLocalDB = null;
+    }
+  });
+}
+
 function getLocalDB() {
+  if (cachedLocalDB && typeof cachedLocalDB === 'object') {
+    return cachedLocalDB;
+  }
   try {
     const data = localStorage.getItem("deped_saas_db");
     if (data) {
@@ -211,9 +316,55 @@ function getLocalDB() {
             updated = true;
           }
         }
+        if (!parsed.chats || Object.keys(parsed.chats).length === 0) {
+          parsed.chats = DEFAULT_LOCAL_DB.chats;
+          updated = true;
+        } else {
+          // Merge missing default chats such as school channels
+          for (const key of Object.keys(DEFAULT_LOCAL_DB.chats)) {
+            if (!parsed.chats[key]) {
+              parsed.chats[key] = DEFAULT_LOCAL_DB.chats[key];
+              updated = true;
+            }
+          }
+        }
+        if (!parsed.groups || parsed.groups.length === 0) {
+          parsed.groups = DEFAULT_LOCAL_DB.groups;
+          updated = true;
+        }
+        if (parsed.announcements) {
+          parsed.announcements.forEach(a => {
+            if (a.authorAvatar && a.authorAvatar.includes('/bot/svg')) {
+              a.authorAvatar = a.authorAvatar.replace('/bot/svg', '/bottts/svg');
+              updated = true;
+            }
+          });
+          const existingIds = new Set(parsed.announcements.map(a => a.id));
+          DEFAULT_LOCAL_DB.announcements.forEach(defA => {
+            if (!existingIds.has(defA.id)) {
+              parsed.announcements.push(defA);
+              updated = true;
+            }
+          });
+          if (!parsed.announcements.some(a => a.isPinned)) {
+            const firstAnn = parsed.announcements.find(a => a.id === 'ann1') || parsed.announcements[0];
+            if (firstAnn) {
+              firstAnn.isPinned = true;
+              updated = true;
+            }
+          }
+        }
+        if (parsed.schools && parsed.schools["default-school"]) {
+          const docs = parsed.schools["default-school"].transparencyDocs || [];
+          if (docs.length < 5 || !docs[0].category) {
+            parsed.schools["default-school"].transparencyDocs = DEFAULT_LOCAL_DB.schools["default-school"].transparencyDocs;
+            updated = true;
+          }
+        }
         if (updated) {
           localStorage.setItem("deped_saas_db", JSON.stringify(parsed));
         }
+        cachedLocalDB = parsed;
         return parsed;
       }
     }
@@ -225,10 +376,12 @@ function getLocalDB() {
   } catch(e) {
     console.error("Failed to write to local storage", e);
   }
+  cachedLocalDB = DEFAULT_LOCAL_DB;
   return DEFAULT_LOCAL_DB;
 }
 
 function saveLocalDB(data) {
+  cachedLocalDB = data;
   try {
     localStorage.setItem("deped_saas_db", JSON.stringify(data));
   } catch(e) {
@@ -254,17 +407,23 @@ let currentSchoolId = "default-school";
 // ==========================================
 
 const dbService = {
+  getLocalDB: () => getLocalDB(),
+  saveLocalDB: (local) => saveLocalDB(local),
+  getUsers: async () => {
+    const local = getLocalDB();
+    return Object.values(local.users || {});
+  },
   getFeedSources: async () => {
     const local = getLocalDB();
     if (!local.feedSources) local.feedSources = [];
     
-    // Cleanup script to remove broken DepEd category feeds from local storage
+    // Cleanup script to remove deprecated or failing feeds from local storage
     const originalLength = local.feedSources.length;
-    local.feedSources = local.feedSources.filter(s => s.id !== "fs3" && s.id !== "fs4");
+    local.feedSources = local.feedSources.filter(s => s.id !== "fs1" && s.id !== "fs2" && s.id !== "fs3" && s.id !== "fs4");
     
     // Auto-inject TeacherPH if missing
     if (!local.feedSources.find(s => s.id === "fs5")) {
-      local.feedSources.push({ id: "fs5", url: "https://www.teacherph.com/feed/", type: "Teacher Resources", tag: "library", color: "#8b5cf6" });
+      local.feedSources.push({ id: "fs5", url: "https://www.teacherph.com/feed/", type: "Educational Resources", tag: "library", color: "#8b5cf6" });
     }
     
     if (local.feedSources.length !== originalLength || !local.feedSources.find(s => s.id === "fs5" && originalLength > 0)) {
@@ -601,21 +760,23 @@ const dbService = {
     const groups = (local.groups || []).filter(g => g.participants.includes(uid)).map(g => ({
       uid: g.id,
       name: g.name,
-      role: 'Group Chat',
+      role: g.category === 'channel' ? 'School Channel' : 'Group Chat',
       avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(g.name) + '&backgroundColor=0ea5e9',
       isGroup: true,
+      category: g.category || 'channel',
       participants: g.participants
     }));
     
     return [...users, ...groups];
   },
-  createGroupChat: async (name, participants) => {
+  createGroupChat: async (name, participants, category = 'channel') => {
     const local = getLocalDB();
     if (!local.groups) local.groups = [];
     const groupId = 'group_' + Date.now();
     local.groups.push({
       id: groupId,
       name,
+      category,
       participants,
       createdAt: Date.now()
     });
@@ -632,13 +793,16 @@ const dbService = {
       local.chats[chatId] = [];
     }
     
-    // Legacy support for string imageData
+    // Legacy support for string imageData or objects
     let imageData = null;
     let fileAttachment = null;
+    let voiceNote = null;
     if (typeof attachment === 'string') {
       imageData = attachment;
     } else if (attachment && typeof attachment === 'object') {
-      if (attachment.type.startsWith('image/')) {
+      if (attachment.isVoice) {
+        voiceNote = attachment;
+      } else if (attachment.type && attachment.type.startsWith('image/')) {
         imageData = attachment.data;
       } else {
         fileAttachment = attachment;
@@ -650,12 +814,36 @@ const dbService = {
       text: text || '',
       imageData: imageData,
       fileAttachment: fileAttachment,
+      voiceNote: voiceNote,
+      reactions: {},
       timestamp: Date.now()
     };
     local.chats[chatId].push(newMsg);
     
     saveLocalDB(local);
     return newMsg;
+  },
+  toggleReaction: async (chatId, msgIndex, emoji, userId) => {
+    const local = getLocalDB();
+    if (!local.chats[chatId] || !local.chats[chatId][msgIndex]) return {};
+    const msg = local.chats[chatId][msgIndex];
+    if (!msg.reactions) msg.reactions = {};
+    if (!msg.reactions[emoji]) msg.reactions[emoji] = [];
+    const userIdx = msg.reactions[emoji].indexOf(userId);
+    if (userIdx >= 0) {
+      msg.reactions[emoji].splice(userIdx, 1);
+      if (msg.reactions[emoji].length === 0) delete msg.reactions[emoji];
+    } else {
+      msg.reactions[emoji].push(userId);
+    }
+    saveLocalDB(local);
+    return msg.reactions;
+  },
+  clearMessages: async (chatId) => {
+    const local = getLocalDB();
+    local.chats[chatId] = [];
+    saveLocalDB(local);
+    return true;
   },
   getSchedule: async (role, uid) => {
     const local = getLocalDB();
@@ -667,4 +855,8 @@ const dbService = {
     return [];
   }
 };
+
+window.dbService = dbService;
+window.getLocalDB = getLocalDB;
+window.saveLocalDB = saveLocalDB;
 

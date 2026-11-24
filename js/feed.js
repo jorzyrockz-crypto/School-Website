@@ -169,22 +169,101 @@ async function renderCommentsList(annId) {
   };
 }
 
+let currentTransparencyCategory = 'all';
+
 async function renderTransparencyDocs() {
-  const list = document.getElementById('transparency-docs-list');
-  if (!list) return;
+  const grid = document.getElementById('transparency-docs-grid');
+  const legacyList = document.getElementById('transparency-docs-list');
+  if (!grid && !legacyList) return;
 
   const school = await dbService.getSchool(currentSchoolId);
-  list.innerHTML = school.transparencyDocs.map(d => `
-    <tr>
-      <td><strong>${escapeHTMLSafe(d.title)}</strong></td>
-      <td>June 2026</td>
-      <td>
-        <a href="${sanitizeUrlSafe(d.url, { allowHash: false })}" class="nav-link" style="color:var(--primary); font-weight:600; display:inline-flex; align-items:center; gap:0.25rem;" rel="noopener noreferrer">
-          <ion-icon name="download-outline"></ion-icon> View Document
-        </a>
-      </td>
-    </tr>
-  `).join('');
+  const allDocs = school.transparencyDocs || [];
+
+  const searchInput = document.getElementById('transparency-search-input');
+  const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+
+  // Filter docs
+  let filtered = allDocs;
+  if (currentTransparencyCategory !== 'all') {
+    filtered = filtered.filter(d => (d.category || 'charter') === currentTransparencyCategory);
+  }
+  if (query) {
+    filtered = filtered.filter(d => 
+      (d.title && d.title.toLowerCase().includes(query)) ||
+      (d.desc && d.desc.toLowerCase().includes(query)) ||
+      (d.category && d.category.toLowerCase().includes(query))
+    );
+  }
+
+  // Wire Tab Buttons once
+  const tabsContainer = document.getElementById('transparency-tabs');
+  if (tabsContainer && !tabsContainer.dataset.wired) {
+    tabsContainer.dataset.wired = "true";
+    tabsContainer.querySelectorAll('button').forEach(btn => {
+      btn.onclick = (e) => {
+        tabsContainer.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+        e.currentTarget.classList.add('active');
+        currentTransparencyCategory = e.currentTarget.dataset.cat || 'all';
+        renderTransparencyDocs();
+      };
+    });
+  }
+
+  // Wire Search input once
+  if (searchInput && !searchInput.dataset.wired) {
+    searchInput.dataset.wired = "true";
+    searchInput.oninput = () => {
+      renderTransparencyDocs();
+    };
+  }
+
+  if (grid) {
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div style="grid-column: 1 / -1; text-align:center; padding:3rem 1rem; color:var(--text-secondary); background:var(--bg-secondary); border-radius:var(--radius-md); border:1px dashed var(--border-color);">
+          <ion-icon name="document-text-outline" style="font-size:2.5rem; opacity:0.4; margin-bottom:0.5rem; display:block; margin:0 auto 0.5rem;"></ion-icon>
+          <div style="font-weight:700; font-size:1rem; color:var(--text-primary); margin-bottom:0.25rem;">No Documents Found</div>
+          <div style="font-size:0.85rem; opacity:0.8;">Try clearing your search query or selecting another category.</div>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(d => {
+      const isPDF = (d.format || 'PDF').toUpperCase() === 'PDF';
+      const badgeBg = isPDF ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)';
+      const badgeColor = isPDF ? 'var(--danger)' : 'var(--success)';
+      const iconName = isPDF ? 'document-text' : 'grid';
+
+      return `
+        <div class="dash-card" style="display:flex; flex-direction:column; justify-content:space-between; padding:1.25rem; transition:transform 0.2s, box-shadow 0.2s;">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.75rem;">
+              <span style="font-size:0.72rem; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; padding:3px 8px; border-radius:6px; background:${badgeBg}; color:${badgeColor}; display:inline-flex; align-items:center; gap:0.25rem;">
+                <ion-icon name="${iconName}"></ion-icon> ${d.format || 'PDF'}
+              </span>
+              <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">${d.size || '2.4 MB'}</span>
+            </div>
+            <h3 style="font-size:1.05rem; font-weight:700; margin:0 0 0.4rem; line-height:1.35; color:var(--text-primary);">${escapeHTMLSafe(d.title)}</h3>
+            <p style="font-size:0.82rem; color:var(--text-secondary); margin:0 0 1rem; line-height:1.45; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;">${escapeHTMLSafe(d.desc || 'Official verified institutional publication.')}</p>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:0.75rem; margin-top:0.5rem;">
+            <span style="font-size:0.75rem; color:var(--text-secondary); display:flex; align-items:center; gap:0.25rem;">
+              <ion-icon name="calendar-outline"></ion-icon> ${d.date || 'June 2026'}
+            </span>
+            <div style="display:flex; gap:0.4rem;">
+              <button type="button" class="btn-secondary" onclick="showToast('Document verified & preview ready')" style="padding:0.35rem 0.75rem; font-size:0.78rem; border-radius:var(--radius-sm); cursor:pointer;">
+                Preview
+              </button>
+              <a href="${sanitizeUrlSafe(d.url || '#', { allowHash: false })}" download="${escapeAttrSafe(d.title)}" class="btn-primary" style="padding:0.35rem 0.75rem; font-size:0.78rem; border-radius:var(--radius-sm); text-decoration:none; display:inline-flex; align-items:center; gap:0.25rem;">
+                <ion-icon name="download-outline"></ion-icon> Download
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 // INLINE COMPOSER WIRING
@@ -500,19 +579,28 @@ async function renderPinnedPosts() {
   const pinned = announcements.filter(a => a.isPinned).slice(0, 5);
 
   if (pinned.length === 0) {
-    container.innerHTML = `<div style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:1rem;">No pinned posts yet.</div>`;
+    container.innerHTML = `
+      <div style="text-align:center; padding:1.25rem 0.5rem; color:var(--text-secondary); background:var(--bg-primary); border-radius:var(--radius-sm); border:1px dashed var(--border-color);">
+        <ion-icon name="pin-outline" style="font-size:1.8rem; color:var(--text-secondary); opacity:0.6; display:block; margin:0 auto 0.4rem;"></ion-icon>
+        <div style="font-weight:600; font-size:0.82rem; color:var(--text-primary);">No Pinned Notices</div>
+        <div style="font-size:0.72rem; opacity:0.8; margin-top:2px;">Important school announcements will appear here</div>
+      </div>
+    `;
     return;
   }
 
   container.innerHTML = pinned.map(p => {
+    const rawType = (p.type || p.category || 'Announcement').toLowerCase();
     let typeColor = 'var(--primary)';
-    if (p.type === 'announcement') typeColor = 'var(--danger)';
-    if (p.type === 'achievement') typeColor = '#f59e0b';
-    if (p.type === 'event') typeColor = '#10b981';
+    if (rawType === 'announcement') typeColor = 'var(--danger)';
+    if (rawType === 'achievement') typeColor = '#f59e0b';
+    if (rawType === 'event') typeColor = '#10b981';
+
+    const displayType = rawType === 'standard' ? 'Post' : (rawType.charAt(0).toUpperCase() + rawType.slice(1));
 
     return `
       <div class="pinned-item" onclick="window.location.hash='#/home'; setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);" style="background:var(--bg-primary); padding:0.75rem 1rem; border-radius:var(--radius-sm); border:1px solid var(--border-color); display:flex; flex-direction:column; gap:0.25rem; cursor:pointer; transition:var(--transition);">
-        <span style="font-size:0.65rem; font-weight:700; color:${typeColor}; text-transform:uppercase;">${p.type === 'standard' ? 'Post' : p.type} &bull; ${p.author}</span>
+        <span style="font-size:0.65rem; font-weight:700; color:${typeColor}; text-transform:uppercase;">${displayType} &bull; ${p.author}</span>
         <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary); line-height:1.3; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;">${p.title || p.content || (p.extraData && p.extraData.eventTitle)}</span>
       </div>
     `;
@@ -539,7 +627,13 @@ async function renderAgenda() {
   }).slice(0, 5); // Take only the next 5 events
 
   if (upcomingEvents.length === 0) {
-    container.innerHTML = `<li style="font-size:0.8rem; color:var(--text-secondary); text-align:center; padding:1rem;">No upcoming events.</li>`;
+    container.innerHTML = `
+      <li style="text-align:center; padding:1.25rem 0.5rem; color:var(--text-secondary); background:var(--bg-primary); border-radius:var(--radius-sm); border:1px dashed var(--border-color); list-style:none;">
+        <ion-icon name="calendar-outline" style="font-size:1.8rem; color:var(--text-secondary); opacity:0.6; display:block; margin:0 auto 0.4rem;"></ion-icon>
+        <div style="font-weight:600; font-size:0.82rem; color:var(--text-primary);">All Clear for Today</div>
+        <div style="font-size:0.72rem; opacity:0.8; margin-top:2px;">No scheduled events or exams today</div>
+      </li>
+    `;
     return;
   }
 
@@ -658,8 +752,9 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
   const statsContainer = document.getElementById('calendar-quick-stats');
   if (!container) return;
 
+  const announcements = await dbService.getAnnouncements();
+
   if (forceRefresh || cachedFeedPosts === null) {
-    const announcements = await dbService.getAnnouncements();
     const feedSources = await dbService.getFeedSources();
 
     let externalItems = [];
@@ -668,11 +763,14 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
       try {
         const cacheBuster = Math.floor(Date.now() / (1000 * 60 * 5)); // 5-minute cache bucket
         const res = await fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent(source.url + "?cb=" + cacheBuster));
+        if (!res.ok) return [];
         const data = await res.json();
-        if (data.status === 'ok') {
+        if (data && data.status === 'ok' && Array.isArray(data.items)) {
           return data.items.map(item => {
             const tmp = document.createElement('div');
-            tmp.innerHTML = item.description || item.content;
+            // Insert spaces around HTML tags to prevent text concatenation (e.g. CLICKDownload)
+            const htmlString = (item.description || item.content || '').replace(/<[^>]+>/g, ' $& ');
+            tmp.innerHTML = htmlString;
             let imgUrl = item.thumbnail;
             if (!imgUrl && item.description) {
               const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
@@ -680,7 +778,7 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
             }
             return {
               title: item.title,
-              content: tmp.textContent || tmp.innerText || "No description",
+              content: (tmp.textContent || tmp.innerText || "No description").replace(/\s+/g, ' ').trim(),
               timestamp: new Date(item.pubDate).getTime(),
               imageData: imgUrl || '',
               type: source.type || 'News Source',
@@ -691,24 +789,24 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
           });
         }
       } catch(e) {
-        console.warn("Failed to fetch RSS source: " + source.url, e);
+        // Silently catch network or parsing failures
       }
       return [];
     });
 
     const results = await Promise.allSettled(fetchPromises);
     results.forEach(res => {
-      if (res.status === 'fulfilled') {
+      if (res.status === 'fulfilled' && Array.isArray(res.value)) {
         externalItems = externalItems.concat(res.value);
       }
     });
 
-    // Fallback for primary deped if it's in the sources but failed due to Cloudflare
-    if (feedSources.some(s => s.url.includes("www.deped.gov.ph")) && !externalItems.some(i => i.link.includes("deped.gov.ph"))) {
+    // Clean educational fallbacks if external sources fail or are blocked
+    if (externalItems.length === 0) {
       externalItems.push(
-        { title: "Statement on the school shooting incident in Tacloban City", content: "LUNGSOD NG MAKATI — Binigyang-diin ng Department of Education...", timestamp: Date.now() - 3600000 * 4, type: 'National News', icon: 'globe-outline', color: 'var(--primary)', link: 'https://www.deped.gov.ph/' },
-        { title: "Guidelines on Public School Teachers’ Proportional Vacation Pay", content: "DM_s2026_040r. Guidelines and regulations regarding the proportional vacation pay...", timestamp: Date.now() - 86400000 * 2, type: 'National News', icon: 'globe-outline', color: 'var(--primary)', link: 'https://www.deped.gov.ph/' },
-        { title: "2026 Pride Month Celebration in the Department of Education", content: "DM_s2026_041r. Official memorandum for the celebration of Pride Month...", timestamp: Date.now() - 86400000 * 3, type: 'National News', icon: 'globe-outline', color: 'var(--primary)', link: 'https://www.deped.gov.ph/' }
+        { title: "National Advisory on School Safety and Preparedness", content: "Educational institutions are reminded to review school emergency response and safety measures.", timestamp: Date.now() - 3600000 * 4, type: 'School News', icon: 'shield-checkmark-outline', color: 'var(--primary)', link: '#/calendar' },
+        { title: "Academic Calendar Guidelines & Activities for AY 2026-2027", content: "Guidelines and regulations regarding student activities and academic schedules for the incoming semester.", timestamp: Date.now() - 86400000 * 2, type: 'Advisory', icon: 'calendar-outline', color: 'var(--success)', link: '#/calendar' },
+        { title: "Digital Learning and Student Support Services Update", content: "School Portal updates and online learning resources are now available for all learners and parents.", timestamp: Date.now() - 86400000 * 3, type: 'Academic', icon: 'school-outline', color: 'var(--warning)', link: '#/calendar' }
       );
     }
 
@@ -757,7 +855,11 @@ async function renderCalendarNewsFeed(forceRefresh = false) {
       return `
         <a href="${post.link}" ${targetAttr} style="display:flex; gap:0.75rem; padding-bottom:1.25rem; border-bottom:1px solid var(--border-color); cursor:pointer; transition:opacity 0.2s; text-decoration:none; color:inherit;" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
           ${hasImage
-            ? `<img src="${post.imageData}" alt="News" style="width:68px; height:68px; border-radius:8px; object-fit:cover; flex-shrink:0;" onerror="this.outerHTML='${fallbackThumb.replace(/`/g, '\\`').replace(/'/g, "\\'")}';">`
+            ? `<img src="${post.imageData}" alt="News" style="width:68px; height:68px; border-radius:8px; object-fit:cover; flex-shrink:0;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+               <div style="display:none; width:68px; height:68px; border-radius:8px; background:linear-gradient(135deg, ${post.color || 'var(--primary)'} 0%, color-mix(in srgb, ${post.color || 'var(--primary)'} 60%, #000) 100%); flex-direction:column; align-items:center; justify-content:center; flex-shrink:0; gap:2px;">
+                 <ion-icon name="newspaper-outline" style="font-size:1.4rem; color:rgba(255,255,255,0.85);"></ion-icon>
+                 <span style="font-size:0.55rem; color:rgba(255,255,255,0.7); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; max-width:60px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${(post.type || 'News').split(' ')[0]}</span>
+               </div>`
             : fallbackThumb
           }
           <div style="flex:1; min-width:0;">
@@ -1058,6 +1160,26 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(checkTabletOrientation, 1000);
 });
 
+function formatDisplayDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return dateStr;
+  
+  const now = new Date();
+  const diffMs = now - d;
+  const diffMins = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMins / 60);
+  const diffDays = Math.floor(diffHours / 24);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24 && now.getDate() === d.getDate()) return `${diffHours}h ago`;
+  if (diffDays === 1) return 'Yesterday';
+  if (diffDays < 7) return `${diffDays}d ago`;
+
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 window.renderPostList = async function(filtered, container, customRenderCallback) {
   if (filtered.length === 0) {
     container.innerHTML = `<p style="padding: 2rem; text-align: center; color:var(--text-secondary)">No news or announcements found for this filter.</p>`;
@@ -1071,7 +1193,7 @@ window.renderPostList = async function(filtered, container, customRenderCallback
     const safeAuthorUid = escapeAttrSafe(a.authorUid || '');
     const safeAuthor = escapeHTMLSafe(a.author || 'Unknown Author');
     const safeAuthorRole = escapeHTMLSafe(a.authorRole || 'member');
-    const safeDate = escapeHTMLSafe(a.date || '');
+    const safeDate = escapeHTMLSafe(formatDisplayDate(a.date));
     const safeTitleValue = escapeHTMLSafe(a.title || '');
     const safeContentValue = escapeHTMLSafe(a.content || '');
     const safeAvatarUrl = sanitizeUrlSafe(a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder', { allowDataImage: true, allowHash: false });
@@ -1263,11 +1385,16 @@ window.renderPostList = async function(filtered, container, customRenderCallback
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
             <a href="#/user/${safeAuthorUid}" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; color:inherit;">
-              <img class="thread-avatar" src="${safeAvatarUrl}" alt="avatar">
+              <img class="thread-avatar" src="${safeAvatarUrl}" alt="avatar" style="border:2px solid var(--border-color); border-radius:50%;">
               <div>
-                <strong style="font-size:0.95rem; display:block;">${safeAuthor}</strong>
-              <span style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; font-weight:600;">${safeAuthorRole} &bull; ${safeDate}</span>
-            </div>
+                <strong style="font-size:0.96rem; display:flex; align-items:center; gap:0.4rem; font-weight:700;">
+                  ${safeAuthor}
+                  <span class="chat-role-pill" style="font-size:0.62rem; padding:1px 6px; text-transform:uppercase;">${safeAuthorRole}</span>
+                </strong>
+                <span style="font-size:0.75rem; color:var(--text-secondary); display:flex; align-items:center; gap:0.25rem; margin-top:2px;">
+                  <ion-icon name="time-outline" style="font-size:0.85rem;"></ion-icon> ${safeDate}
+                </span>
+              </div>
             </a>
           </div>
           ${contextMenuHTML}

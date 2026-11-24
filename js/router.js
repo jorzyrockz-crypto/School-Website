@@ -21,6 +21,12 @@ function initRouter() {
       return;
     }
 
+    // Direct routing for Apex Messenger as the primary messenger app
+    if (viewName === 'messages' || viewName === 'messenger') {
+      window.location.href = pathParam ? `messenger.html?uid=${encodeURIComponent(pathParam)}` : 'messenger.html';
+      return;
+    }
+
     switchView(viewName, pathParam);
   };
 
@@ -79,13 +85,49 @@ function switchView(viewName, pathParam) {
     }
   }
 
-  // Remove workspace padding when in messaging view for full-height layout
+  // Reset scroll position on route switch so views don't start scrolled halfway down
   const workspace = document.querySelector('.portal-workspace');
   if (workspace) {
+    workspace.scrollTop = 0;
     if (viewName === 'messages') {
       workspace.classList.add('no-padding');
     } else {
       workspace.classList.remove('no-padding');
+    }
+  }
+  window.scrollTo(0, 0);
+  const mainEl = document.querySelector('.portal-main');
+  if (mainEl) mainEl.scrollTop = 0;
+
+  // Toggle route-messages class on body for responsive CSS rules
+  document.body.classList.toggle('route-messages', viewName === 'messages');
+
+  // Floating chat dock & window management
+  const chatDock = document.getElementById('chat-heads-dock');
+  if (chatDock) {
+    if (viewName === 'messages') {
+      chatDock.classList.add('view-messages-hidden');
+      chatDock.style.display = 'none';
+    } else {
+      chatDock.classList.remove('view-messages-hidden');
+      chatDock.style.display = '';
+    }
+  }
+  const floatingWindow = document.getElementById('floating-chat-window');
+  if (floatingWindow && viewName === 'messages') {
+    floatingWindow.classList.remove('show');
+    floatingWindow.style.display = 'none';
+  }
+
+  // Tablet bottom nav management (hide in messages view to prevent collision with chat composer)
+  const bottomNav = document.getElementById('tablet-bottom-nav');
+  if (bottomNav) {
+    if (viewName === 'messages') {
+      bottomNav.style.display = 'none';
+      bottomNav.classList.add('nav-hidden-messages');
+    } else {
+      bottomNav.style.display = '';
+      bottomNav.classList.remove('nav-hidden-messages');
     }
   }
 

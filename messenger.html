@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Apex School Messenger | Official Communication App</title>
+
+  <!-- Instant Theme Boot Script (Prevents FOUC) -->
+  <script>
+    (function() {
+      try {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = saved ? saved : (prefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {}
+    })();
+  </script>
+  
+  <!-- Meta & Branding -->
+  <meta name="description" content="Dedicated official school messenger for Apex Integrated School faculty, learners, and parents.">
+  <meta name="theme-color" content="#0a3d2e">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+
+  <!-- Network Preconnect & DNS Prefetch for Fast Avatar & Font Loading -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://api.dicebear.com">
+  <link rel="dns-prefetch" href="https://api.dicebear.com">
+  <link rel="preconnect" href="https://unpkg.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap">
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+
+  <!-- Core Styles -->
+  <link rel="stylesheet" href="css/variables.css?v=64">
+  <link rel="stylesheet" href="css/messenger.css?v=4">
+</head>
+<body class="messenger-app-body">
+
+  <!-- ================= APP WRAPPER ================= -->
+  <div class="msg-app-layout" id="msg-app-root">
+
+    <!-- ── TOP GLOBAL APP BAR ── -->
+    <header class="msg-top-bar">
+      <div class="msg-brand-group">
+        <a href="index.html#/home" class="msg-back-portal-btn" title="Return to School Portal">
+          <ion-icon name="arrow-back"></ion-icon>
+          <span class="back-text">School Portal</span>
+        </a>
+        <div class="msg-brand-divider"></div>
+        <div class="msg-app-logo">
+          <div class="msg-logo-icon">
+            <ion-icon name="school"></ion-icon>
+          </div>
+          <div class="msg-logo-text">
+            <span class="msg-logo-title">Apex Messenger</span>
+            <span class="msg-logo-badge">School Edition</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Center: Safety & Compliance Pill -->
+      <div class="msg-safety-pill" title="Official School Academic Network - Encrypted & Compliant">
+        <ion-icon name="shield-checkmark"></ion-icon>
+        <span>Official Academic Network &bull; Monitored for Student Safety</span>
+      </div>
+
+      <!-- Right: User Identity & Role Switcher -->
+      <div class="msg-top-actions">
+        <!-- Theme Toggle -->
+        <button type="button" class="msg-icon-button" id="msg-theme-toggle" title="Toggle Dark/Light Mode">
+          <ion-icon name="moon-outline" id="msg-theme-icon"></ion-icon>
+        </button>
+
+        <!-- Claymorphic Avatar Picker Button -->
+        <button type="button" class="msg-avatar-picker-btn clay-pill-btn" id="btn-open-avatar-picker" onclick="openClayAvatarModal()" title="Choose Built-in Claymorphic Avatar">
+          <ion-icon name="color-palette"></ion-icon>
+          <span class="btn-label">Clay Avatar</span>
+        </button>
+
+        <!-- Role / Persona Quick Switcher (Crucial for School Demo) -->
+        <div class="msg-persona-switcher" id="msg-persona-wrap">
+          <button type="button" class="msg-persona-btn" id="btn-msg-persona" title="Switch User Role">
+            <div class="top-user-avatar-wrap" onclick="event.stopPropagation(); openClayAvatarModal();" title="Click to customize Clay Avatar">
+              <img id="msg-user-avatar" class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos" alt="Avatar">
+              <span class="avatar-sparkle-dot"><ion-icon name="sparkles"></ion-icon></span>
+            </div>
+            <div class="msg-persona-info">
+              <span class="msg-persona-name" id="msg-user-name">Dr. Maria Santos</span>
+              <span class="msg-persona-role-badge" id="msg-user-role-badge">ADMIN</span>
+            </div>
+            <ion-icon name="chevron-down-outline" class="msg-persona-caret"></ion-icon>
+          </button>
+
+          <!-- Dropdown of School Personas -->
+          <div class="msg-persona-dropdown" id="msg-persona-dropdown">
+            <div class="dropdown-header">Switch School Persona</div>
+            <div class="persona-option" data-uid="admin1" data-email="admin@school.edu">
+              <img src="https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos" alt="Admin">
+              <div class="option-details">
+                <span class="option-name">Dr. Maria Santos</span>
+                <span class="option-sub"><span class="badge-tag admin">ADMIN</span> School Principal</span>
+              </div>
+            </div>
+            <div class="persona-option" data-uid="teacher1" data-email="teacher@school.edu">
+              <img src="https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose" alt="Teacher">
+              <div class="option-details">
+                <span class="option-name">Teacher Jose</span>
+                <span class="option-sub"><span class="badge-tag teacher">FACULTY</span> STEM & Math Dept</span>
+              </div>
+            </div>
+            <div class="persona-option" data-uid="learner1" data-email="learner@school.edu">
+              <img src="https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz" alt="Learner">
+              <div class="option-details">
+                <span class="option-name">Juan Cruz</span>
+                <span class="option-sub"><span class="badge-tag learner">LEARNER</span> Grade 10 - Rizal</span>
+              </div>
+            </div>
+            <div class="persona-option" data-uid="parent1" data-email="parent@school.edu">
+              <img src="https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz" alt="Parent">
+              <div class="option-details">
+                <span class="option-name">Mrs. Elena Cruz</span>
+                <span class="option-sub"><span class="badge-tag parent">PARENT</span> PTA Vice President</span>
+              </div>
+            </div>
+
+            <div class="dropdown-footer" style="padding-top:0.4rem; border-top:1px solid var(--border-color); margin-top:0.35rem;">
+              <button type="button" class="btn-dropdown-clay-avatar" onclick="openClayAvatarModal()">
+                <ion-icon name="color-palette"></ion-icon> Choose Claymorphic Avatar
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </header>
+
+    <!-- ── MAIN 3-PANE CONTAINER ── -->
+    <main class="msg-main-stage">
+
+      <!-- ================= PANE 1: CONVERSATIONS SIDEBAR ================= -->
+      <aside class="msg-sidebar" id="msg-sidebar-pane">
+        
+        <!-- Sidebar Controls Header -->
+        <div class="msg-sidebar-header">
+          <div class="msg-sidebar-title-row">
+            <h1 class="msg-sidebar-title">Chats & Channels</h1>
+            <div class="msg-sidebar-actions">
+              <button type="button" class="msg-icon-btn-round" id="btn-msg-new-group" title="Create Class Channel / Advisory Group">
+                <ion-icon name="people"></ion-icon>
+              </button>
+              <button type="button" class="msg-icon-btn-round primary" id="btn-msg-new-chat" title="New Direct Message">
+                <ion-icon name="create"></ion-icon>
+              </button>
+            </div>
+          </div>
+
+          <!-- Search Input -->
+          <div class="msg-search-box">
+            <ion-icon name="search-outline"></ion-icon>
+            <input type="text" id="msg-search-input" placeholder="Search faculty, learners, advisory..." autocomplete="off">
+            <button type="button" id="btn-clear-msg-search" class="msg-search-clear" style="display:none;" title="Clear">
+              <ion-icon name="close-circle"></ion-icon>
+            </button>
+          </div>
+
+          <!-- Category Segment Filter Tabs -->
+          <div class="msg-category-tabs">
+            <button type="button" class="msg-cat-tab active" data-filter="all">All</button>
+            <button type="button" class="msg-cat-tab" data-filter="channel"><ion-icon name="megaphone"></ion-icon> Channels</button>
+            <button type="button" class="msg-cat-tab" data-filter="teacher"><ion-icon name="school"></ion-icon> Faculty</button>
+            <button type="button" class="msg-cat-tab" data-filter="learner"><ion-icon name="person"></ion-icon> Students</button>
+            <button type="button" class="msg-cat-tab" data-filter="parent"><ion-icon name="heart"></ion-icon> Parents</button>
+          </div>
+        </div>
+
+        <!-- Thread List -->
+        <div class="msg-thread-list" id="msg-thread-list-container">
+          <!-- Populated dynamically via JS -->
+          <div class="msg-loading-placeholder">
+            <div class="msg-skeleton-item"></div>
+            <div class="msg-skeleton-item"></div>
+            <div class="msg-skeleton-item"></div>
+          </div>
+        </div>
+
+        <!-- Status & School Info Footer -->
+        <div class="msg-sidebar-footer">
+          <div class="msg-status-indicator">
+            <span class="status-dot online"></span>
+            <span class="status-label" id="msg-current-status-text">Academic Status: Available</span>
+          </div>
+          <button type="button" class="msg-status-btn" id="btn-change-status" title="Change Status">
+            <ion-icon name="options-outline"></ion-icon>
+          </button>
+        </div>
+
+      </aside>
+
+      <!-- ================= PANE 2: ACTIVE CONVERSATION ================= -->
+      <section class="msg-chat-stage" id="msg-chat-stage-pane">
+        
+        <!-- Active Chat Topbar -->
+        <header class="msg-chat-header" id="msg-chat-header">
+          <div class="msg-chat-header-left">
+            <!-- Mobile Back Button -->
+            <button type="button" class="msg-mobile-back-btn" id="btn-msg-mobile-back" title="Back to Chats">
+              <ion-icon name="arrow-back"></ion-icon>
+            </button>
+
+            <!-- Active Contact / Group Avatar -->
+            <div class="msg-chat-avatar-wrap">
+              <img id="msg-active-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=Apex" alt="Avatar">
+              <span class="active-status-dot online" id="msg-active-status-dot"></span>
+            </div>
+
+            <!-- Active Contact / Group Meta -->
+            <div class="msg-chat-meta">
+              <div class="msg-chat-name-row">
+                <h2 class="msg-chat-name" id="msg-active-name">Select a Conversation</h2>
+                <span class="msg-chat-role-pill" id="msg-active-role-pill">OFFICIAL</span>
+              </div>
+              <p class="msg-chat-sub" id="msg-active-sub">Apex Integrated School Portal</p>
+            </div>
+          </div>
+
+          <!-- Active Chat Actions -->
+          <div class="msg-chat-header-right">
+            <!-- Call Buttons -->
+            <button type="button" class="msg-action-btn" id="btn-msg-audio-call" title="Start Academic Audio Call">
+              <ion-icon name="call-outline"></ion-icon>
+            </button>
+            <button type="button" class="msg-action-btn" id="btn-msg-video-call" title="Start School Video Meet">
+              <ion-icon name="videocam-outline"></ion-icon>
+            </button>
+            <!-- In-chat search -->
+            <button type="button" class="msg-action-btn" id="btn-msg-search-chat" title="Search in Conversation">
+              <ion-icon name="search-outline"></ion-icon>
+            </button>
+            <!-- Toggle Right Info Pane -->
+            <button type="button" class="msg-action-btn" id="btn-msg-toggle-info" title="Toggle Academic Info & Files">
+              <ion-icon name="information-circle-outline"></ion-icon>
+            </button>
+          </div>
+        </header>
+
+        <!-- In-Chat Search Bar (Collapsible) -->
+        <div class="msg-in-chat-search" id="msg-in-chat-search" style="display:none;">
+          <ion-icon name="search"></ion-icon>
+          <input type="text" id="msg-in-chat-search-input" placeholder="Search keywords in this conversation...">
+          <button type="button" id="btn-close-in-chat-search"><ion-icon name="close"></ion-icon></button>
+        </div>
+
+        <!-- Academic Safeguard Notice Banner -->
+        <div class="msg-academic-notice" id="msg-academic-notice">
+          <ion-icon name="shield"></ion-icon>
+          <span>Official Communication Policy: Messages and shared academic attachments are retained under Apex School Guidelines.</span>
+        </div>
+
+        <!-- Messages Flow Viewport -->
+        <div class="msg-messages-viewport" id="msg-messages-viewport">
+          <!-- Populated dynamically via JS -->
+          <div class="msg-welcome-empty-state" id="msg-empty-placeholder">
+            <div class="empty-icon-wrap">
+              <ion-icon name="chatbubbles-outline"></ion-icon>
+            </div>
+            <h3>Apex School Messenger</h3>
+            <p>Select a faculty member, learner group, or school advisory channel from the left sidebar to start collaborating.</p>
+            <div class="empty-quick-shortcuts">
+              <button type="button" class="quick-start-btn" onclick="openPresetThread('teacher1')">
+                <ion-icon name="school"></ion-icon> Message Teacher Jose
+              </button>
+              <button type="button" class="quick-start-btn" onclick="openPresetThread('group_faculty')">
+                <ion-icon name="people"></ion-icon> Faculty Lounge
+              </button>
+              <button type="button" class="quick-start-btn" onclick="openPresetThread('group_grade10_advisory')">
+                <ion-icon name="calendar"></ion-icon> Grade 10 Advisory
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Attachment Staging Preview Bar -->
+        <div class="msg-attachment-staging" id="msg-attachment-staging" style="display:none;">
+          <div class="staging-thumb-wrap" id="staging-thumb-wrap">
+            <img id="staging-img-preview" src="" alt="preview" style="display:none;">
+            <div id="staging-file-preview" style="display:none;">
+              <ion-icon name="document-attach"></ion-icon>
+              <span id="staging-file-name">document.pdf</span>
+            </div>
+          </div>
+          <div class="staging-info">
+            <span class="staging-title" id="staging-title">Attached Academic File</span>
+            <span class="staging-size" id="staging-size">Ready to send</span>
+          </div>
+          <button type="button" class="staging-cancel-btn" id="btn-cancel-staging" title="Remove attachment">
+            <ion-icon name="close-circle"></ion-icon>
+          </button>
+        </div>
+
+        <!-- Composer & Action Bar -->
+        <footer class="msg-composer-footer" id="msg-composer-footer">
+          <!-- Hidden Native File Inputs -->
+          <input type="file" id="msg-photo-input" accept="image/*" style="display:none;">
+          <input type="file" id="msg-document-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" style="display:none;">
+
+          <div class="msg-composer-wrapper">
+            <!-- Left Tool Buttons -->
+            <div class="msg-composer-tools">
+              <!-- Quick School Tools Popover Trigger -->
+              <button type="button" class="msg-tool-btn" id="btn-msg-school-tools" title="School Academic Tools & Templates">
+                <ion-icon name="add-circle"></ion-icon>
+              </button>
+              <!-- Photo Attach -->
+              <button type="button" class="msg-tool-btn" id="btn-msg-attach-photo" title="Attach Photo or Diagram">
+                <ion-icon name="image-outline"></ion-icon>
+              </button>
+              <!-- Document Attach -->
+              <button type="button" class="msg-tool-btn" id="btn-msg-attach-doc" title="Attach Academic Document (PDF, Word)">
+                <ion-icon name="document-attach-outline"></ion-icon>
+              </button>
+              <!-- Voice Note Record -->
+              <button type="button" class="msg-tool-btn" id="btn-msg-voice-note" title="Record Voice Note / Pronunciation">
+                <ion-icon name="mic-outline"></ion-icon>
+              </button>
+            </div>
+
+            <!-- Main Text Input -->
+            <div class="msg-input-field-wrap">
+              <textarea id="msg-text-input" rows="1" placeholder="Type a message or press '/' for templates..." autocomplete="off"></textarea>
+              <button type="button" class="msg-emoji-btn" id="btn-msg-emoji" title="Insert Emoji">
+                <ion-icon name="happy-outline"></ion-icon>
+              </button>
+            </div>
+
+            <!-- Send Button -->
+            <button type="button" class="msg-send-btn" id="btn-msg-send" title="Send Message">
+              <ion-icon name="paper-plane"></ion-icon>
+            </button>
+          </div>
+        </footer>
+
+        <!-- QUICK SCHOOL TOOLS POPOVER -->
+        <div class="msg-tools-popover" id="msg-tools-popover" style="display:none;">
+          <div class="popover-header">Academic Shortcuts</div>
+          <div class="popover-grid">
+            <button type="button" class="popover-item" data-action="assignment">
+              <div class="popover-item-icon assignment"><ion-icon name="book"></ion-icon></div>
+              <span>Post Assignment</span>
+            </button>
+            <button type="button" class="popover-item" data-action="consultation">
+              <div class="popover-item-icon consultation"><ion-icon name="time"></ion-icon></div>
+              <span>Request Consultation</span>
+            </button>
+            <button type="button" class="popover-item" data-action="location">
+              <div class="popover-item-icon location"><ion-icon name="location"></ion-icon></div>
+              <span>Classroom / Room</span>
+            </button>
+            <button type="button" class="popover-item" data-action="excuse">
+              <div class="popover-item-icon excuse"><ion-icon name="medkit"></ion-icon></div>
+              <span>Absence / Excuse Note</span>
+            </button>
+            <button type="button" class="popover-item" data-action="resource">
+              <div class="popover-item-icon resource"><ion-icon name="folder-open"></ion-icon></div>
+              <span>Learning Resource</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- QUICK EMOJI PICKER POPOVER -->
+        <div class="msg-emoji-popover" id="msg-emoji-popover" style="display:none;">
+          <div class="emoji-tabs">
+            <span class="emoji-tab active">Frequent</span>
+          </div>
+          <div class="emoji-grid">
+            <span class="emoji-btn">👍</span>
+            <span class="emoji-btn">❤️</span>
+            <span class="emoji-btn">👏</span>
+            <span class="emoji-btn">🎉</span>
+            <span class="emoji-btn">💡</span>
+            <span class="emoji-btn">📚</span>
+            <span class="emoji-btn">✏️</span>
+            <span class="emoji-btn">🏫</span>
+            <span class="emoji-btn">✅</span>
+            <span class="emoji-btn">🙏</span>
+            <span class="emoji-btn">😊</span>
+            <span class="emoji-btn">⭐</span>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ================= PANE 3: ACADEMIC INFO & DETAILS ================= -->
+      <aside class="msg-info-pane" id="msg-info-pane">
+        
+        <div class="msg-info-header">
+          <h3 class="msg-info-title">Academic Profile</h3>
+          <button type="button" class="msg-info-close-btn" id="btn-close-info-pane" title="Close Panel">
+            <ion-icon name="close"></ion-icon>
+          </button>
+        </div>
+
+        <div class="msg-info-body">
+          <!-- Profile Card -->
+          <div class="msg-info-profile-card">
+            <div class="msg-info-avatar-wrap" onclick="openClayAvatarModal()" title="Customize Clay Avatar">
+              <img id="info-avatar" class="clay-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=Apex" alt="Avatar">
+              <span class="avatar-edit-overlay"><ion-icon name="color-palette"></ion-icon></span>
+            </div>
+            <h4 id="info-name">Conversation Title</h4>
+            <span class="info-role-badge" id="info-role-badge">ROLE</span>
+            <p class="info-email" id="info-email">user@school.edu</p>
+            <button type="button" class="btn-change-avatar-clay" onclick="openClayAvatarModal()" title="Select Claymorphic Avatar">
+              <ion-icon name="sparkles"></ion-icon> <span>Choose Clay Avatar</span>
+            </button>
+          </div>
+
+          <!-- Academic Affiliation & Schedule -->
+          <div class="msg-info-section">
+            <div class="section-title"><ion-icon name="school-outline"></ion-icon> Academic Affiliation</div>
+            <div class="section-content">
+              <div class="info-data-row">
+                <span class="data-label">Department / Advisory:</span>
+                <span class="data-value" id="info-department">Junior & Senior High School</span>
+              </div>
+              <div class="info-data-row">
+                <span class="data-label">Office / Room:</span>
+                <span class="data-value" id="info-room">Room 204 - STEM Lab</span>
+              </div>
+              <div class="info-data-row">
+                <span class="data-label">Office Hours:</span>
+                <span class="data-value" id="info-hours">Mon - Fri, 8:00 AM - 4:00 PM</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shared Files & Resources -->
+          <div class="msg-info-section">
+            <div class="section-title">
+              <ion-icon name="document-text-outline"></ion-icon>
+              <span>Shared Academic Files</span>
+              <span class="badge-count" id="info-files-count">0</span>
+            </div>
+            <div class="info-files-list" id="info-files-list">
+              <div class="empty-files-text">No documents shared yet in this thread.</div>
+            </div>
+          </div>
+
+          <!-- Quick Navigation Actions -->
+          <div class="msg-info-section">
+            <div class="section-title"><ion-icon name="flash-outline"></ion-icon> Quick Shortcuts</div>
+            <div class="info-action-links">
+              <a href="index.html#/home" class="info-action-link">
+                <ion-icon name="newspaper-outline"></ion-icon>
+                <span>View School Feed</span>
+              </a>
+              <a href="index.html#/transparency" class="info-action-link">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                <span>Transparency Board</span>
+              </a>
+              <button type="button" class="info-action-link-btn" id="btn-info-clear-chat">
+                <ion-icon name="trash-outline"></ion-icon>
+                <span>Clear Conversation History</span>
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </aside>
+
+    </main>
+
+  </div>
+
+  <!-- ================= MODAL: NEW DIRECT MESSAGE ================= -->
+  <div class="msg-modal-overlay" id="modal-new-dm" style="display:none;">
+    <div class="msg-modal-card">
+      <div class="msg-modal-header">
+        <div class="modal-title-wrap">
+          <ion-icon name="create-outline"></ion-icon>
+          <h3>New Direct Message</h3>
+        </div>
+        <button type="button" class="msg-modal-close" onclick="closeModal('modal-new-dm')"><ion-icon name="close"></ion-icon></button>
+      </div>
+      <div class="msg-modal-body">
+        <div class="msg-search-box modal-search">
+          <ion-icon name="search-outline"></ion-icon>
+          <input type="text" id="dm-search-filter" placeholder="Type a name, role, or department...">
+        </div>
+        <div class="dm-directory-list" id="dm-directory-list">
+          <!-- Populated dynamically with faculty, learners, parents -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: NEW CHANNEL / GROUP ================= -->
+  <div class="msg-modal-overlay" id="modal-new-group" style="display:none;">
+    <div class="msg-modal-card">
+      <div class="msg-modal-header">
+        <div class="modal-title-wrap">
+          <ion-icon name="people-outline"></ion-icon>
+          <h3>Create School Channel / Advisory Group</h3>
+        </div>
+        <button type="button" class="msg-modal-close" onclick="closeModal('modal-new-group')"><ion-icon name="close"></ion-icon></button>
+      </div>
+      <div class="msg-modal-body">
+        <div class="form-group">
+          <label for="group-name-input">Channel / Group Name</label>
+          <input type="text" id="group-name-input" class="msg-form-control" placeholder="e.g., Grade 10 Science Projects or PTA Committee">
+        </div>
+        <div class="form-group">
+          <label for="group-category-select">Channel Type</label>
+          <select id="group-category-select" class="msg-form-control">
+            <option value="channel">Official School Channel (Broadcast & Notices)</option>
+            <option value="group">Interactive Study Group / Committee</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Select Participants</label>
+          <div class="group-participants-selector" id="group-participants-selector">
+            <!-- Checkbox items populated dynamically -->
+          </div>
+        </div>
+      </div>
+      <div class="msg-modal-footer">
+        <button type="button" class="btn-msg-secondary" onclick="closeModal('modal-new-group')">Cancel</button>
+        <button type="button" class="btn-msg-primary" id="btn-submit-create-group">Create Channel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: ACADEMIC AUDIO/VIDEO CALL ================= -->
+  <div class="msg-modal-overlay call-overlay" id="modal-call-interface" style="display:none;">
+    <div class="msg-call-card">
+      <!-- Call Top Header -->
+      <div class="call-top-header">
+        <div class="call-badge">
+          <ion-icon name="lock-closed"></ion-icon>
+          <span>Apex Secure School Meet</span>
+        </div>
+        <span class="call-timer" id="call-duration-timer">00:00</span>
+      </div>
+
+      <!-- Main Video / Avatar Stage -->
+      <div class="call-main-stage" id="call-main-stage">
+        <!-- Remote Participant View -->
+        <div class="call-remote-participant" id="call-remote-view">
+          <img id="call-remote-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose" alt="Call Avatar">
+          <div class="call-pulse-ring"></div>
+          <h3 id="call-remote-name">Teacher Jose</h3>
+          <p id="call-status-state">Connecting to School Audio...</p>
+        </div>
+
+        <!-- Simulated Video Feed (hidden in audio-only) -->
+        <div class="call-simulated-video" id="call-simulated-video" style="display:none;">
+          <div class="video-placeholder-banner">
+            <ion-icon name="videocam"></ion-icon>
+            <span>Live Classroom Camera Feed Active</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Call Control Floating Action Bar -->
+      <div class="call-controls-bar">
+        <button type="button" class="call-ctrl-btn" id="btn-call-toggle-mic" title="Mute/Unmute Mic">
+          <ion-icon name="mic"></ion-icon>
+        </button>
+        <button type="button" class="call-ctrl-btn" id="btn-call-toggle-cam" title="Turn Camera On/Off">
+          <ion-icon name="videocam"></ion-icon>
+        </button>
+        <button type="button" class="call-ctrl-btn" id="btn-call-toggle-screen" title="Share Screen / Presentation">
+          <ion-icon name="desktop-outline"></ion-icon>
+        </button>
+        <button type="button" class="call-ctrl-btn end-call" id="btn-call-hangup" title="End Call">
+          <ion-icon name="call" style="transform:rotate(135deg);"></ion-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: IMAGE LIGHTBOX ================= -->
+  <div class="msg-lightbox-overlay" id="msg-lightbox" style="display:none;" onclick="closeLightbox()">
+    <button type="button" class="lightbox-close-btn" onclick="closeLightbox()"><ion-icon name="close"></ion-icon></button>
+    <img id="lightbox-img" src="" alt="Enlarged academic image" onclick="event.stopPropagation()">
+  </div>
+
+  <!-- ================= MODAL: CLAYMORPHIC AVATAR SELECTOR ================= -->
+  <div class="msg-modal-overlay clay-modal-overlay" id="modal-clay-avatar-picker" style="display:none;">
+    <div class="msg-modal-card clay-avatar-modal-card">
+      <div class="msg-modal-header clay-modal-header">
+        <div class="modal-title-wrap">
+          <div class="clay-icon-badge">
+            <ion-icon name="color-palette"></ion-icon>
+          </div>
+          <div>
+            <h3>Built-in Claymorphic Avatars</h3>
+            <p class="clay-modal-subtitle">Select a handcrafted 3D soft clay profile for your school persona.</p>
+          </div>
+        </div>
+        <button type="button" class="msg-modal-close" onclick="closeModal('modal-clay-avatar-picker')"><ion-icon name="close"></ion-icon></button>
+      </div>
+
+      <div class="msg-modal-body clay-modal-body">
+        
+        <!-- Top: Live Claymorphic Preview Card -->
+        <div class="clay-preview-hero-card">
+          <div class="clay-preview-avatar-wrap">
+            <div class="clay-avatar-stage" id="clay-preview-stage">
+              <img id="clay-preview-avatar-img" src="https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos" alt="Selected Clay Avatar">
+            </div>
+            <div class="clay-selected-badge" id="clay-preview-tag">3D CLAY</div>
+          </div>
+          
+          <div class="clay-preview-meta">
+            <div class="meta-title-row">
+              <h4 id="clay-preview-name">Dr. Maria Santos</h4>
+              <span class="clay-preview-role-pill" id="clay-preview-role">ADMIN</span>
+            </div>
+            <p class="clay-preview-caption" id="clay-preview-caption">Official Clay Avatar Profile</p>
+            
+            <!-- Clay Background Tone Palette -->
+            <div class="clay-palette-selector">
+              <span class="palette-label">Clay Tint:</span>
+              <div class="palette-swatches">
+                <button type="button" class="clay-swatch active" data-color="mint" title="Mint Forest Clay" style="background:#bbf7d0;"></button>
+                <button type="button" class="clay-swatch" data-color="sky" title="Academic Sky Blue Clay" style="background:#bfdbfe;"></button>
+                <button type="button" class="clay-swatch" data-color="peach" title="Coral Peach Clay" style="background:#fed7aa;"></button>
+                <button type="button" class="clay-swatch" data-color="lavender" title="Lilac Clay" style="background:#ddd6fe;"></button>
+                <button type="button" class="clay-swatch" data-color="amber" title="Golden Honey Clay" style="background:#fde68a;"></button>
+                <button type="button" class="clay-swatch" data-color="rose" title="Rose Quartz Clay" style="background:#fbcfe8;"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle: Category Filters -->
+        <div class="clay-category-tabs">
+          <button type="button" class="clay-cat-pill active" data-cat="all">All Clay Avatars (<span id="clay-total-count">18</span>)</button>
+          <button type="button" class="clay-cat-pill" data-cat="faculty"><ion-icon name="school"></ion-icon> Faculty & Staff</button>
+          <button type="button" class="clay-cat-pill" data-cat="student"><ion-icon name="person"></ion-icon> Scholars & Learners</button>
+          <button type="button" class="clay-cat-pill" data-cat="parent"><ion-icon name="heart"></ion-icon> Parents</button>
+          <button type="button" class="clay-cat-pill" data-cat="mascot"><ion-icon name="sparkles"></ion-icon> 3D Mascots</button>
+        </div>
+
+        <!-- Main: Avatar Grid -->
+        <div class="clay-avatars-grid" id="clay-avatars-grid">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+      </div>
+
+      <div class="msg-modal-footer clay-modal-footer">
+        <button type="button" class="btn-msg-secondary clay-btn-cancel" onclick="closeModal('modal-clay-avatar-picker')">Cancel</button>
+        <button type="button" class="btn-msg-primary clay-btn-apply" id="btn-apply-clay-avatar">
+          <ion-icon name="checkmark-circle"></ion-icon> <span>Save as My Avatar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="msg-toast-container" id="msg-toast-container"></div>
+
+  <!-- Core Database & Application Scripts -->
+  <script src="js/db.js?v=63"></script>
+  <script src="js/auth.js?v=63"></script>
+  <script src="js/messenger.js?v=3"></script>
+</body>
+</html>

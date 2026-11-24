@@ -347,14 +347,16 @@ body.sidebar-hidden .portal-main {
   display: none;
 }
 
-/* Main content shifts when sidebar collapses */
+/* Main content shifts when sidebar collapses (desktop only) */
 .portal-main {
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.portal-sidebar.collapsed ~ .portal-main,
-body:has(.portal-sidebar.collapsed) .portal-main {
-  margin-left: var(--sidebar-collapsed);
+@media (min-width: 768px) {
+  .portal-sidebar.collapsed ~ .portal-main,
+  body:has(.portal-sidebar.collapsed) .portal-main {
+    margin-left: var(--sidebar-collapsed);
+  }
 }
 
 /* ── Tablet breakpoint (768–1199px): auto-narrow sidebar ── */
@@ -414,13 +416,23 @@ body:has(.portal-sidebar.collapsed) .portal-main {
 /* ── Mobile breakpoint ── */
 @media (max-width: 767px) {
   .portal-sidebar {
-    transform: translateX(-100%);
+    position: fixed !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 9999;
+    width: min(280px, 82vw) !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .portal-sidebar.mobile-open {
-    transform: translateX(0);
+    transform: translateX(0) !important;
+    box-shadow: 4px 0 32px rgba(0, 0, 0, 0.5) !important;
   }
   .portal-main {
-    margin-left: 0;
+    margin-left: 0 !important;
+    width: 100% !important;
+    min-width: 0 !important;
   }
   #btn-sidebar-toggle {
     display: flex !important;

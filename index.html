@@ -31,22 +31,22 @@
   <link rel="preconnect" href="https://images.unsplash.com">
   <link rel="preconnect" href="https://api.dicebear.com">
 
-  <!-- Google Material Symbols & Expressive Fonts -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
+  <!-- Expressive Modern Fonts & Icons -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" />
 
   <!-- Stylesheets -->
-  <link rel="stylesheet" href="css/variables.css?v=54">
-  <link rel="stylesheet" href="css/layout.css?v=54">
-  <link rel="stylesheet" href="css/components.css?v=54">
-  <link rel="stylesheet" href="css/mobile.css?v=54">
+  <link rel="stylesheet" href="css/variables.css?v=63">
+  <link rel="stylesheet" href="css/layout.css?v=63">
+  <link rel="stylesheet" href="css/components.css?v=63">
+  <link rel="stylesheet" href="css/mobile.css?v=63">
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=51" defer></script>
-  <script src="js/auth.js?v=51" defer></script>
-  <script src="js/feed.js?v=53" defer></script>
-  <script src="js/dashboard.js?v=51" defer></script>
-  <script src="js/router.js?v=51" defer></script>
-  <script src="js/main.js?v=51" defer></script>
+  <script src="js/db.js?v=63" defer></script>
+  <script src="js/auth.js?v=63" defer></script>
+  <script src="js/feed.js?v=63" defer></script>
+  <script src="js/dashboard.js?v=63" defer></script>
+  <script src="js/router.js?v=63" defer></script>
+  <script src="js/main.js?v=63" defer></script>
 
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <!-- Instant Inline Orientation and Tablet Detector -->
@@ -55,14 +55,13 @@
       function checkTabletOrientation() {
         var isPortrait = window.matchMedia('(orientation: portrait)').matches || (window.innerHeight > window.innerWidth);
         var target = document.documentElement;
-        if (isPortrait && window.innerWidth <= 1366) {
+        // Only classify as tablet portrait if width is within tablet bounds (>= 768px and <= 1366px)
+        if (isPortrait && window.innerWidth >= 768 && window.innerWidth <= 1366) {
           target.classList.add('is-portrait');
           if (document.body) document.body.classList.add('is-portrait');
-          console.log('[Inline Detection] Tablet Portrait detected. Applied is-portrait class.');
         } else {
           target.classList.remove('is-portrait');
           if (document.body) document.body.classList.remove('is-portrait');
-          console.log('[Inline Detection] Landscape or non-tablet detected.');
         }
       }
       window.addEventListener('resize', checkTabletOrientation);
@@ -137,11 +136,21 @@
         <li class="menu-item auth-only" data-view="dashboard" style="display:none; border-top: 1px solid rgba(255,255,255,0.1); padding-top:0.5rem;">
           <a href="#/dashboard" data-label="Profile Dashboard"><ion-icon name="grid-outline"></ion-icon> <span class="nav-label">Profile Dashboard</span></a>
         </li>
+        <li class="menu-item" data-view="messenger">
+          <a href="messenger.html" data-label="Apex Messenger" style="color:var(--accent); font-weight:700;">
+            <ion-icon name="chatbubbles"></ion-icon> 
+            <span class="nav-label">Apex Messenger</span>
+            <span style="background:linear-gradient(135deg, var(--accent) 0%, #10b981 100%); color:white; font-size:0.58rem; padding:2px 7px; border-radius:10px; margin-left:auto; font-weight:800; letter-spacing:0.04em;">APP</span>
+          </a>
+        </li>
       </ul>
 
-      <!-- Sidebar Footer (Version / Branding strip) -->
+      <!-- Sidebar Footer (Version / Branding strip + Collapse Toggle) -->
       <div class="sidebar-footer">
-        <span class="sidebar-version-label" id="sidebar-version-text" style="font-size:0.65rem; color:rgba(255,255,255,0.3); font-weight:600; overflow:hidden; white-space:nowrap; transition:opacity 0.2s, width 0.3s; width:100%; text-align:center;">Apex School Portal</span>
+        <span class="sidebar-version-label" id="sidebar-version-text" style="font-size:0.65rem; color:rgba(255,255,255,0.4); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; transition:opacity 0.2s, width 0.3s; flex:1;">School Portal v1.6.0</span>
+        <button id="btn-sidebar-collapse" title="Collapse sidebar" aria-label="Toggle sidebar" style="background:rgba(255,255,255,0.07); border:none; color:rgba(255,255,255,0.6); border-radius:8px; width:30px; height:30px; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:1rem; flex-shrink:0; transition:background 0.2s, color 0.2s, transform 0.2s;">
+          <ion-icon name="chevron-back-outline" id="collapse-icon"></ion-icon>
+        </button>
       </div>
     </aside>
 
@@ -167,13 +176,18 @@
             
             <div id="messenger-dropdown-menu" class="header-dropdown">
               <div class="header-dropdown-header" style="display:flex; justify-content:space-between; align-items:center; padding:1rem; border-bottom:1px solid var(--border-color);">
-                <span style="font-weight:700; font-size:1.1rem;">Messages</span>
-                <a href="#/messages" style="color:var(--primary); font-size:1.2rem; cursor:pointer;" title="Open Full Messenger"><ion-icon name="expand-outline"></ion-icon></a>
+                <span style="font-weight:700; font-size:1.1rem;">Apex Messenger</span>
+                <a href="messenger.html" style="color:var(--primary); font-size:1.2rem; cursor:pointer;" title="Open Apex Messenger App"><ion-icon name="open-outline"></ion-icon></a>
               </div>
               <div id="messenger-dropdown-list" class="header-dropdown-content" style="max-height:300px; overflow-y:auto; padding:0;">
                 <div style="padding:1rem; text-align:center; color:var(--text-secondary); font-size:0.9rem;">
                   No recent messages
                 </div>
+              </div>
+              <div style="padding:0.6rem 1rem; border-top:1px solid var(--border-color); background:var(--bg-primary); text-align:center;">
+                <a href="messenger.html" style="color:var(--primary); font-weight:700; font-size:0.85rem; text-decoration:none; display:inline-flex; align-items:center; gap:0.4rem;">
+                  <ion-icon name="chatbubbles"></ion-icon> <span>Open Apex Messenger App</span> <ion-icon name="arrow-forward-outline"></ion-icon>
+                </a>
               </div>
             </div>
           </div>
@@ -182,7 +196,7 @@
           <div class="header-widget-wrap" id="notif-bell-trigger" style="position:relative;">
             <div class="header-action-btn" title="Notifications">
               <ion-icon name="notifications"></ion-icon>
-              <span id="notif-badge-count" class="header-badge">0</span>
+              <span id="notif-badge-count" class="header-badge" style="display:none;">0</span>
             </div>
             
             <div id="notif-dropdown-menu" class="header-dropdown">
@@ -241,78 +255,79 @@
 
           <!-- PINNED ANNOUNCEMENTS MOVED TO SIDEBAR -->
 
-          <!-- FEED FILTER BAR -->
-          <div class="feed-filter-bar">
-            <button class="filter-pill active"><ion-icon name="apps"></ion-icon> All</button>
-            <button class="filter-pill"><ion-icon name="megaphone"></ion-icon> Announcements</button>
-            <button class="filter-pill"><ion-icon name="trophy"></ion-icon> Achievements</button>
-            <button class="filter-pill"><ion-icon name="calendar"></ion-icon> Events</button>
-            <button class="filter-pill"><ion-icon name="folder-open"></ion-icon> Resources</button>
-            <button class="filter-pill"><ion-icon name="bar-chart"></ion-icon> Polls</button>
-          </div>
-          
-          <!-- FB Create Post box -->
-          <div id="fb-create-post-box" class="news-card composer-card" style="display:none; margin-bottom:1rem; padding:1.25rem;">
-            <div class="composer-top" style="display:flex; gap:1rem; align-items:flex-start;">
-              <img id="post-box-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" alt="avatar" style="width:48px; height:48px; margin-top:0.25rem;">
-              <div style="flex:1; display:flex; flex-direction:column; gap:0.5rem;">
-                <!-- Main Input Area -->
-                <textarea id="composer-main-input" class="form-control" placeholder="What's on your mind?" rows="1" style="resize:none; background:transparent; color:var(--text-primary); border-radius:1rem; border:none; padding:1rem 0; font-size:1.1rem; width:100%; box-shadow:none; overflow:hidden; outline:none;"></textarea>
-                
-                <!-- Hidden Expansion Area -->
-                <div id="composer-expansion-area" style="display:none; flex-direction:column; gap:1rem; margin-top:0.5rem;">
-                  <!-- Dynamic Fields Container (for Event/Poll inputs) -->
-                  <div id="composer-dynamic-fields"></div>
-                  <!-- Attachments Container (for Photos/Docs) -->
-                  <div id="composer-attachments" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
-                  
-                  <!-- Bottom Action Row (Icons + Audience + Post) -->
-                  <div class="composer-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-top:0.5rem; padding-top:0.5rem;">
-                    
-                    <!-- Left: Bare Outline Icons -->
-                    <div class="composer-actions" style="display:flex; gap:0.25rem; align-items:center; color:var(--text-secondary);">
-                      <!-- Reusing existing buttons but restyling them as bare outline icons -->
-                      <button class="post-action-btn icon-btn-bare" data-type="link" title="Link"><ion-icon name="link-outline"></ion-icon></button>
-                      <button class="post-action-btn icon-btn-bare" data-type="photo" title="Photo/Video"><ion-icon name="image-outline"></ion-icon></button>
-                      <button class="post-action-btn icon-btn-bare" data-type="location" title="Location"><ion-icon name="location-outline"></ion-icon></button>
-                      <button class="post-action-btn icon-btn-bare" data-type="document" title="Document"><ion-icon name="document-attach-outline"></ion-icon></button>
-                      <button class="post-action-btn icon-btn-bare" data-type="event" title="Event"><ion-icon name="calendar-outline"></ion-icon></button>
-                      <button class="post-action-btn icon-btn-bare" data-type="poll" title="Poll"><ion-icon name="bar-chart-outline"></ion-icon></button>
-                      <button class="post-action-btn icon-btn-bare" data-type="achievement" title="Achievement"><ion-icon name="trophy-outline"></ion-icon></button>
-                      <button id="btn-action-announcement" class="post-action-btn icon-btn-bare" data-type="announcement" title="Announce"><ion-icon name="megaphone-outline"></ion-icon></button>
-                    </div>
-
-                    <!-- Right: Dropdown & Submit -->
-                    <div style="display:flex; align-items:center; gap:1rem;">
-                      <div style="position:relative;" class="composer-audience-wrapper">
-                        <button id="btn-composer-audience" class="btn-text-only" style="display:flex; align-items:center; gap:0.25rem; font-size:0.85rem; color:var(--text-secondary); background:none; border:none; padding:0; cursor:pointer; outline:none;">Logged in Users <ion-icon name="caret-down"></ion-icon></button>
-                        <div id="composer-audience-dropdown" class="dropdown-menu" style="display:none; position:absolute; bottom:150%; right:0; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:0.5rem; min-width:150px; z-index:10; box-shadow:var(--shadow-lg);">
-                          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="all" checked id="aud-all"> All Logged in</label>
-                          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="teacher" class="aud-cb"> Teachers</label>
-                          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="admin" class="aud-cb"> Admins</label>
-                          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="learner" class="aud-cb"> Learners</label>
-                          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="parent" class="aud-cb"> Parents</label>
-                        </div>
-                      </div>
-                      
-                      <div class="composer-submit-group" style="display:flex; gap:0.5rem;">
-                        <button id="btn-composer-cancel" class="btn-text-only" style="padding:0.4rem 1rem; color:var(--text-secondary); background:none; border:none; cursor:pointer; outline:none;">Cancel</button>
-                        <button id="btn-composer-submit" class="btn-primary btn-pill" style="padding:0.6rem 2rem; border-radius:50px; background:var(--accent); color:white; border:none; font-weight:600; cursor:pointer; outline:none;">Post</button>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <input type="file" id="composer-file-input" multiple style="display:none;">
-          </div>
-
           <!-- Main Feed Layout (Feed + Right Widgets) -->
           <div class="sections-grid">
-            <div id="school-newsfeed-container">
+            <div class="feed-main-col" style="min-width: 0; width: 100%; display: flex; flex-direction: column;">
+              <!-- FB Create Post box (at top of feed) -->
+              <div id="fb-create-post-box" class="news-card composer-card" style="display:none; margin-bottom:1.25rem; padding:1.25rem;">
+                <div class="composer-top" style="display:flex; gap:1rem; align-items:flex-start;">
+                  <img id="post-box-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" alt="avatar" style="width:48px; height:48px; margin-top:0.25rem;">
+                  <div style="flex:1; display:flex; flex-direction:column; gap:0.5rem;">
+                    <!-- Main Input Area -->
+                    <textarea id="composer-main-input" class="form-control" placeholder="What's on your mind?" rows="1" style="resize:none; background:transparent; color:var(--text-primary); border-radius:1rem; border:none; padding:1rem 0; font-size:1.1rem; width:100%; box-shadow:none; overflow:hidden; outline:none;"></textarea>
+                    
+                    <!-- Hidden Expansion Area -->
+                    <div id="composer-expansion-area" style="display:none; flex-direction:column; gap:1rem; margin-top:0.5rem;">
+                      <!-- Dynamic Fields Container (for Event/Poll inputs) -->
+                      <div id="composer-dynamic-fields"></div>
+                      <!-- Attachments Container (for Photos/Docs) -->
+                      <div id="composer-attachments" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
+                      
+                      <!-- Bottom Action Row (Icons + Audience + Post) -->
+                      <div class="composer-footer" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; margin-top:0.5rem; padding-top:0.5rem;">
+                        
+                        <!-- Left: Bare Outline Icons -->
+                        <div class="composer-actions" style="display:flex; gap:0.25rem; align-items:center; color:var(--text-secondary);">
+                          <!-- Reusing existing buttons but restyling them as bare outline icons -->
+                          <button class="post-action-btn icon-btn-bare" data-type="link" title="Link"><ion-icon name="link-outline"></ion-icon></button>
+                          <button class="post-action-btn icon-btn-bare" data-type="photo" title="Photo/Video"><ion-icon name="image-outline"></ion-icon></button>
+                          <button class="post-action-btn icon-btn-bare" data-type="location" title="Location"><ion-icon name="location-outline"></ion-icon></button>
+                          <button class="post-action-btn icon-btn-bare" data-type="document" title="Document"><ion-icon name="document-attach-outline"></ion-icon></button>
+                          <button class="post-action-btn icon-btn-bare" data-type="event" title="Event"><ion-icon name="calendar-outline"></ion-icon></button>
+                          <button class="post-action-btn icon-btn-bare" data-type="poll" title="Poll"><ion-icon name="bar-chart-outline"></ion-icon></button>
+                          <button class="post-action-btn icon-btn-bare" data-type="achievement" title="Achievement"><ion-icon name="trophy-outline"></ion-icon></button>
+                          <button id="btn-action-announcement" class="post-action-btn icon-btn-bare" data-type="announcement" title="Announce"><ion-icon name="megaphone-outline"></ion-icon></button>
+                        </div>
+
+                        <!-- Right: Dropdown & Submit -->
+                        <div style="display:flex; align-items:center; gap:1rem;">
+                          <div style="position:relative;" class="composer-audience-wrapper">
+                            <button id="btn-composer-audience" class="btn-text-only" style="display:flex; align-items:center; gap:0.25rem; font-size:0.85rem; color:var(--text-secondary); background:none; border:none; padding:0; cursor:pointer; outline:none;">Logged in Users <ion-icon name="caret-down"></ion-icon></button>
+                            <div id="composer-audience-dropdown" class="dropdown-menu" style="display:none; position:absolute; bottom:150%; right:0; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:var(--radius-md); padding:0.5rem; min-width:150px; z-index:10; box-shadow:var(--shadow-lg);">
+                              <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="all" checked id="aud-all"> All Logged in</label>
+                              <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="teacher" class="aud-cb"> Teachers</label>
+                              <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="admin" class="aud-cb"> Admins</label>
+                              <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="learner" class="aud-cb"> Learners</label>
+                              <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; padding:0.35rem 0.5rem; cursor:pointer;"><input type="checkbox" value="parent" class="aud-cb"> Parents</label>
+                            </div>
+                          </div>
+                          
+                          <div class="composer-submit-group" style="display:flex; gap:0.5rem;">
+                            <button id="btn-composer-cancel" class="btn-text-only" style="padding:0.4rem 1rem; color:var(--text-secondary); background:none; border:none; cursor:pointer; outline:none;">Cancel</button>
+                            <button id="btn-composer-submit" class="btn-primary btn-pill" style="padding:0.6rem 2rem; border-radius:50px; background:var(--accent); color:white; border:none; font-weight:600; cursor:pointer; outline:none;">Post</button>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <input type="file" id="composer-file-input" multiple style="display:none;">
+              </div>
+
+              <!-- FEED FILTER BAR -->
+              <div class="feed-filter-bar">
+                <button class="filter-pill active"><ion-icon name="apps"></ion-icon> All</button>
+                <button class="filter-pill"><ion-icon name="megaphone"></ion-icon> Announcements</button>
+                <button class="filter-pill"><ion-icon name="trophy"></ion-icon> Achievements</button>
+                <button class="filter-pill"><ion-icon name="calendar"></ion-icon> Events</button>
+                <button class="filter-pill"><ion-icon name="folder-open"></ion-icon> Resources</button>
+                <button class="filter-pill"><ion-icon name="bar-chart"></ion-icon> Polls</button>
+              </div>
+
               <!-- Dynamically populated Facebook-style announcements -->
+              <div id="school-newsfeed-container"></div>
             </div>
             
             <!-- Right Widget column -->
@@ -475,25 +490,69 @@
 
         <!-- ================= VIEW: TRANSPARENCY BOARD ================= -->
         <div id="view-transparency" class="route-view" style="display:none;">
-          <h1 class="hero-title" style="text-align:center;">School Transparency Board</h1>
-          <p style="text-align:center; color:var(--text-secondary); margin-bottom:3rem;">In compliance with the national mandate for transparency in educational institutions, we make our school credentials and reports available to the public.</p>
-          
-          <div class="news-card">
-            <h2 class="widget-title">Citizen's Charter & Reports</h2>
-            <div style="overflow-x: auto;">
-              <table class="transparency-table">
-                <thead>
-                  <tr>
-                    <th>Document / Report Title</th>
-                    <th>Last Updated</th>
-                    <th>Access Link</th>
-                  </tr>
-                </thead>
-                <tbody id="transparency-docs-list">
-                  <!-- Dynamically populated -->
-                </tbody>
-              </table>
+          <!-- Transparency Banner Hero -->
+          <div class="news-card" style="margin-bottom:2rem; background:linear-gradient(135deg, color-mix(in srgb, var(--primary) 8%, var(--bg-secondary)), var(--bg-secondary)); border:1.5px solid color-mix(in srgb, var(--primary) 20%, var(--border-color));">
+            <div style="display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap;">
+              <div style="width:72px; height:72px; border-radius:50%; background:color-mix(in srgb, var(--accent) 18%, transparent); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:2.4rem; flex-shrink:0; border:2px solid var(--accent); box-shadow:0 0 20px color-mix(in srgb, var(--accent) 30%, transparent);">
+                <ion-icon name="shield-checkmark"></ion-icon>
+              </div>
+              <div style="flex:1; min-width:280px;">
+                <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
+                  <span class="chat-role-pill" style="background:var(--accent); color:white; font-size:0.68rem;">OFFICIAL SEAL</span>
+                  <span style="font-size:0.8rem; color:var(--text-secondary); font-weight:600;">Apex Integrated School Portal</span>
+                </div>
+                <h1 style="font-size:1.65rem; margin:0 0 0.4rem; font-weight:800;">Public Transparency & Accountability Board</h1>
+                <p style="color:var(--text-secondary); margin:0; font-size:0.9rem; line-height:1.45;">In compliance with the national mandate on educational governance, we provide open public access to institutional liquidation reports, procurement biddings, and official charters.</p>
+              </div>
             </div>
+
+            <!-- Transparency Compliance Badges -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem; margin-top:1.5rem; padding-top:1.25rem; border-top:1px solid var(--border-color);">
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <ion-icon name="ribbon-outline" style="font-size:1.6rem; color:var(--primary);"></ion-icon>
+                <div>
+                  <div style="font-size:0.85rem; font-weight:700;">Level III Accredited</div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary);">Quality Management Standard</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <ion-icon name="cash-outline" style="font-size:1.6rem; color:var(--success);"></ion-icon>
+                <div>
+                  <div style="font-size:0.85rem; font-weight:700;">100% MOOE Liquidation</div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary);">Annual Audit Rating</div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:0.6rem;">
+                <ion-icon name="document-lock-outline" style="font-size:1.6rem; color:var(--accent);"></ion-icon>
+                <div>
+                  <div style="font-size:0.85rem; font-weight:700;">Citizen's Charter v2026</div>
+                  <div style="font-size:0.72rem; color:var(--text-secondary);">Public Service Guarantee</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Document Controls: Tabs & Search -->
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.5rem; flex-wrap:wrap;">
+            <!-- Category Tabs -->
+            <div id="transparency-tabs" style="display:flex; gap:0.4rem; overflow-x:auto; padding-bottom:4px; max-width:100%;">
+              <button type="button" class="filter-pill active" data-cat="all">All Documents</button>
+              <button type="button" class="filter-pill" data-cat="charter">Citizen's Charter</button>
+              <button type="button" class="filter-pill" data-cat="financial">Financial & MOOE</button>
+              <button type="button" class="filter-pill" data-cat="procurement">Procurement & Bids</button>
+              <button type="button" class="filter-pill" data-cat="performance">Performance & SRC</button>
+            </div>
+
+            <!-- Search input -->
+            <div style="position:relative; min-width:240px; flex:1; max-width:320px;">
+              <ion-icon name="search-outline" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary);"></ion-icon>
+              <input type="text" id="transparency-search-input" placeholder="Search documents & reports..." style="width:100%; padding:0.45rem 1rem 0.45rem 2.2rem; border-radius:var(--radius-pill); border:1.5px solid var(--border-color); background:var(--bg-secondary); font-size:0.85rem; color:var(--text-primary); outline:none;">
+            </div>
+          </div>
+
+          <!-- Modern Document Cards Grid -->
+          <div id="transparency-docs-grid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(320px, 1fr)); gap:1.25rem;">
+            <!-- Rendered dynamically -->
           </div>
         </div>
 
@@ -573,20 +632,84 @@
 
           <!-- View: ADMIN PORTAL -->
           <div id="portal-view-admin" style="display:none;">
-            <h2>School Administrator Dashboard</h2>
-            <p style="color:var(--text-secondary); margin-bottom:1.5rem;">Manage school branding, content review, and attendance metrics.</p>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem;">
+              <div>
+                <h2 style="font-size:1.6rem; margin-bottom:0.25rem;">School Administrator Dashboard</h2>
+                <p style="color:var(--text-secondary); margin:0;">Real-time overview of campus attendance, academic approvals, and operations.</p>
+              </div>
+              <div style="display:flex; gap:0.5rem; align-items:center;">
+                <button type="button" class="btn-secondary" onclick="window.location.hash='#/transparency'" style="padding:0.45rem 0.9rem; font-size:0.85rem; border-radius:var(--radius-sm); display:flex; align-items:center; gap:0.35rem;">
+                  <ion-icon name="document-text-outline"></ion-icon> Transparency Docs
+                </button>
+                <button type="button" class="btn-primary" onclick="openCreatePostModal()" style="padding:0.45rem 1rem; font-size:0.85rem; border-radius:var(--radius-sm); display:flex; align-items:center; gap:0.35rem;">
+                  <ion-icon name="megaphone-outline"></ion-icon> Broadcast Notice
+                </button>
+              </div>
+            </div>
+
+            <!-- Executive KPI Metric Strip -->
+            <div id="admin-kpi-stats" class="kpi-stats-grid">
+              <div class="kpi-card">
+                <div class="kpi-icon-pill" style="background:color-mix(in srgb, var(--primary) 14%, transparent); color:var(--primary);">
+                  <ion-icon name="school-outline"></ion-icon>
+                </div>
+                <div>
+                  <div class="kpi-val">1,248</div>
+                  <div class="kpi-label">Active Learners</div>
+                  <div class="kpi-sub"><ion-icon name="trending-up-outline"></ion-icon> +3.4% this year</div>
+                </div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon-pill" style="background:color-mix(in srgb, var(--success) 14%, transparent); color:var(--success);">
+                  <ion-icon name="people-outline"></ion-icon>
+                </div>
+                <div>
+                  <div class="kpi-val">48 / 52</div>
+                  <div class="kpi-label">Faculty on Duty</div>
+                  <div class="kpi-sub"><ion-icon name="checkmark-circle-outline"></ion-icon> 92.3% active</div>
+                </div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon-pill" style="background:color-mix(in srgb, var(--accent) 18%, transparent); color:var(--accent);">
+                  <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+                </div>
+                <div>
+                  <div class="kpi-val">96.8%</div>
+                  <div class="kpi-label">Attendance Today</div>
+                  <div class="kpi-sub"><ion-icon name="arrow-up-outline"></ion-icon> High compliance</div>
+                </div>
+              </div>
+              <div class="kpi-card">
+                <div class="kpi-icon-pill" style="background:color-mix(in srgb, var(--warning) 14%, transparent); color:var(--warning);">
+                  <ion-icon name="hourglass-outline"></ion-icon>
+                </div>
+                <div>
+                  <div class="kpi-val" id="kpi-pending-count">0</div>
+                  <div class="kpi-label">Pending Inquiries</div>
+                  <div class="kpi-sub" id="kpi-pending-status">All reviewed</div>
+                </div>
+              </div>
+            </div>
             
             <div class="dash-grid">
-              <div class="dash-card" style="grid-column: span 2;">
-                <h3 class="widget-title">Announcement Approvals Queue</h3>
-                <div id="admin-pending-announcements" class="news-card-list" style="margin-top:1rem;">
+              <!-- Announcement Approvals Queue -->
+              <div class="dash-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.75rem;">
+                  <h3 class="widget-title" style="margin:0; border:none; padding:0;">Announcement Approvals Queue</h3>
+                  <span id="badge-pending-count" class="chat-count-pill" style="display:none;">0</span>
+                </div>
+                <div id="admin-pending-announcements" class="news-card-list">
                   <!-- Pending items list -->
                 </div>
               </div>
               
+              <!-- Consolidated Attendance Monitor -->
               <div class="dash-card">
-                <h3 class="widget-title">Consolidated Attendance Monitor</h3>
-                <div id="admin-attendance-grid" style="margin-top:1rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; border-bottom:1px solid var(--border-color); padding-bottom:0.75rem;">
+                  <h3 class="widget-title" style="margin:0; border:none; padding:0;">Consolidated Attendance Monitor</h3>
+                  <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;">Grade 10 Advisory</span>
+                </div>
+                <div id="admin-attendance-grid">
                   <!-- Grid -->
                 </div>
               </div>
@@ -594,83 +717,9 @@
           </div>
         </div>
 
-        <!-- ================= VIEW: DIRECT MESSAGES ================= -->
-        <div id="view-messages" class="route-view" style="display:none;">
-          <div id="chat-container-element" class="chat-container">
-            <div class="chat-threads">
-              <div style="padding:1rem 1rem 0 1rem;">
-                <h2 style="font-size:1.5rem;">Chats</h2>
-              </div>
-              <div class="chat-search" style="display:flex; gap:0.5rem; align-items:center;">
-                <input type="text" placeholder="Search contacts..." style="flex:1;">
-                <button type="button" id="btn-create-group-chat" title="Create Group Chat" style="background:var(--bg-primary); border:1px solid var(--border-color); color:var(--text-secondary); width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer;">
-                  <ion-icon name="people-outline"></ion-icon>
-                </button>
-              </div>
-              <div id="chat-thread-list" class="thread-list">
-                <!-- Threads -->
-              </div>
-            </div>
-            <div class="chat-window" style="flex:1;">
-              <div class="chat-window-header" style="justify-content:space-between; background:var(--bg-secondary); color:var(--text-primary);">
-                <div style="display:flex; align-items:center; gap:0.75rem;">
-                  <!-- Mobile back button to chat lists -->
-                  <button id="btn-chat-back" style="background:none; border:none; font-size:1.5rem; color:var(--text-secondary); cursor:pointer; display:none; align-items:center; justify-content:center; padding-right:0.5rem;">
-                    <ion-icon name="arrow-back-outline"></ion-icon>
-                  </button>
-                  <div style="position:relative;">
-                    <img id="chat-header-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" alt="User avatar" loading="lazy" decoding="async">
-                    <div id="chat-header-active-dot" style="position:absolute; bottom:2px; right:2px; width:10px; height:10px; background:var(--success); border-radius:50%; border:2px solid var(--bg-secondary); display:none;"></div>
-                  </div>
-                  <div style="display:flex; flex-direction:column; align-items:flex-start;">
-                    <h3 id="chat-header-name" class="thread-name" style="margin:0;">Select a thread</h3>
-                    <span id="chat-header-role" style="font-size:0.75rem; color:var(--text-secondary);">No active conversation</span>
-                  </div>
-                </div>
-                <div class="chat-header-actions" style="display:flex; gap:1.2rem; color:var(--primary); font-size:1.5rem; align-items:center;">
-                  <ion-icon name="call" style="cursor:pointer; transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="showToast('Voice call coming soon')"></ion-icon>
-                  <ion-icon name="videocam" style="cursor:pointer; transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="showToast('Video call coming soon')"></ion-icon>
-                  <ion-icon name="information-circle" style="cursor:pointer; transition:transform 0.1s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" onclick="toggleMediaPanel(event)"></ion-icon>
-                </div>
-              </div>
-              <div id="chat-messages-body" class="chat-messages">
-                <!-- Messages -->
-              </div>
-              <form id="chat-input-form" class="chat-input-bar">
-                <button type="button" class="btn-chat-action add-btn" onclick="showToast('Action menu coming soon')" title="More actions" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.5rem; display:flex; align-items:center; flex-shrink:0;">
-                  <ion-icon name="add-circle"></ion-icon>
-                </button>
-                <input type="file" id="chat-photo-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;">
-                <button type="button" id="btn-attach-chat-photo" title="Attach file" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.4rem; display:flex; align-items:center; flex-shrink:0;">
-                  <ion-icon name="image-outline"></ion-icon>
-                </button>
-                <button type="button" class="btn-chat-action" onclick="toggleEmojiPicker('chat-msg-input')" title="Insert Emoji" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); font-size:1.4rem; display:flex; align-items:center; flex-shrink:0;">
-                  <ion-icon name="happy"></ion-icon>
-                </button>
-                
-                <div style="flex:1; position:relative; display:flex; align-items:center; background:var(--bg-primary); border-radius:20px; padding:0.4rem 0.75rem; margin:0 0.5rem; border:1px solid var(--border-color);">
-                  <input type="text" id="chat-msg-input" placeholder="Aa" style="width:100%; border:none; background:transparent; outline:none; font-size:0.95rem;">
-                </div>
-                
-                <button type="submit" class="btn-send" style="background:none; border:none; color:var(--primary); font-size:1.5rem; display:flex; align-items:center; padding:0 0.25rem; cursor:pointer;">
-                  <ion-icon name="send"></ion-icon>
-                </button>
-              </form>
-            </div>
-            
-            <div id="chat-media-panel" class="chat-media-panel" style="display:none; width:300px; border-left:1px solid var(--border-color); background:var(--bg-secondary); overflow-y:auto; flex-direction:column;">
-              <div style="padding:1.5rem; border-bottom:1px solid var(--border-color); display:flex; flex-direction:column; align-items:center; text-align:center;">
-                <img id="media-panel-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" style="width:80px; height:80px; border-radius:50%; margin-bottom:0.5rem;" loading="lazy" decoding="async">
-                <h3 id="media-panel-name" style="margin:0; font-size:1.1rem;">Select a thread</h3>
-              </div>
-              <div style="padding:1rem; flex:1;">
-                <h4 style="font-size:0.85rem; color:var(--text-secondary); margin-bottom:0.75rem; text-transform:uppercase; letter-spacing:0.5px;">Shared Media</h4>
-                <div id="chat-media-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem;">
-                  <!-- Dynamically populated -->
-                </div>
-              </div>
-            </div>
-          </div>
+        <!-- ================= VIEW: DIRECT MESSAGES (APEX MESSENGER PRIMARY) ================= -->
+        <div id="view-messages" class="route-view" style="display:none; width:100%; height:calc(100vh - var(--header-height, 64px)); padding:0; margin:0; overflow:hidden;">
+          <iframe id="main-apex-messenger-frame" src="messenger.html" title="Apex School Messenger" style="width:100%; height:100%; border:none; display:block; background:transparent;"></iframe>
         </div>
         <!-- ================= VIEW: PUBLIC USER PROFILE ================= -->
         <div id="view-user-profile" class="route-view" style="display:none; padding: 0;">
@@ -767,50 +816,49 @@
               
               <!-- TAB: ACCOUNT -->
               <div id="tab-account" class="settings-tab-content">
-                <h2>Edit Profile</h2>
-                <p style="color:var(--text-secondary); margin-bottom:2rem;">Manage your personal information and how others see you.</p>
-                
-                <form id="profile-user-form" class="news-card" style="padding: 1.5rem;">
-                  
-                  <div style="display:flex; gap: 2rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
-                    <!-- Avatar Upload Area -->
-                    <div class="form-group" style="text-align:center; flex: 0 0 130px;">
-                      <label style="display:block; text-align:left; margin-bottom:0.5rem;">Avatar</label>
-                      <input type="file" id="profile-photo-input" accept="image/*" style="display:none;">
-                      <div id="profile-avatar-upload-wrap" title="Click to upload photo" style="position:relative; display:inline-block; cursor:pointer; margin-bottom:0.75rem;">
-                        <img id="profile-avatar-preview" class="profile-avatar" style="width:110px; height:110px; border:3px solid var(--accent); transition: opacity 0.2s;" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" alt="Avatar Preview">
-                        <div style="position:absolute; bottom:4px; right:4px; background:var(--accent); border-radius:50%; width:30px; height:30px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,0.4);">
-                          <ion-icon name="camera-outline" style="font-size:1rem; color:#fff;"></ion-icon>
+                <div style="margin-bottom:1.5rem;">
+                  <h2 style="font-size:1.6rem; margin-bottom:0.25rem;">Edit Profile & Settings</h2>
+                  <p style="color:var(--text-secondary); margin:0;">Personalize your profile banner, contact information, and community bio.</p>
+                </div>
+
+                <!-- Interactive Live Profile Banner Header -->
+                <div class="news-card" style="padding:0; overflow:hidden; margin-bottom:1.5rem; position:relative; border-radius:var(--radius-md);">
+                  <div style="position:relative; width:100%; height:140px; background:var(--bg-tint);">
+                    <img id="profile-cover-preview" src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80" style="width:100%; height:100%; object-fit:cover; display:block;" alt="Cover Banner">
+                    <button type="button" class="btn-secondary" onclick="document.getElementById('profile-cover-file').click()" style="position:absolute; bottom:12px; right:12px; font-size:0.75rem; padding:0.35rem 0.8rem; background:rgba(0,0,0,0.65); color:white; border:none; backdrop-filter:blur(4px); border-radius:50px; display:flex; align-items:center; gap:0.3rem; cursor:pointer;">
+                      <ion-icon name="camera-outline"></ion-icon> Change Cover Photo
+                    </button>
+                    <input type="file" id="profile-cover-file" accept="image/*" style="display:none;">
+                  </div>
+                  <div style="padding:0 1.5rem 1.25rem; display:flex; align-items:flex-end; justify-content:space-between; margin-top:-45px; flex-wrap:wrap; gap:1rem;">
+                    <div style="display:flex; align-items:flex-end; gap:1rem;">
+                      <div id="profile-avatar-upload-wrap" title="Click to change profile photo" style="position:relative; width:88px; height:88px; cursor:pointer; flex-shrink:0;">
+                        <img id="profile-avatar-preview" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--bg-secondary); background:var(--bg-secondary); object-fit:cover;" alt="Avatar Preview">
+                        <div style="position:absolute; bottom:2px; right:2px; background:var(--primary); color:white; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; border:2px solid var(--bg-secondary);">
+                          <ion-icon name="camera"></ion-icon>
                         </div>
                       </div>
-                      <details style="margin-top:0.25rem; text-align:left;">
-                        <summary style="font-size:0.8rem; color:var(--text-secondary); cursor:pointer; list-style:none; display:flex; align-items:center; gap:0.35rem; justify-content:center;">
-                          <ion-icon name="color-palette-outline"></ion-icon> Use cartoon seed
-                        </summary>
-                        <input type="text" id="profile-avatar-seed" class="form-control" style="margin-top:0.5rem; font-size:0.85rem; text-align:center;" placeholder="Name (e.g. Juan)">
-                      </details>
-                    </div>
-                    
-                    <div style="flex: 1; min-width: 250px;">
-                      <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="profile-name-input" class="form-control" required>
-                      </div>
-                      <div class="form-group">
-                        <label>Contact Info / Email</label>
-                        <input type="text" id="profile-contact-input" class="form-control" placeholder="Visible on your public profile">
+                      <div style="padding-bottom:4px;">
+                        <h3 id="profile-preview-display-name" style="margin:0; font-size:1.15rem; font-weight:700;">Account Profile</h3>
+                        <span id="profile-preview-display-role" class="chat-role-pill" style="font-size:0.65rem; padding:1px 6px;">MEMBER</span>
                       </div>
                     </div>
                   </div>
+                </div>
+                
+                <form id="profile-user-form" class="news-card" style="padding: 1.5rem;">
+                  <input type="file" id="profile-photo-input" accept="image/*" style="display:none;">
+                  <input type="hidden" id="profile-cover-input">
                   
-                  <div class="form-group">
-                    <label>Cover Photo</label>
-                    <div style="display:flex; gap:0.5rem; align-items:center;">
-                      <input type="text" id="profile-cover-input" class="form-control" placeholder="Image URL (or click Upload ->)">
-                      <input type="file" id="profile-cover-file" accept="image/*" style="display:none;">
-                      <button type="button" class="btn-secondary" onclick="document.getElementById('profile-cover-file').click()" style="white-space:nowrap; padding:0.5rem 1rem;"><ion-icon name="cloud-upload-outline"></ion-icon> Upload</button>
+                  <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:1.25rem; margin-bottom:1.25rem;">
+                    <div class="form-group" style="margin:0;">
+                      <label>Full Name</label>
+                      <input type="text" id="profile-name-input" class="form-control" placeholder="Enter your full name" required>
                     </div>
-                    <div style="font-size:0.8rem; color:var(--text-secondary); margin-top:0.25rem;">Paste an image URL or upload a file to display on your public profile banner.</div>
+                    <div class="form-group" style="margin:0;">
+                      <label>Contact Info / Email</label>
+                      <input type="text" id="profile-contact-input" class="form-control" placeholder="Visible on your public profile">
+                    </div>
                   </div>
 
                   <div class="form-group">
@@ -820,9 +868,12 @@
 
                   <div id="profile-role-fields" style="margin-bottom:1.5rem; display:flex; flex-direction:column; gap:1rem;"></div>
                   
-                  <button type="submit" class="btn-action">
-                    <ion-icon name="save-outline" style="vertical-align:middle; margin-right:0.3rem;"></ion-icon> Save Changes
-                  </button>
+                  <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border-color); padding-top:1.25rem; flex-wrap:wrap; gap:0.75rem;">
+                    <span style="font-size:0.75rem; color:var(--text-secondary);">Changes take effect across the entire portal immediately.</span>
+                    <button type="submit" class="btn-action" style="padding:0.6rem 1.6rem; border-radius:var(--radius-pill); font-size:0.9rem; font-weight:700; display:inline-flex; align-items:center; gap:0.4rem; cursor:pointer;">
+                      <ion-icon name="save-outline"></ion-icon> Save Changes
+                    </button>
+                  </div>
                 </form>
               </div>
 
@@ -980,16 +1031,22 @@
   <div id="floating-chat-window" class="floating-chat-window" style="display:none;">
     <!-- Chat Header -->
     <div class="chat-window-header">
-      <div style="display:flex; align-items:center; gap:0.5rem; flex:1;">
+      <div style="display:flex; align-items:center; gap:0.5rem; flex:1; cursor:pointer;" onclick="openActiveInFullMessenger()" title="Click to view full thread in Messenger">
         <img id="floating-chat-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=MC&backgroundColor=0369a1" style="width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,0.2);">
         <div style="display:flex; flex-direction:column;">
           <span id="floating-chat-title" style="font-weight:700; font-size:0.95rem; line-height:1.2;">Main chat</span>
           <span id="floating-chat-subtitle" style="font-size:0.75rem; opacity:0.8;">Apex Elementary School</span>
         </div>
       </div>
-      <div class="chat-window-actions" style="display:flex; gap:0.5rem; align-items:center;">
+      <div class="chat-window-actions" style="display:flex; gap:0.4rem; align-items:center;">
+        <!-- Audio Call -->
+        <button type="button" onclick="startChatCall('audio')" title="Voice Call" style="background:none; border:none; color:rgba(255,255,255,0.85); font-size:1.15rem; cursor:pointer; display:flex; align-items:center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.85)'"><ion-icon name="call-outline"></ion-icon></button>
+        <!-- Video Call -->
+        <button type="button" onclick="startChatCall('video')" title="Video Call" style="background:none; border:none; color:rgba(255,255,255,0.85); font-size:1.15rem; cursor:pointer; display:flex; align-items:center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.85)'"><ion-icon name="videocam-outline"></ion-icon></button>
+        <!-- Open in Full Messenger -->
+        <button type="button" onclick="openActiveInFullMessenger()" title="Open Full Messenger" style="background:none; border:none; color:rgba(255,255,255,0.85); font-size:1.15rem; cursor:pointer; display:flex; align-items:center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.85)'"><ion-icon name="open-outline"></ion-icon></button>
         <!-- Media History Button -->
-        <button type="button" onclick="toggleFloatingMediaPanel()" title="Media History" style="background:none; border:none; color:rgba(255,255,255,0.8); font-size:1.2rem; cursor:pointer; display:flex; align-items:center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.8)'"><ion-icon name="images-outline"></ion-icon></button>
+        <button type="button" onclick="toggleFloatingMediaPanel()" title="Media History" style="background:none; border:none; color:rgba(255,255,255,0.85); font-size:1.15rem; cursor:pointer; display:flex; align-items:center;" onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255,255,255,0.85)'"><ion-icon name="images-outline"></ion-icon></button>
         <button onclick="minimizeChatWindow()"><ion-icon name="remove"></ion-icon></button>
         <button onclick="closeChatWindow()"><ion-icon name="close"></ion-icon></button>
       </div>
@@ -1017,20 +1074,35 @@
       
       <!-- Dynamic Messages go here -->
     </div>
+
+    <!-- Floating Attachment Preview Bar -->
+    <div id="floating-attachment-preview-bar" class="chat-attachment-preview" style="display:none; padding:0.4rem 0.6rem; background:var(--bg-primary); border-top:1px solid var(--border-color);">
+      <div class="attachment-preview-thumb-wrap" style="width:32px; height:32px;">
+        <img id="floating-attachment-preview-thumb" src="" alt="preview" style="display:none; width:100%; height:100%; border-radius:4px; object-fit:cover;">
+        <ion-icon id="floating-attachment-preview-icon" name="document-text" style="display:none; font-size:1.2rem; color:var(--primary);"></ion-icon>
+      </div>
+      <div style="flex:1; min-width:0;">
+        <div id="floating-attachment-preview-name" style="font-size:0.75rem; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;"></div>
+      </div>
+      <button type="button" class="btn-remove-attachment" onclick="clearFloatingAttachmentPreview()" title="Remove attachment" style="background:none; border:none; cursor:pointer; color:var(--text-secondary); display:flex; align-items:center;">
+        <ion-icon name="close-circle"></ion-icon>
+      </button>
+    </div>
     
     <!-- Chat Input Bar -->
     <form id="floating-chat-form" class="chat-window-input-area" onsubmit="event.preventDefault(); submitFloatingChat();">
-      <button type="button" class="chat-input-btn add-btn" onclick="showToast('Action menu coming soon')" title="More actions"><ion-icon name="add-circle"></ion-icon></button>
+      <button type="button" class="chat-input-btn add-btn" onclick="toggleChatQuickActions(event, 'floating-chat-input')" title="Quick actions"><ion-icon name="add-circle"></ion-icon></button>
       <!-- Hidden file input for floating chat -->
       <input type="file" id="floating-chat-photo-input" accept="image/*,.pdf,.doc,.docx,.txt" style="display:none;">
       <button type="button" class="chat-input-btn" id="btn-attach-floating-photo" title="Attach file"><ion-icon name="attach-outline"></ion-icon></button>
+      <button type="button" class="chat-input-btn" onclick="recordSimulatedVoiceNote('floating-chat-input')" title="Voice Note"><ion-icon name="mic-outline"></ion-icon></button>
       
       <div class="chat-input-wrap">
         <input type="text" id="floating-chat-input" placeholder="Aa" class="chat-text-input" autocomplete="off">
-        <button type="button" class="chat-emoji-btn" onclick="toggleEmojiPicker('floating-chat-input')" title="Insert Emoji"><ion-icon name="happy-outline"></ion-icon></button>
+        <button type="button" class="chat-emoji-btn" onclick="toggleEmojiPicker('floating-chat-input', event)" title="Insert Emoji"><ion-icon name="happy-outline"></ion-icon></button>
       </div>
       
-      <button type="submit" class="chat-input-btn like-btn" style="color:var(--primary);"><ion-icon name="send"></ion-icon></button>
+      <button type="submit" class="chat-input-btn like-btn" style="color:var(--primary);"><ion-icon name="paper-plane"></ion-icon></button>
     </form>
   </div>
 
@@ -1065,6 +1137,59 @@
     </div>
     <div id="emoji-list" style="display:flex; flex-wrap:wrap; gap:0.25rem; max-height:200px; overflow-y:auto; padding-right:0.25rem;">
       <!-- Populated by JS -->
+    </div>
+  </div>
+
+  <!-- Quick Actions Popover -->
+  <div id="chat-quick-actions-popover" class="chat-action-popover" style="display:none; position:fixed; z-index:99999; background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:16px; padding:0.6rem; box-shadow:var(--shadow-xl); width:240px; backdrop-filter:blur(10px);">
+    <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-secondary); padding:0.3rem 0.5rem 0.5rem; border-bottom:1px solid var(--border-color); margin-bottom:0.4rem;">
+      Quick Actions
+    </div>
+    <div class="quick-action-items" style="display:flex; flex-direction:column; gap:0.25rem;">
+      <button type="button" class="quick-action-btn" onclick="triggerQuickAction('photo')">
+        <ion-icon name="image-outline" style="color:var(--primary);"></ion-icon> Send Photo
+      </button>
+      <button type="button" class="quick-action-btn" onclick="triggerQuickAction('file')">
+        <ion-icon name="document-text-outline" style="color:#f59e0b;"></ion-icon> Attach Document
+      </button>
+      <button type="button" class="quick-action-btn" onclick="triggerQuickAction('location')">
+        <ion-icon name="location-outline" style="color:#10b981;"></ion-icon> Send Campus Location
+      </button>
+      <button type="button" class="quick-action-btn" onclick="triggerQuickAction('greeting')">
+        <ion-icon name="sparkles-outline" style="color:#ec4899;"></ion-icon> Quick Greeting
+      </button>
+      <button type="button" class="quick-action-btn" onclick="triggerQuickAction('profile')">
+        <ion-icon name="person-circle-outline" style="color:var(--text-secondary);"></ion-icon> View Profile
+      </button>
+    </div>
+  </div>
+
+  <!-- Simulated Call Modal -->
+  <div id="chat-call-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; backdrop-filter:blur(8px); z-index:999999;">
+    <div class="modal-content" style="width:100%; max-width:360px; margin:1rem; border-radius:24px; padding:2rem 1.5rem; text-align:center; background:var(--bg-secondary); border:1px solid var(--border-color); box-shadow:var(--shadow-xl); position:relative;">
+      <div style="position:relative; width:96px; height:96px; margin:0 auto 1.25rem;">
+        <div class="call-pulse-ring"></div>
+        <img id="call-modal-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" style="width:100%; height:100%; border-radius:50%; object-fit:cover; position:relative; z-index:2; border:3px solid var(--primary);">
+      </div>
+      <h3 id="call-modal-name" style="margin:0 0 0.25rem; font-size:1.3rem; font-weight:700; color:var(--text-primary);">Caller Name</h3>
+      <p id="call-modal-status" style="margin:0 0 1.5rem; font-size:0.9rem; color:var(--primary); font-weight:600;">Connecting audio call...</p>
+      
+      <!-- Call Control Buttons -->
+      <div style="display:flex; justify-content:center; gap:1.25rem; margin-bottom:1.5rem;">
+        <button type="button" id="btn-call-mute" onclick="toggleCallMute()" title="Mute Microphone" style="width:48px; height:48px; border-radius:50%; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:1.3rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
+          <ion-icon name="mic-outline"></ion-icon>
+        </button>
+        <button type="button" id="btn-call-cam" onclick="toggleCallCam()" title="Toggle Camera" style="width:48px; height:48px; border-radius:50%; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:1.3rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
+          <ion-icon name="videocam-outline"></ion-icon>
+        </button>
+        <button type="button" id="btn-call-speaker" onclick="toggleCallSpeaker()" title="Toggle Speakerphone" style="width:48px; height:48px; border-radius:50%; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-size:1.3rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:all 0.2s;">
+          <ion-icon name="volume-high-outline"></ion-icon>
+        </button>
+      </div>
+      
+      <button type="button" onclick="endChatCall()" style="background:var(--danger); color:white; border:none; padding:0.75rem 2rem; border-radius:50px; font-weight:700; font-size:0.95rem; cursor:pointer; display:inline-flex; align-items:center; gap:0.5rem; box-shadow:0 4px 14px rgba(239,68,68,0.4); transition:transform 0.15s;" onmouseover="this.style.transform='scale(1.04)'" onmouseout="this.style.transform='scale(1)'">
+        <ion-icon name="call" style="transform:rotate(135deg);"></ion-icon> End Call
+      </button>
     </div>
   </div>
 
@@ -1146,24 +1271,34 @@
     }
   </script>
   <!-- Contact Drawer Overlay -->
-  <div id="contact-drawer-overlay" class="modal-overlay" style="display:none; align-items:flex-end;">
-    <div class="modal-content" style="width:100%; max-width:400px; margin:0 auto; border-bottom-left-radius:0; border-bottom-right-radius:0; padding:1.5rem;">
+  <div id="contact-drawer-overlay" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; backdrop-filter:blur(6px); z-index:999999;">
+    <div class="modal-content" style="width:100%; max-width:440px; margin:1rem; border-radius:var(--radius-lg); padding:1.5rem; max-height:85vh; display:flex; flex-direction:column; box-shadow:0 16px 40px rgba(0,0,0,0.25);">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-        <h3 style="margin:0;">New Message</h3>
-        <button class="btn-icon" onclick="closeContactDrawer()" style="background:none; border:none; font-size:1.5rem; cursor:pointer;"><ion-icon name="close"></ion-icon></button>
-      </div>
-      <div style="margin-bottom:1rem;">
-        <input type="text" class="form-control" placeholder="Search contacts..." style="width:100%;">
-      </div>
-      <h4 style="font-size:0.85rem; color:var(--text-secondary); text-transform:uppercase; margin-bottom:0.5rem;">Recent Contacts</h4>
-      <div style="display:flex; flex-direction:column; gap:0.5rem;">
-        <div style="display:flex; align-items:center; gap:0.75rem; padding:0.5rem; border-radius:var(--radius-sm); cursor:pointer;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'" onclick="showToast('Starting chat...'); closeContactDrawer();">
-          <img src="https://api.dicebear.com/7.x/initials/svg?seed=Teacher" style="width:40px; height:40px; border-radius:50%;">
-          <div>
-            <div style="font-weight:600;">Mrs. Anderson</div>
-            <div style="font-size:0.8rem; color:var(--text-secondary);">Mathematics</div>
-          </div>
+        <div>
+          <h3 style="margin:0; font-size:1.2rem; font-weight:700;">New Conversation</h3>
+          <p style="margin:0.2rem 0 0; font-size:0.8rem; color:var(--text-secondary);">Select a faculty, learner, or parent to message</p>
         </div>
+        <button class="btn-icon" onclick="closeContactDrawer()" style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:50%; width:32px; height:32px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);"><ion-icon name="close"></ion-icon></button>
+      </div>
+
+      <div style="position:relative; margin-bottom:1rem;">
+        <ion-icon name="search-outline" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); color:var(--text-secondary); font-size:1.1rem;"></ion-icon>
+        <input type="text" id="drawer-contact-search" class="form-control" placeholder="Search by name or role..." style="width:100%; padding-left:2.4rem; border-radius:50px;">
+      </div>
+
+      <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+        <button type="button" id="drawer-btn-create-group" style="flex:1; background:var(--bg-primary); border:1px dashed var(--primary); color:var(--primary); padding:0.6rem; border-radius:var(--radius-sm); font-size:0.85rem; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:0.4rem; transition:all 0.2s;" onmouseover="this.style.background='var(--sidebar-active-bg)'" onmouseout="this.style.background='var(--bg-primary)'">
+          <ion-icon name="people-outline"></ion-icon> Create Group Chat
+        </button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+        <h4 style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.05em; margin:0;">School Contacts</h4>
+        <span id="drawer-contact-count" style="font-size:0.75rem; color:var(--text-secondary); font-weight:600;"></span>
+      </div>
+
+      <div id="drawer-contacts-list" style="display:flex; flex-direction:column; gap:0.4rem; overflow-y:auto; max-height:320px; padding-right:0.25rem;">
+        <!-- Populated dynamically via JS -->
       </div>
     </div>
   </div>
