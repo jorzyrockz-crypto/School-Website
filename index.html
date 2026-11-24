@@ -41,13 +41,13 @@
   <link rel="stylesheet" href="css/mobile.css?v=63">
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=64" defer></script>
-  <script src="js/auth.js?v=64" defer></script>
-  <script src="js/feed.js?v=64" defer></script>
-  <script src="js/dashboard.js?v=64" defer></script>
-  <script src="js/clay-avatars.js?v=64" defer></script>
-  <script src="js/router.js?v=64" defer></script>
-  <script src="js/main.js?v=64" defer></script>
+  <script src="js/db.js?v=65" defer></script>
+  <script src="js/auth.js?v=65" defer></script>
+  <script src="js/feed.js?v=65" defer></script>
+  <script src="js/dashboard.js?v=65" defer></script>
+  <script src="js/clay-avatars.js?v=65" defer></script>
+  <script src="js/router.js?v=65" defer></script>
+  <script src="js/main.js?v=65" defer></script>
 
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <!-- Instant Inline Orientation and Tablet Detector -->
@@ -76,25 +76,239 @@
 </head>
 <body>
 
-  <!-- ================= FULL PAGE LOGIN SCREEN ================= -->
-  <div id="login-screen-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:var(--bg-primary); z-index:9999; display:flex; align-items:center; justify-content:center; padding:1.5rem;">
-    <div style="background:var(--bg-secondary); border-radius:var(--radius-lg); padding:2.5rem; max-width:400px; width:100%; box-shadow:var(--shadow-lg); text-align:center;">
-      <div style="margin-bottom:2rem;">
-        <img id="login-logo-img" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80" alt="School Logo" style="width:80px; height:80px; border-radius:16px; object-fit:cover; margin-bottom:1rem;">
-        <h2 style="font-size:1.5rem; font-weight:700; margin-bottom:0.25rem;" id="login-school-name">Apex School Portal</h2>
-        <p style="color:var(--text-secondary); font-size:0.95rem;">Sign in to continue</p>
+  <!-- ================= REVAMPED FULL-SCREEN SIGN-IN LANDING PAGE ================= -->
+  <div id="login-screen-overlay" class="signin-landing-container" style="display:none;">
+    
+    <!-- Floating Ambient Mesh Orbs -->
+    <div class="signin-ambient-orb signin-orb-1"></div>
+    <div class="signin-ambient-orb signin-orb-2"></div>
+    <div class="signin-ambient-orb signin-orb-3"></div>
+
+    <!-- Sign-in Top Header Navigation -->
+    <header class="signin-top-nav">
+      <div class="signin-brand-badge">
+        <img id="login-logo-img" class="signin-brand-logo clay-avatar" src="https://images.unsplash.com/photo-1546410531-bb4caa6b424d?w=150&auto=format&fit=crop&q=80" alt="Apex Integrated School Logo">
+        <div>
+          <div class="signin-brand-title" id="login-school-name">Apex Integrated School</div>
+          <div class="signin-brand-subtitle">Official Institutional Portal</div>
+        </div>
       </div>
 
-      <div style="display:flex; flex-direction:column; gap:0.75rem;">
-        <!-- Mock Login Buttons instead of real auth for now -->
-        <button class="btn-action btn-mock-login" data-email="admin@school.edu" style="width:100%;">Sign in as Admin</button>
-        <button class="btn-secondary btn-mock-login" data-email="teacher@school.edu" style="width:100%;">Sign in as Teacher</button>
-        <button class="btn-secondary btn-mock-login" data-email="learner@school.edu" style="width:100%;">Sign in as Learner</button>
-        <button class="btn-secondary btn-mock-login" data-email="parent@school.edu" style="width:100%;">Sign in as Parent</button>
+      <div class="signin-top-actions">
+        <span class="signin-pill-tag">
+          <ion-icon name="shield-checkmark" style="color:var(--primary); font-size:0.9rem;"></ion-icon>
+          <span>AY 2026–2027</span>
+        </span>
+        <button type="button" class="signin-btn-theme" id="signin-theme-toggle" title="Toggle Theme (Light / Dark)">
+          <ion-icon name="moon-outline" id="signin-theme-icon"></ion-icon>
+        </button>
+        <button type="button" class="signin-btn-guest" id="btn-signin-guest" title="Explore public announcements and campus resources">
+          <span>Browse as Guest</span>
+          <ion-icon name="arrow-forward-outline"></ion-icon>
+        </button>
       </div>
+    </header>
 
-      <div style="margin-top:2rem; font-size:0.85rem; color:var(--text-secondary);">
-        <p>By signing in, you agree to the School Privacy Policy and Terms of Service.</p>
+    <!-- Sign-in Main Stage Wrap (Split Showcase Grid) -->
+    <div class="signin-stage-wrap">
+      <div class="signin-split-grid">
+        
+        <!-- Left Hero Showcase Pane -->
+        <div class="signin-hero-pane">
+          <div class="signin-hero-crest-badge">
+            <ion-icon name="sparkles"></ion-icon>
+            <span>Unified Campus Ecosystem</span>
+          </div>
+
+          <h1 class="signin-hero-title">
+            Empowering Minds,<br>
+            <span>Shaping Tomorrow.</span>
+          </h1>
+
+          <p class="signin-hero-description">
+            Welcome to the centralized digital campus for educators, scholars, parents, and administrative leadership. Experience real-time school news, classroom channels, encrypted messaging, and academic growth tracking.
+          </p>
+
+          <!-- 3 Feature Highlight Cards -->
+          <div class="signin-feature-cards">
+            <div class="signin-feature-card">
+              <div class="signin-feat-icon">
+                <ion-icon name="newspaper-outline"></ion-icon>
+              </div>
+              <h3 class="signin-feat-title">Campus Newsfeed</h3>
+              <p class="signin-feat-desc">Verified updates, achievements, polls, and institutional transparency boards.</p>
+            </div>
+
+            <div class="signin-feature-card">
+              <div class="signin-feat-icon">
+                <ion-icon name="chatbubbles-outline"></ion-icon>
+              </div>
+              <h3 class="signin-feat-title">Apex Messenger</h3>
+              <p class="signin-feat-desc">Integrated 3D chat channels, parent advisories, and live voice & video calls.</p>
+            </div>
+
+            <div class="signin-feature-card">
+              <div class="signin-feat-icon">
+                <ion-icon name="school-outline"></ion-icon>
+              </div>
+              <h3 class="signin-feat-title">Academic Portal</h3>
+              <p class="signin-feat-desc">Learner schedules, attendance logs, quarterly development, and faculty records.</p>
+            </div>
+          </div>
+
+          <!-- Community Stats Strip -->
+          <div class="signin-community-stats">
+            <div class="signin-stat-item">
+              <span class="signin-stat-num">1,250+</span>
+              <span class="signin-stat-lbl">Active Scholars</span>
+            </div>
+            <div class="signin-stat-item">
+              <span class="signin-stat-num">85</span>
+              <span class="signin-stat-lbl">Faculty Mentors</span>
+            </div>
+            <div class="signin-stat-item">
+              <span class="signin-stat-num">100%</span>
+              <span class="signin-stat-lbl">Digital Campus</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sign-In Chamber Pane -->
+        <div class="signin-card-pane">
+          <div class="signin-glass-card">
+            
+            <div class="signin-card-header">
+              <div class="signin-card-icon-badge">
+                <ion-icon name="lock-closed"></ion-icon>
+              </div>
+              <h2 class="signin-card-title">Portal Access</h2>
+              <p class="signin-card-subtitle">Choose fast role access or enter your credentials</p>
+            </div>
+
+            <!-- Segmented Tab Switcher -->
+            <div class="signin-tab-group">
+              <button type="button" class="signin-tab-btn active" id="tab-btn-fast-access" onclick="switchSigninTab('fast')">
+                <ion-icon name="flash-outline"></ion-icon>
+                <span>Quick Personas</span>
+              </button>
+              <button type="button" class="signin-tab-btn" id="tab-btn-credentials" onclick="switchSigninTab('creds')">
+                <ion-icon name="key-outline"></ion-icon>
+                <span>Credentials</span>
+              </button>
+            </div>
+
+            <!-- Tab 1: Fast Role Access Grid -->
+            <div id="signin-view-fast" style="display:flex; flex-direction:column; gap:0.85rem;">
+              <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-align:center;">
+                Click any role to sign in instantly:
+              </span>
+
+              <div class="signin-persona-grid">
+                <!-- Admin Card -->
+                <div class="signin-persona-card btn-mock-login" data-email="admin@school.edu">
+                  <span class="signin-persona-badge admin">ADMIN</span>
+                  <div class="signin-persona-avatar-wrap">
+                    <img class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny" alt="Dr. Maria Santos">
+                  </div>
+                  <h4 class="signin-persona-name">Dr. Maria Santos</h4>
+                  <p class="signin-persona-sub">School Principal</p>
+                  <span class="signin-persona-action-btn">Sign In <ion-icon name="arrow-forward"></ion-icon></span>
+                </div>
+
+                <!-- Teacher Card -->
+                <div class="signin-persona-card btn-mock-login" data-email="teacher@school.edu">
+                  <span class="signin-persona-badge teacher">FACULTY</span>
+                  <div class="signin-persona-avatar-wrap">
+                    <img class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT" alt="Teacher Jose">
+                  </div>
+                  <h4 class="signin-persona-name">Teacher Jose</h4>
+                  <p class="signin-persona-sub">Math & STEM Faculty</p>
+                  <span class="signin-persona-action-btn">Sign In <ion-icon name="arrow-forward"></ion-icon></span>
+                </div>
+
+                <!-- Learner Card -->
+                <div class="signin-persona-card btn-mock-login" data-email="learner@school.edu">
+                  <span class="signin-persona-badge learner">STUDENT</span>
+                  <div class="signin-persona-avatar-wrap">
+                    <img class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz&backgroundColor=bbf7d0&hair=fonze" alt="Juan Cruz">
+                  </div>
+                  <h4 class="signin-persona-name">Juan Cruz</h4>
+                  <p class="signin-persona-sub">Grade 10 Scholar</p>
+                  <span class="signin-persona-action-btn">Sign In <ion-icon name="arrow-forward"></ion-icon></span>
+                </div>
+
+                <!-- Parent Card -->
+                <div class="signin-persona-card btn-mock-login" data-email="parent@school.edu">
+                  <span class="signin-persona-badge parent">PARENT</span>
+                  <div class="signin-persona-avatar-wrap">
+                    <img class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz&backgroundColor=fed7aa&hair=full" alt="Mrs. Elena Cruz">
+                  </div>
+                  <h4 class="signin-persona-name">Mrs. Elena Cruz</h4>
+                  <p class="signin-persona-sub">PTA Vice President</p>
+                  <span class="signin-persona-action-btn">Sign In <ion-icon name="arrow-forward"></ion-icon></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tab 2: Standard Credential Sign In Form -->
+            <form id="signin-view-creds" class="signin-cred-form" style="display:none;">
+              <div class="signin-form-group">
+                <label class="signin-form-label" for="signin-email-input">School Email</label>
+                <div class="signin-input-wrap">
+                  <ion-icon name="mail-outline" class="signin-input-icon"></ion-icon>
+                  <input type="email" id="signin-email-input" class="signin-input-control" placeholder="name@school.edu" required autocomplete="username">
+                </div>
+                <!-- Quick Autofill Chips -->
+                <div class="signin-chip-row">
+                  <span class="signin-chip-label">Quick fill:</span>
+                  <button type="button" class="signin-fill-chip" onclick="fillSigninEmail('admin@school.edu')">Admin</button>
+                  <button type="button" class="signin-fill-chip" onclick="fillSigninEmail('teacher@school.edu')">Teacher</button>
+                  <button type="button" class="signin-fill-chip" onclick="fillSigninEmail('learner@school.edu')">Learner</button>
+                  <button type="button" class="signin-fill-chip" onclick="fillSigninEmail('parent@school.edu')">Parent</button>
+                </div>
+              </div>
+
+              <div class="signin-form-group">
+                <label class="signin-form-label" for="signin-password-input">Password</label>
+                <div class="signin-input-wrap">
+                  <ion-icon name="lock-closed-outline" class="signin-input-icon"></ion-icon>
+                  <input type="password" id="signin-password-input" class="signin-input-control" placeholder="Enter your password" value="password123" required autocomplete="current-password">
+                  <button type="button" class="signin-pwd-toggle-btn" id="btn-toggle-signin-pwd" title="Show or hide password">
+                    <ion-icon name="eye-outline" id="signin-pwd-eye"></ion-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="signin-form-extras">
+                <label class="signin-checkbox-label">
+                  <input type="checkbox" id="signin-remember-me" checked>
+                  <span>Remember this device</span>
+                </label>
+                <span class="signin-forgot-link" onclick="handleForgotPassword()">Forgot password?</span>
+              </div>
+
+              <div id="signin-error-msg" style="display:none; padding:0.6rem 0.85rem; border-radius:10px; background:#fef2f2; color:#b91c1c; font-size:0.8rem; font-weight:600; border:1px solid #fecaca;"></div>
+
+              <button type="submit" class="signin-submit-btn" id="btn-submit-signin">
+                <span>Sign In to School Portal</span>
+                <ion-icon name="arrow-forward-outline"></ion-icon>
+              </button>
+            </form>
+
+            <!-- Security Footer inside Glass Card -->
+            <div class="signin-card-footer">
+              <div class="signin-sec-badge">
+                <ion-icon name="shield-checkmark" style="color:var(--primary); font-size:0.95rem;"></ion-icon>
+                <span>Institutional 256-Bit SSL Protection</span>
+              </div>
+              <div class="signin-legal-links">
+                By signing in, you agree to the Apex <a onclick="openPrivacyModal()">Privacy Policy</a> and <a onclick="openTermsModal()">Terms of Service</a>.
+              </div>
+            </div>
+
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
@@ -242,6 +456,12 @@
               </div>
             </div>
           </div>
+
+          <!-- Guest Sign In Action Button (Shown when not logged in) -->
+          <button type="button" class="btn-action" id="header-guest-signin-btn" onclick="openLoginOverlay()" style="display:none; padding:0.4rem 1.1rem; border-radius:50px; font-size:0.84rem; font-weight:700; align-items:center; gap:0.4rem; cursor:pointer;">
+            <ion-icon name="log-in-outline" style="font-size:1.1rem;"></ion-icon>
+            <span>Sign In</span>
+          </button>
 
         </div>
       </header>

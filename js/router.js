@@ -37,9 +37,13 @@ function initRouter() {
 function switchView(viewName, pathParam) {
   // Check auth and show login screen if not authenticated
   const loginOverlay = document.getElementById('login-screen-overlay');
+  const authRequiredViews = ['dashboard', 'profile'];
   if (!activeUser) {
-    if (loginOverlay) loginOverlay.style.display = 'flex';
-    // Let the background routing still process underneath so when they log in, it's ready.
+    if (authRequiredViews.includes(viewName) || !window.guestBrowsingAllowed) {
+      if (loginOverlay) loginOverlay.style.display = 'flex';
+    } else {
+      if (loginOverlay) loginOverlay.style.display = 'none';
+    }
   } else {
     if (loginOverlay) loginOverlay.style.display = 'none';
   }
