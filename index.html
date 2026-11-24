@@ -41,12 +41,13 @@
   <link rel="stylesheet" href="css/mobile.css?v=63">
 
   <!-- Javascript Modules -->
-  <script src="js/db.js?v=63" defer></script>
-  <script src="js/auth.js?v=63" defer></script>
-  <script src="js/feed.js?v=63" defer></script>
-  <script src="js/dashboard.js?v=63" defer></script>
-  <script src="js/router.js?v=63" defer></script>
-  <script src="js/main.js?v=63" defer></script>
+  <script src="js/db.js?v=64" defer></script>
+  <script src="js/auth.js?v=64" defer></script>
+  <script src="js/feed.js?v=64" defer></script>
+  <script src="js/dashboard.js?v=64" defer></script>
+  <script src="js/clay-avatars.js?v=64" defer></script>
+  <script src="js/router.js?v=64" defer></script>
+  <script src="js/main.js?v=64" defer></script>
 
   <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
   <!-- Instant Inline Orientation and Tablet Detector -->
@@ -213,7 +214,7 @@
           <!-- Profile Widget Dropdown -->
           <div class="header-widget-wrap auth-only" id="profile-widget-trigger" style="position:relative; display:none; margin-left:0.5rem;">
             <div class="profile-widget-btn" style="position:relative; cursor:pointer;">
-              <img id="header-user-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest" alt="Avatar" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color);">
+              <img id="header-user-avatar" class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest&backgroundColor=bbf7d0" alt="Avatar" style="width:40px; height:40px;">
               <div style="position:absolute; bottom:-2px; right:-2px; background:var(--bg-secondary); border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg-primary);">
                 <ion-icon name="chevron-down-outline" style="font-size:0.6rem; color:var(--text-primary);"></ion-icon>
               </div>
@@ -222,7 +223,7 @@
             <div id="profile-dropdown-menu" class="header-dropdown" style="right:0; width:300px;">
               <div style="padding:0.5rem; border-bottom:1px solid var(--border-color);">
                 <a id="dropdown-user-profile-link" href="#/dashboard" style="display:flex; align-items:center; gap:0.75rem; padding:0.5rem; border-radius:var(--radius-sm); text-decoration:none; color:inherit; transition:background 0.2s;" onmouseover="this.style.background='var(--bg-secondary)'" onmouseout="this.style.background='transparent'">
-                  <img id="dropdown-user-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest" style="width:40px; height:40px; border-radius:50%;">
+                  <img id="dropdown-user-avatar" class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=guest&backgroundColor=bbf7d0" style="width:40px; height:40px;">
                   <div style="display:flex; flex-direction:column;">
                     <span id="header-user-name" style="font-weight:700; font-size:1rem;">Guest User</span>
                     <span style="font-size:0.85rem; color:var(--text-secondary);">See your profile</span>
@@ -261,7 +262,7 @@
               <!-- FB Create Post box (at top of feed) -->
               <div id="fb-create-post-box" class="news-card composer-card" style="display:none; margin-bottom:1.25rem; padding:1.25rem;">
                 <div class="composer-top" style="display:flex; gap:1rem; align-items:flex-start;">
-                  <img id="post-box-avatar" class="thread-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" alt="avatar" style="width:48px; height:48px; margin-top:0.25rem;">
+                  <img id="post-box-avatar" class="thread-avatar clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder&backgroundColor=bbf7d0" alt="avatar" style="width:48px; height:48px; margin-top:0.25rem;">
                   <div style="flex:1; display:flex; flex-direction:column; gap:0.5rem;">
                     <!-- Main Input Area -->
                     <textarea id="composer-main-input" class="form-control" placeholder="What's on your mind?" rows="1" style="resize:none; background:transparent; color:var(--text-primary); border-radius:1rem; border:none; padding:1rem 0; font-size:1.1rem; width:100%; box-shadow:none; overflow:hidden; outline:none;"></textarea>
@@ -733,7 +734,7 @@
               <div class="fb-profile-header" style="display:flex; flex-wrap:wrap; align-items:flex-end; gap:1.5rem; position:relative;">
                 <!-- Avatar -->
                 <div style="background: var(--bg-primary); padding: 4px; border-radius: 50%; box-shadow:0 2px 10px rgba(0,0,0,0.1); flex-shrink:0; margin-top:-75px;">
-                  <img id="public-avatar" src="" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;" alt="Avatar" onerror="this.src='https://api.dicebear.com/7.x/micah/svg?seed=guest'">
+                  <img id="public-avatar" class="clay-avatar" src="" style="width: 150px; height: 150px; object-fit: cover;" alt="Avatar" onerror="this.src='https://api.dicebear.com/7.x/micah/svg?seed=guest&backgroundColor=bbf7d0'">
                 </div>
                 
                 <!-- Name and Role -->
@@ -831,16 +832,21 @@
                     <input type="file" id="profile-cover-file" accept="image/*" style="display:none;">
                   </div>
                   <div style="padding:0 1.5rem 1.25rem; display:flex; align-items:flex-end; justify-content:space-between; margin-top:-45px; flex-wrap:wrap; gap:1rem;">
-                    <div style="display:flex; align-items:flex-end; gap:1rem;">
+                    <div style="display:flex; align-items:flex-end; gap:1rem; flex-wrap:wrap;">
                       <div id="profile-avatar-upload-wrap" title="Click to change profile photo" style="position:relative; width:88px; height:88px; cursor:pointer; flex-shrink:0;">
-                        <img id="profile-avatar-preview" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder" style="width:100%; height:100%; border-radius:50%; border:3px solid var(--bg-secondary); background:var(--bg-secondary); object-fit:cover;" alt="Avatar Preview">
+                        <img id="profile-avatar-preview" class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=placeholder&backgroundColor=bbf7d0" style="width:100%; height:100%; object-fit:cover;" alt="Avatar Preview">
                         <div style="position:absolute; bottom:2px; right:2px; background:var(--primary); color:white; width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.85rem; border:2px solid var(--bg-secondary);">
                           <ion-icon name="camera"></ion-icon>
                         </div>
                       </div>
                       <div style="padding-bottom:4px;">
                         <h3 id="profile-preview-display-name" style="margin:0; font-size:1.15rem; font-weight:700;">Account Profile</h3>
-                        <span id="profile-preview-display-role" class="chat-role-pill" style="font-size:0.65rem; padding:1px 6px;">MEMBER</span>
+                        <div style="display:flex; align-items:center; gap:0.5rem; margin-top:4px;">
+                          <span id="profile-preview-display-role" class="chat-role-pill" style="font-size:0.65rem; padding:1px 6px;">MEMBER</span>
+                          <button type="button" class="btn-secondary" onclick="openClayAvatarModal()" style="font-size:0.75rem; padding:0.25rem 0.75rem; border-radius:50px; display:inline-flex; align-items:center; gap:0.35rem; cursor:pointer; border:1.5px solid var(--primary); color:var(--primary); background:var(--bg-tint); font-weight:700;">
+                            <ion-icon name="color-palette-outline"></ion-icon> 3D Clay Avatars
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1032,7 +1038,7 @@
     <!-- Chat Header -->
     <div class="chat-window-header">
       <div style="display:flex; align-items:center; gap:0.5rem; flex:1; cursor:pointer;" onclick="openActiveInFullMessenger()" title="Click to view full thread in Messenger">
-        <img id="floating-chat-avatar" src="https://api.dicebear.com/7.x/initials/svg?seed=MC&backgroundColor=0369a1" style="width:32px; height:32px; border-radius:50%; border:2px solid rgba(255,255,255,0.2);">
+        <img id="floating-chat-avatar" class="clay-avatar" src="https://api.dicebear.com/7.x/bottts/svg?seed=ApexChat&backgroundColor=bfdbfe" style="width:32px; height:32px;">
         <div style="display:flex; flex-direction:column;">
           <span id="floating-chat-title" style="font-weight:700; font-size:0.95rem; line-height:1.2;">Main chat</span>
           <span id="floating-chat-subtitle" style="font-size:0.75rem; opacity:0.8;">Apex Elementary School</span>
@@ -1055,7 +1061,7 @@
     <!-- Floating Media Panel overlay inside window -->
     <div id="floating-chat-media-panel" class="chat-media-panel" style="display:none; position:absolute; top:48px; right:0; bottom:0; left:0; width:100%; background:var(--bg-secondary); overflow-y:auto; flex-direction:column; z-index:10;">
       <div style="padding:1.5rem; border-bottom:1px solid var(--border-color); display:flex; flex-direction:column; align-items:center; text-align:center;">
-        <img id="floating-media-panel-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" style="width:80px; height:80px; border-radius:50%; margin-bottom:0.5rem; object-fit:cover;" loading="lazy" decoding="async">
+        <img id="floating-media-panel-avatar" class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon&backgroundColor=bfdbfe" style="width:80px; height:80px; margin-bottom:0.5rem; object-fit:cover;" loading="lazy" decoding="async">
         <h3 id="floating-media-panel-name" style="margin:0; font-size:1.1rem; color:var(--text-primary);">Shared Media</h3>
         <button type="button" onclick="toggleFloatingMediaPanel()" style="margin-top:0.75rem; background:var(--bg-primary); border:1px solid var(--border-color); padding:0.4rem 1rem; border-radius:12px; cursor:pointer; font-size:0.85rem; font-weight:600; color:var(--text-primary);">Back to Chat</button>
       </div>
@@ -1169,7 +1175,7 @@
     <div class="modal-content" style="width:100%; max-width:360px; margin:1rem; border-radius:24px; padding:2rem 1.5rem; text-align:center; background:var(--bg-secondary); border:1px solid var(--border-color); box-shadow:var(--shadow-xl); position:relative;">
       <div style="position:relative; width:96px; height:96px; margin:0 auto 1.25rem;">
         <div class="call-pulse-ring"></div>
-        <img id="call-modal-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon" style="width:100%; height:100%; border-radius:50%; object-fit:cover; position:relative; z-index:2; border:3px solid var(--primary);">
+        <img id="call-modal-avatar" class="clay-avatar" src="https://api.dicebear.com/7.x/micah/svg?seed=anon&backgroundColor=bfdbfe" style="width:100%; height:100%; object-fit:cover; position:relative; z-index:2;">
       </div>
       <h3 id="call-modal-name" style="margin:0 0 0.25rem; font-size:1.3rem; font-weight:700; color:var(--text-primary);">Caller Name</h3>
       <p id="call-modal-status" style="margin:0 0 1.5rem; font-size:0.9rem; color:var(--primary); font-weight:600;">Connecting audio call...</p>
@@ -1299,6 +1305,80 @@
 
       <div id="drawer-contacts-list" style="display:flex; flex-direction:column; gap:0.4rem; overflow-y:auto; max-height:320px; padding-right:0.25rem;">
         <!-- Populated dynamically via JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL: CLAYMORPHIC AVATAR SELECTOR ================= -->
+  <div class="modal-overlay clay-modal-overlay" id="modal-clay-avatar-picker" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.65); align-items:center; justify-content:center; backdrop-filter:blur(8px); z-index:9999999;">
+    <div class="clay-avatar-modal-card">
+      <div class="clay-modal-header">
+        <div class="modal-title-wrap">
+          <div class="clay-icon-badge">
+            <ion-icon name="color-palette"></ion-icon>
+          </div>
+          <div>
+            <h3 style="margin:0; font-size:1.15rem; font-weight:800;">Built-in Claymorphic Avatars</h3>
+            <p class="clay-modal-subtitle">Select a handcrafted 3D soft clay profile for your school persona.</p>
+          </div>
+        </div>
+        <button type="button" class="btn-icon" onclick="closeClayAvatarModal()" style="background:var(--bg-primary); border:1px solid var(--border-color); border-radius:50%; width:32px; height:32px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--text-secondary);"><ion-icon name="close"></ion-icon></button>
+      </div>
+
+      <div class="clay-modal-body">
+        
+        <!-- Top: Live Claymorphic Preview Card -->
+        <div class="clay-preview-hero-card">
+          <div class="clay-preview-avatar-wrap">
+            <div class="clay-avatar-stage" id="clay-preview-stage">
+              <img id="clay-preview-avatar-img" src="https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0" alt="Selected Clay Avatar">
+            </div>
+            <div class="clay-selected-badge" id="clay-preview-tag">3D CLAY</div>
+          </div>
+          
+          <div class="clay-preview-meta">
+            <div class="meta-title-row">
+              <h4 id="clay-preview-name">Dr. Maria Santos</h4>
+              <span class="clay-preview-role-pill" id="clay-preview-role">ADMIN</span>
+            </div>
+            <p class="clay-preview-caption" id="clay-preview-caption">Official Clay Avatar Profile</p>
+            
+            <!-- Clay Background Tone Palette -->
+            <div class="clay-palette-selector">
+              <span class="palette-label">Clay Tint:</span>
+              <div class="palette-swatches">
+                <button type="button" class="clay-swatch active" data-color="mint" title="Mint Forest Clay" style="background:#bbf7d0;"></button>
+                <button type="button" class="clay-swatch" data-color="sky" title="Academic Sky Blue Clay" style="background:#bfdbfe;"></button>
+                <button type="button" class="clay-swatch" data-color="peach" title="Coral Peach Clay" style="background:#fed7aa;"></button>
+                <button type="button" class="clay-swatch" data-color="lavender" title="Lilac Clay" style="background:#ddd6fe;"></button>
+                <button type="button" class="clay-swatch" data-color="amber" title="Golden Honey Clay" style="background:#fde68a;"></button>
+                <button type="button" class="clay-swatch" data-color="rose" title="Rose Quartz Clay" style="background:#fbcfe8;"></button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Middle: Category Filters -->
+        <div class="clay-category-tabs">
+          <button type="button" class="clay-cat-pill active" data-cat="all">All Clay Avatars (<span id="clay-total-count">18</span>)</button>
+          <button type="button" class="clay-cat-pill" data-cat="faculty"><ion-icon name="school"></ion-icon> Faculty & Staff</button>
+          <button type="button" class="clay-cat-pill" data-cat="student"><ion-icon name="person"></ion-icon> Scholars & Learners</button>
+          <button type="button" class="clay-cat-pill" data-cat="parent"><ion-icon name="heart"></ion-icon> Parents</button>
+          <button type="button" class="clay-cat-pill" data-cat="mascot"><ion-icon name="sparkles"></ion-icon> 3D Mascots</button>
+        </div>
+
+        <!-- Main: Avatar Grid -->
+        <div class="clay-avatars-grid" id="clay-avatars-grid">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+      </div>
+
+      <div class="clay-modal-footer">
+        <button type="button" class="clay-btn-cancel" onclick="closeClayAvatarModal()">Cancel</button>
+        <button type="button" class="clay-btn-apply" id="btn-apply-clay-avatar">
+          <ion-icon name="checkmark-circle"></ion-icon> <span>Save as My Avatar</span>
+        </button>
       </div>
     </div>
   </div>

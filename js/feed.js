@@ -112,7 +112,7 @@ async function renderCommentsList(annId) {
     list.innerHTML = comments.map(c => `
       <div class="comment-item" style="display:flex; gap:0.5rem; margin-bottom:1rem;">
         <a href="#/user/${escapeAttrSafe(c.authorUid || '')}" style="display:block; flex-shrink:0;">
-          <img src="${sanitizeUrlSafe(c.authorAvatar || `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(c.author || 'user')}`, { allowDataImage: true, allowHash: false })}" alt="avatar" style="width:32px; height:32px; border-radius:50%; object-fit:cover;">
+          <img class="comment-author-avatar clay-avatar" src="${sanitizeUrlSafe(c.authorAvatar || `https://api.dicebear.com/7.x/micah/svg?seed=${encodeURIComponent(c.author || 'user')}&backgroundColor=fed7aa`, { allowDataImage: true, allowHash: false })}" alt="avatar" style="width:32px; height:32px;">
         </a>
         <div style="flex:1;">
           <div style="background:var(--bg-secondary); border:1px solid var(--border-color); border-radius:1rem; padding:0.5rem 0.75rem; display:inline-block; min-width:150px;">
@@ -1196,7 +1196,7 @@ window.renderPostList = async function(filtered, container, customRenderCallback
     const safeDate = escapeHTMLSafe(formatDisplayDate(a.date));
     const safeTitleValue = escapeHTMLSafe(a.title || '');
     const safeContentValue = escapeHTMLSafe(a.content || '');
-    const safeAvatarUrl = sanitizeUrlSafe(a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder', { allowDataImage: true, allowHash: false });
+    const safeAvatarUrl = sanitizeUrlSafe(a.authorAvatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder&backgroundColor=bbf7d0', { allowDataImage: true, allowHash: false });
     const safeImageUrl = a.imageData ? sanitizeUrlSafe(a.imageData, { allowDataImage: true, allowHash: false }) : '';
     const encodedImageData = a.imageData ? encodeURIComponent(a.imageData) : '';
     
@@ -1385,7 +1385,7 @@ window.renderPostList = async function(filtered, container, customRenderCallback
         <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
           <div style="display:flex; align-items:center; gap:0.75rem;">
             <a href="#/user/${safeAuthorUid}" style="text-decoration:none; display:flex; align-items:center; gap:0.75rem; color:inherit;">
-              <img class="thread-avatar" src="${safeAvatarUrl}" alt="avatar" style="border:2px solid var(--border-color); border-radius:50%;">
+              <img class="thread-avatar clay-avatar" src="${safeAvatarUrl}" alt="avatar">
               <div>
                 <strong style="font-size:0.96rem; display:flex; align-items:center; gap:0.4rem; font-weight:700;">
                   ${safeAuthor}

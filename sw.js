@@ -2,7 +2,7 @@
 // APEX SCHOOL PORTAL - SERVICE WORKER v1.8.0
 // ==========================================
 
-const CACHE_NAME = 'apex-school-v2.4.3';
+const CACHE_NAME = 'apex-school-v2.4.4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -18,6 +18,7 @@ const APP_SHELL = [
   './js/auth.js',
   './js/feed.js',
   './js/dashboard.js',
+  './js/clay-avatars.js',
   './js/router.js',
   './js/main.js',
   './js/messenger.js',

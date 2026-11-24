@@ -292,7 +292,7 @@
         <div class="msg-thread-item ${isActive ? 'active' : ''} ${hasUnread ? 'thread-item-unread' : ''}" 
              onclick="selectThread('${t.uid}')">
           <div class="msg-thread-avatar-wrap">
-            <img class="msg-thread-avatar" src="${escapeHTML(t.avatar)}" alt="${escapeHTML(t.name)}">
+            <img class="msg-thread-avatar clay-avatar" src="${escapeHTML(t.avatar)}" alt="${escapeHTML(t.name)}">
             <span class="thread-online-dot ${t.isGroup ? 'offline' : 'online'}"></span>
           </div>
           <div class="msg-thread-content">
@@ -495,7 +495,7 @@
     const row = document.createElement('div');
     row.className = `msg-row ${isSent ? 'sent' : 'recv'}`;
     row.innerHTML = `
-      ${!isSent && activeThread.isGroup ? `<img class="msg-row-avatar" src="${escapeHTML(senderAvatar)}" alt="${escapeHTML(senderName)}" decoding="async">` : ''}
+      ${!isSent && activeThread.isGroup ? `<img class="msg-row-avatar clay-avatar" src="${escapeHTML(senderAvatar)}" alt="${escapeHTML(senderName)}" decoding="async">` : ''}
       <div class="msg-bubble-wrap">
         ${!isSent && activeThread.isGroup ? `<span class="msg-sender-label">${escapeHTML(senderName)}</span>` : ''}
         <div class="msg-bubble">
@@ -568,7 +568,7 @@
 
       html += `
         <div class="msg-row ${isSent ? 'sent' : 'recv'}">
-          ${!isSent && activeThread.isGroup ? `<img class="msg-row-avatar" src="${escapeHTML(senderAvatar)}" alt="${escapeHTML(senderName)}" decoding="async">` : ''}
+          ${!isSent && activeThread.isGroup ? `<img class="msg-row-avatar clay-avatar" src="${escapeHTML(senderAvatar)}" alt="${escapeHTML(senderName)}" decoding="async">` : ''}
           <div class="msg-bubble-wrap">
             ${!isSent && activeThread.isGroup ? `<span class="msg-sender-label">${escapeHTML(senderName)}</span>` : ''}
             <div class="msg-bubble">
@@ -1541,7 +1541,7 @@
           list.innerHTML = users.map(u => `
             <div class="persona-option" style="padding:0.6rem; border-bottom:1px solid var(--border-color); cursor:pointer;" 
                  onclick="startDirectMessageWith('${u.uid}')">
-              <img src="${escapeHTML(u.avatar)}" alt="${escapeHTML(u.name)}" style="width:40px; height:40px; border-radius:50%;">
+              <img class="clay-avatar" src="${escapeHTML(u.avatar)}" alt="${escapeHTML(u.name)}" style="width:40px; height:40px;">
               <div class="option-details" style="margin-left:0.5rem;">
                 <span class="option-name">${escapeHTML(u.name)}</span>
                 <span class="option-sub"><span class="badge-tag ${u.role}">${u.role.toUpperCase()}</span> &bull; ${escapeHTML(u.email)}</span>

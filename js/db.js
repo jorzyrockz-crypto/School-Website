@@ -33,10 +33,10 @@ const DEFAULT_LOCAL_DB = {
     { id: "fs5", url: "https://www.teacherph.com/feed/", type: "Educational Resources", tag: "library", color: "#8b5cf6" }
   ],
   users: {
-    "admin1":   { uid: "admin1",   email: "admin@school.edu",   name: "Maria Santos (Admin)",    role: "admin",   schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos", bio: "Leading the school administration to foster a community of excellence.", coverPhoto: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80", contactInfo: "maria.santos@school.edu", connections: [] },
-    "teacher1": { uid: "teacher1", email: "teacher@school.edu", name: "Teacher Jose (Math)",    role: "teacher", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose", bio: "Passionate mathematics teacher helping students discover the joy of numbers.", coverPhoto: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80", contactInfo: "jose.math@school.edu", connections: [] },
-    "parent1":  { uid: "parent1",  email: "parent@school.edu",  name: "Mrs. Cruz (Parent)",     role: "parent",  schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz", bio: "Proud parent of Juan Cruz. PTA Committee Member.", coverPhoto: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1200&q=80", contactInfo: "mrs.cruz@email.com", connections: [] },
-    "learner1": { uid: "learner1", email: "learner@school.edu", name: "Juan Cruz (Grade 10)",   role: "learner", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz", bio: "Grade 10 student. Member of the Science Club.", coverPhoto: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80", contactInfo: "juan.cruz@student.school.edu", connections: [] }
+    "admin1":   { uid: "admin1",   email: "admin@school.edu",   name: "Maria Santos (Admin)",    role: "admin",   schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny", bio: "Leading the school administration to foster a community of excellence.", coverPhoto: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80", contactInfo: "maria.santos@school.edu", connections: [] },
+    "teacher1": { uid: "teacher1", email: "teacher@school.edu", name: "Teacher Jose (Math)",    role: "teacher", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT", bio: "Passionate mathematics teacher helping students discover the joy of numbers.", coverPhoto: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80", contactInfo: "jose.math@school.edu", connections: [] },
+    "parent1":  { uid: "parent1",  email: "parent@school.edu",  name: "Mrs. Cruz (Parent)",     role: "parent",  schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz&backgroundColor=fed7aa&hair=full", bio: "Proud parent of Juan Cruz. PTA Committee Member.", coverPhoto: "https://images.unsplash.com/photo-1511895426328-dc8714191300?auto=format&fit=crop&w=1200&q=80", contactInfo: "mrs.cruz@email.com", connections: [] },
+    "learner1": { uid: "learner1", email: "learner@school.edu", name: "Juan Cruz (Grade 10)",   role: "learner", schoolId: "default-school", avatar: "https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz&backgroundColor=bbf7d0&hair=fonze", bio: "Grade 10 student. Member of the Science Club.", coverPhoto: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80", contactInfo: "juan.cruz@student.school.edu", connections: [] }
   },
   announcements: [
     {
@@ -47,7 +47,7 @@ const DEFAULT_LOCAL_DB = {
       author: "Maria Santos",
       authorUid: "admin1",
       authorRole: "admin",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny",
       date: "2026-06-24",
       status: "approved",
       isPinned: true,
@@ -61,7 +61,7 @@ const DEFAULT_LOCAL_DB = {
       author: "Teacher Jose",
       authorUid: "teacher1",
       authorRole: "teacher",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT",
       date: "2026-06-22",
       status: "approved",
       likes: ["parent1"]
@@ -74,7 +74,7 @@ const DEFAULT_LOCAL_DB = {
       author: "Teacher Jose",
       authorUid: "teacher1",
       authorRole: "teacher",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT",
       date: "2026-06-23",
       status: "pending",
       likes: []
@@ -87,7 +87,7 @@ const DEFAULT_LOCAL_DB = {
       author: "System Auto-Update",
       authorUid: "system",
       authorRole: "bot",
-      authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=ApexSystem",
+      authorAvatar: "https://api.dicebear.com/7.x/bottts/svg?seed=ApexSystem&backgroundColor=bfdbfe",
       date: "2026-06-25",
       status: "approved",
       likes: ["teacher1"],
@@ -102,7 +102,7 @@ const DEFAULT_LOCAL_DB = {
       author: "Maria Santos",
       authorUid: "admin1",
       authorRole: "admin",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny",
       date: "2026-07-05",
       status: "approved",
       likes: [],
@@ -122,7 +122,7 @@ const DEFAULT_LOCAL_DB = {
       author: "Teacher Jose",
       authorUid: "teacher1",
       authorRole: "teacher",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT",
       date: "2026-06-26",
       status: "approved",
       likes: ["learner1"],
@@ -141,7 +141,7 @@ const DEFAULT_LOCAL_DB = {
       author: "Teacher Jose",
       authorUid: "teacher1",
       authorRole: "teacher",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT",
       date: "2026-11-24",
       status: "approved",
       likes: ["learner1", "admin1"],
@@ -161,7 +161,7 @@ const DEFAULT_LOCAL_DB = {
       author: "Maria Santos",
       authorUid: "admin1",
       authorRole: "admin",
-      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos",
+      authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny",
       date: "2026-11-23",
       status: "approved",
       likes: ["parent1"],
@@ -175,7 +175,7 @@ const DEFAULT_LOCAL_DB = {
     }
   ],
   comments: [
-    { id: "c1", announcementId: "ann1", author: "Mrs. Cruz (Parent)", text: "Are the enrollment forms downloadable online?", timestamp: Date.now() }
+    { id: "c1", announcementId: "ann1", author: "Mrs. Cruz (Parent)", authorUid: "parent1", authorAvatar: "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz&backgroundColor=fed7aa&hair=full", text: "Are the enrollment forms downloadable online?", timestamp: Date.now() }
   ],
   attendance: {}, // format: { "default-school": { "learner1": { "2026-06-24": "present" } } }
   groups: [
@@ -361,6 +361,54 @@ function getLocalDB() {
             updated = true;
           }
         }
+        // Auto-upgrade legacy flat avatars to unified 3D clay avatars
+        const clayUserMapping = {
+          "admin1": "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny",
+          "teacher1": "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT",
+          "parent1": "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz&backgroundColor=fed7aa&hair=full",
+          "learner1": "https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz&backgroundColor=bbf7d0&hair=fonze"
+        };
+        if (parsed.users) {
+          for (const uid of Object.keys(parsed.users)) {
+            const u = parsed.users[uid];
+            if (clayUserMapping[uid] && (!u.avatar || !u.avatar.includes("backgroundColor="))) {
+              u.avatar = clayUserMapping[uid];
+              updated = true;
+            } else if (u.avatar && !u.avatar.includes("backgroundColor=")) {
+              const bg = uid.includes("teacher") ? "bfdbfe" : (uid.includes("parent") ? "fed7aa" : "bbf7d0");
+              u.avatar = u.avatar + `&backgroundColor=${bg}`;
+              updated = true;
+            }
+          }
+        }
+        if (parsed.announcements) {
+          parsed.announcements.forEach(a => {
+            if (a.authorUid === 'admin1' && (!a.authorAvatar || !a.authorAvatar.includes("backgroundColor="))) {
+              a.authorAvatar = "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny";
+              updated = true;
+            } else if (a.authorUid === 'teacher1' && (!a.authorAvatar || !a.authorAvatar.includes("backgroundColor="))) {
+              a.authorAvatar = "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT";
+              updated = true;
+            } else if (a.authorUid === 'system' && (!a.authorAvatar || !a.authorAvatar.includes("backgroundColor="))) {
+              a.authorAvatar = "https://api.dicebear.com/7.x/bottts/svg?seed=ApexSystem&backgroundColor=bfdbfe";
+              updated = true;
+            } else if (a.authorAvatar && !a.authorAvatar.includes("backgroundColor=")) {
+              a.authorAvatar = a.authorAvatar + `&backgroundColor=bbf7d0`;
+              updated = true;
+            }
+          });
+        }
+        if (parsed.comments) {
+          parsed.comments.forEach(c => {
+            if (c.authorUid && clayUserMapping[c.authorUid] && (!c.authorAvatar || !c.authorAvatar.includes("backgroundColor="))) {
+              c.authorAvatar = clayUserMapping[c.authorUid];
+              updated = true;
+            } else if (c.authorAvatar && !c.authorAvatar.includes("backgroundColor=")) {
+              c.authorAvatar = c.authorAvatar + `&backgroundColor=fed7aa`;
+              updated = true;
+            }
+          });
+        }
         if (updated) {
           localStorage.setItem("deped_saas_db", JSON.stringify(parsed));
         }
@@ -397,6 +445,18 @@ function saveLocalDB(data) {
 let activeUser = null;
 try {
   activeUser = JSON.parse(sessionStorage.getItem('activeUser')) || null;
+  if (activeUser && (!activeUser.avatar || !activeUser.avatar.includes("backgroundColor="))) {
+    const clayUserMapping = {
+      "admin1": "https://api.dicebear.com/7.x/micah/svg?seed=MariaSantos&backgroundColor=bbf7d0&hair=dougFunny",
+      "teacher1": "https://api.dicebear.com/7.x/micah/svg?seed=TeacherJose&backgroundColor=bfdbfe&hair=mrT",
+      "parent1": "https://api.dicebear.com/7.x/micah/svg?seed=MrsCruz&backgroundColor=fed7aa&hair=full",
+      "learner1": "https://api.dicebear.com/7.x/micah/svg?seed=JuanCruz&backgroundColor=bbf7d0&hair=fonze"
+    };
+    if (clayUserMapping[activeUser.uid]) {
+      activeUser.avatar = clayUserMapping[activeUser.uid];
+      try { sessionStorage.setItem('activeUser', JSON.stringify(activeUser)); } catch(e) {}
+    }
+  }
 } catch(e) {
   console.error("Session storage blocked or unavailable", e);
 }
@@ -756,12 +816,17 @@ const dbService = {
       isGroup: false
     }));
     
-    // Add groups where user is a participant
+    // Add groups where user is a participant with clay-style bottts / icon avatars
+    const groupAvatarMap = {
+      "group_faculty": "https://api.dicebear.com/7.x/bottts/svg?seed=FacultyLounge&backgroundColor=bbf7d0",
+      "group_grade10_advisory": "https://api.dicebear.com/7.x/bottts/svg?seed=Grade10Advisory&backgroundColor=fed7aa",
+      "group_stem_robotics": "https://api.dicebear.com/7.x/bottts/svg?seed=CyberBot&backgroundColor=bfdbfe"
+    };
     const groups = (local.groups || []).filter(g => g.participants.includes(uid)).map(g => ({
       uid: g.id,
       name: g.name,
       role: g.category === 'channel' ? 'School Channel' : 'Group Chat',
-      avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent(g.name) + '&backgroundColor=0ea5e9',
+      avatar: groupAvatarMap[g.id] || ('https://api.dicebear.com/7.x/bottts/svg?seed=' + encodeURIComponent(g.name) + '&backgroundColor=bfdbfe'),
       isGroup: true,
       category: g.category || 'channel',
       participants: g.participants

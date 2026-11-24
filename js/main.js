@@ -186,7 +186,7 @@ async function updateMessengerDropdownList() {
       const isYou = t.lastMsg.senderId === activeUser.uid ? 'You: ' : '';
       return `
         <div class="notif-item" style="cursor:pointer; display:flex; align-items:center;" onclick="closeHeaderDropdowns(); window.location.href='messenger.html?uid=${encodeURIComponent(t.uid)}'">
-          <img src="${sanitizeUrlSafe(t.avatar, { allowDataImage: true, allowHash: false })}" style="width:40px; height:40px; border-radius:50%; margin-right:0.75rem;">
+          <img class="clay-avatar" src="${sanitizeUrlSafe(t.avatar, { allowDataImage: true, allowHash: false })}" style="width:40px; height:40px; margin-right:0.75rem;">
           <div class="notif-text">
             <strong>${escapeHTMLSafe(t.name)}</strong><br>
             <span style="font-size:0.8rem; color:var(--text-secondary);">${escapeHTMLSafe(isYou)}${escapeHTMLSafe(t.lastMsg.text ? t.lastMsg.text.substring(0,25) + '...' : 'Sent an attachment')}</span>
@@ -300,7 +300,7 @@ async function initFloatingChatHeads() {
     const tJson = encodeURIComponent(JSON.stringify(t)).replace(/'/g, "%27");
     return `
       <div class="chat-head-bubble" style="position:relative;" title="${escapeAttrSafe(t.name)}">
-        <img src="${sanitizeUrlSafe(t.avatar, { allowDataImage: true, allowHash: false })}" alt="${escapeAttrSafe(t.name)}" onclick="openFloatingChat('${tJson}')">
+        <img class="clay-avatar" src="${sanitizeUrlSafe(t.avatar, { allowDataImage: true, allowHash: false })}" alt="${escapeAttrSafe(t.name)}" onclick="openFloatingChat('${tJson}')">
         <button class="chat-head-dismiss-btn" onclick="dismissChatHead('${escapeAttrSafe(t.uid)}', event)" style="position:absolute; top:-2px; right:-2px; background:var(--danger); color:white; border:none; border-radius:50%; width:16px; height:16px; display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:10; font-size:0.7rem; box-shadow:0 1px 3px rgba(0,0,0,0.3);">
           <ion-icon name="close"></ion-icon>
         </button>
@@ -355,7 +355,7 @@ function renderDrawerContacts(filterText = '') {
     
     return `
       <div class="drawer-contact-card" onclick="selectDrawerContact('${uJson}')" style="display:flex; align-items:center; gap:0.75rem; padding:0.6rem 0.75rem; border-radius:var(--radius-md); cursor:pointer; transition:background 0.15s; border:1px solid transparent;" onmouseover="this.style.background='var(--bg-primary)'; this.style.borderColor='var(--border-color)';" onmouseout="this.style.background='transparent'; this.style.borderColor='transparent';">
-        <img src="${sanitizeUrlSafe(u.avatar, { allowDataImage: true, allowHash: false })}" alt="${escapeAttrSafe(u.name)}" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--border-color);">
+        <img class="clay-avatar" src="${sanitizeUrlSafe(u.avatar, { allowDataImage: true, allowHash: false })}" alt="${escapeAttrSafe(u.name)}" style="width:40px; height:40px;">
         <div style="flex:1; min-width:0;">
           <div style="display:flex; align-items:center; gap:0.4rem; justify-content:space-between;">
             <span style="font-weight:600; font-size:0.9rem; color:var(--text-primary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHTMLSafe(u.name)}</span>
@@ -578,7 +578,7 @@ async function openFloatingChat(encodedUser) {
     } else {
       html += `
         <div class="chat-msg-row received">
-          <img class="chat-msg-avatar" src="${sanitizeUrlSafe(targetUser.avatar, { allowDataImage: true, allowHash: false })}" alt="Avatar">
+          <img class="chat-msg-avatar clay-avatar" src="${sanitizeUrlSafe(targetUser.avatar, { allowDataImage: true, allowHash: false })}" alt="Avatar">
           <div style="max-width:80%; text-align:left; flex-shrink:0;">
             <div class="chat-msg-bubble-wrap">
               ${toolbarHtml}
@@ -986,7 +986,7 @@ window.startChatCall = function(type = 'audio') {
   const status = document.getElementById('call-modal-status');
   if (!modal) return;
   
-  if (avatar) avatar.src = currentTarget.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=anon';
+  if (avatar) avatar.src = currentTarget.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=anon&backgroundColor=bfdbfe';
   if (name) name.innerText = currentTarget.name || 'School Contact';
   if (status) status.innerText = `Calling (${type === 'video' ? 'Video' : 'Voice'})...`;
   
@@ -1253,7 +1253,7 @@ window.renderPublicProfile = async function(uid) {
     document.getElementById('public-name').innerHTML = `
       ${safeEscape(targetUser.name)} <span class="role-badge">${safeEscape(targetUser.role)}</span>
     `;
-    document.getElementById('public-avatar').src = safeSanitize(targetUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder', { allowDataImage: true, allowHash: false });
+    document.getElementById('public-avatar').src = safeSanitize(targetUser.avatar || 'https://api.dicebear.com/7.x/micah/svg?seed=placeholder&backgroundColor=bbf7d0', { allowDataImage: true, allowHash: false });
     
     const coverEl = document.getElementById('public-cover-photo');
     if (targetUser.coverPhoto) {
